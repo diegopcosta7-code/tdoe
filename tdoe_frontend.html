@@ -1335,7 +1335,12 @@ async function carregarChaves(){
     renderChaves(data);
     atualizarChaveAtivaBadge(data);
     carregarSussurroChips();
-  }catch(e){toast(e.message,'err');}
+  }catch(e){
+    // modo demo: inicializa chaves disponíveis sem backend
+    if(!state.chavesDemo) state.chavesDemo={};
+    renderChavesDemo();
+    atualizarChaveAtivaBadge({});
+  }
 }
 
 function atualizarChaveAtivaBadge(chaves){
@@ -1414,7 +1419,54 @@ async function ativarChave(chave){
     await api('POST','/chaves/'+state.equipeId+'/ativar',{chave});
     toast(nomeChave(chave)+' ativada!','ok');
     await carregarChaves();
-  }catch(e){toast(e.message,'err');}
+  }catch(e){
+    // fallback demo
+    if(!state.chavesDemo) state.chavesDemo={};
+    Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
+    state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
+    toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
+    renderChavesDemo();
+  }
+}
+
+function renderChavesDemo(){
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const chavesData=state.chavesDemo||{};
+  const grid=document.getElementById('jog-chaves-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+  chaves.forEach(c=>{
+    const cd=chavesData[c]||{status:'disponivel',fases:{}};
+    const cor=corChave(c); const nm=nomeChaveLocale(c);
+    const icn={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'}[c];
+    const ativa=cd.status==='ativa';
+    const div=document.createElement('div');
+    div.className='chave-card';
+    div.style=`background:${ativa?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.07)`:'rgba(255,255,255,.02)'};border:${ativa?'2px':'1px dashed'} ${ativa?`var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bd)`:'rgba(255,255,255,.12)'};`;
+    const faseNomes={problema:['Contexto','Características','Motivação'],solucao:['Características','Custos','Riscos'],parcerias:['Recursos','Características','Tempo'],oportunidades:['Características','Diferenciação','Aplicabilidade']};
+    const fasesHtml=faseNomes[c].map((fn,i)=>{
+      const fst=(cd.fases&&cd.fases[i+1])||{status:ativa&&i===0?'disponivel':'bloqueada'};
+      const bloq=fst.status==='bloqueada'||!ativa;
+      return `<div class="cc-fase${bloq?' locked':''}" style="${!bloq?`border-color:var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bd);`:''}">
+        <div class="cc-fnum" style="background:${!bloq?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.15)`:'rgba(255,255,255,.06)'};color:${!bloq?cor:'var(--t3)'};">${i+1}</div>
+        <div class="cc-fnm" style="${!bloq?'color:var(--t1);':''}">${fn}</div>
+        <div class="cc-ftxt">${bloq?'🔒':'clique'}</div>
+      </div>`;
+    }).join('');
+    div.innerHTML=`
+      ${ativa?`<div style="position:absolute;top:0;left:0;right:0;height:2px;background:${cor};box-shadow:0 0 8px ${cor};border-radius:2px 2px 0 0;"></div>`:''}
+      <div class="cc-head">
+        <div class="cc-icon" style="background:var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bg);">${icn}</div>
+        <div class="cc-name" style="color:${ativa?cor:'rgba(255,255,255,.4)'};">${nm}</div>
+        ${helpChaveHtml(c)}
+        ${ativa?`<div class="cc-badge" style="background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd);margin-left:auto;">⏱ Ativa</div>`:''}
+      </div>
+      <div class="cc-fases">${fasesHtml}</div>
+      <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:0%;background:${cor};"></div></div>
+      ${!ativa?`<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`:''}
+    `;
+    grid.appendChild(div);
+  });
 }
 
 // Estado para modal de fase

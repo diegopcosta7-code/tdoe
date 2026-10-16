@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TdoE — Tabuleiro do Empreendedor</title>
+<style>
+/* ═══════════════════════════════════════
+   RESET + VARIÁVEIS
+═══════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --prob:#22C97A; --prob-dk:#1A9055; --prob-bg:rgba(34,201,122,.1); --prob-bd:rgba(34,201,122,.3);
+  --sol:#0FD4B0;  --sol-dk:#0A8C7A;  --sol-bg:rgba(15,212,176,.1);  --sol-bd:rgba(15,212,176,.3);
+  --parc:#2E80F0; --parc-dk:#1A4E9E; --parc-bg:rgba(46,128,240,.1); --parc-bd:rgba(46,128,240,.3);
+  --opor:#A040E0; --opor-dk:#6A28A0; --opor-bg:rgba(160,64,224,.1); --opor-bd:rgba(160,64,224,.3);
+  --gold:#F0BC40; --gold-bg:rgba(240,188,64,.1); --gold-bd:rgba(240,188,64,.3);
+  --bg:#0A0A10; --bg2:#0F0F18; --bg3:#141420;
+  --card:#181826; --card2:#1E1E2E;
+  --border:rgba(255,255,255,.08); --border2:rgba(255,255,255,.13);
+  --t1:rgba(255,255,255,.92); --t2:rgba(255,255,255,.6); --t3:rgba(255,255,255,.35);
+  --white:#FFFFFF;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;}
+
+/* ═══════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════ */
+.hidden{display:none!important;}
+.flex{display:flex;} .col{flex-direction:column;} .center{align-items:center;justify-content:center;}
+.gap8{gap:8px;} .gap12{gap:12px;} .gap16{gap:16px;}
+.w100{width:100%;}
+.bold{font-weight:700;} .small{font-size:11px;} .tiny{font-size:9px;}
+.muted{color:var(--t3);}
+.grad{background:linear-gradient(125deg,var(--prob),var(--sol),var(--parc),var(--opor));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ESTRELA */
+.star-svg{display:inline-block;}
+
+/* ANIMAÇÕES */
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(240,188,64,.7)}70%{box-shadow:0 0 0 8px rgba(240,188,64,0)}100%{box-shadow:0 0 0 0 rgba(240,188,64,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 10px rgba(240,188,64,.2)}50%{box-shadow:0 0 20px rgba(240,188,64,.4)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.anim-in{animation:fadein .3s ease;}
+.anim-ping{animation:ping 1.4s ease-out infinite;}
+.anim-blink{animation:blink 1.2s ease-in-out infinite;}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast-item{padding:12px 18px;border-radius:11px;font-size:13px;font-weight:600;animation:fadein .25s ease;border:1.5px solid;}
+.toast-ok{background:rgba(34,201,122,.15);border-color:rgba(34,201,122,.4);color:var(--prob);}
+.toast-err{background:rgba(255,80,80,.15);border-color:rgba(255,80,80,.4);color:#ff6b6b;}
+.toast-info{background:rgba(46,128,240,.15);border-color:rgba(46,128,240,.4);color:var(--parc);}
+
+/* LOADER */
+.loader{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--parc);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+
+/* FAIXA 4 CORES */
+.quad-bar{height:3px;background:linear-gradient(90deg,var(--prob),var(--sol),var(--parc),var(--opor));box-shadow:0 0 10px rgba(46,128,240,.3);}
+
+/* BOTÕES */
+.btn{padding:12px 22px;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;box-shadow:0 4px 20px rgba(46,128,240,.35);}
+.btn-primary:hover{box-shadow:0 4px 28px rgba(46,128,240,.5);}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--t2);border:1.5px solid var(--border);}
+.btn-ghost:hover{background:rgba(255,255,255,.1);}
+.btn-gold{background:rgba(240,188,64,.1);color:var(--gold);border:1.5px solid var(--gold-bd);animation:glow-pulse 2.8s ease-in-out infinite;}
+.btn-danger{background:rgba(255,80,80,.1);color:#ff6b6b;border:1.5px solid rgba(255,80,80,.3);}
+.btn-sm{padding:7px 14px;font-size:11px;border-radius:8px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* INPUTS */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.field label{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.04em;}
+.field input,.field select,.field textarea{
+  background:rgba(255,255,255,.05);border:1.5px solid var(--border2);
+  border-radius:10px;padding:11px 14px;font-size:13px;
+  color:var(--t1);font-family:inherit;width:100%;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--parc-bd);box-shadow:0 0 0 3px var(--parc-bg);
+}
+.field select option{background:#181826;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:14px;border:.5px solid var(--border);}
+.card-pad{padding:18px 20px;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--bg2);border-radius:18px;border:.5px solid var(--border2);padding:28px;width:100%;max-width:480px;animation:fadein .25s ease;}
+.modal h3{font-size:18px;font-weight:800;margin-bottom:6px;}
+.modal p{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.6;}
+
+/* ═══════════════════════════════════════
+   TELA 1 — LOGIN / CADASTRO
+═══════════════════════════════════════ */
+#tela-login{
+  min-height:100vh;display:grid;
+  grid-template-columns:1.15fr .85fr;
+}
+
+.login-hero{
+  background:var(--bg);padding:56px 58px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow-y:auto;overflow-x:hidden;border-right:.5px solid var(--border);
+}
+
+/* ACORDEÕES DE CONCEITO NA HERO */
+.hero-conceitos{margin-top:28px;display:flex;flex-direction:column;gap:6px;}
+.hc-card{border-radius:10px;border:1px solid;overflow:hidden;transition:border-color .2s;}
+.hc-head{display:flex;align-items:center;gap:9px;padding:10px 13px;cursor:pointer;user-select:none;}
+.hc-icn{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.hc-nm{font-size:12px;font-weight:800;flex:1;}
+.hc-chev{font-size:11px;color:rgba(255,255,255,.3);transition:transform .2s;}
+.hc-card.open .hc-chev{transform:rotate(90deg);}
+.hc-body{display:none;padding:0 13px 12px;font-size:11px;color:var(--t2);line-height:1.7;}
+.hc-card.open .hc-body{display:block;}
+.glow-prob{position:absolute;bottom:-80px;left:-80px;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(34,201,122,.25) 0%,transparent 65%);pointer-events:none;}
+.glow-parc{position:absolute;top:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(46,128,240,.2) 0%,transparent 65%);pointer-events:none;}
+.glow-opor{position:absolute;bottom:-60px;right:10%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(160,64,224,.18) 0%,transparent 65%);pointer-events:none;}
+.hero-star{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.08;pointer-events:none;}
+
+.login-hero-content{position:relative;z-index:2;}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:52px;}
+.logo-gem{width:48px;height:48px;border-radius:13px;background:var(--gold-bg);border:1.5px solid var(--gold-bd);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(240,188,64,.2);}
+.logo-nm{font-size:15px;font-weight:700;line-height:1.2;}
+.logo-sb{font-size:11px;color:var(--t3);}
+.hero-hl{font-size:52px;font-weight:800;line-height:1.0;letter-spacing:-.8px;}
+.hero-jogo{display:block;font-size:86px;font-weight:900;letter-spacing:-4px;line-height:.86;filter:drop-shadow(0 0 30px rgba(46,128,240,.3));}
+.hero-tag{font-size:14px;color:var(--t2);line-height:1.75;margin-top:14px;max-width:380px;}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px;}
+.hero-foot{font-size:10px;color:rgba(255,255,255,.2);}
+.hero-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--prob),var(--sol),var(--parc),var(--opor));}
+
+.login-panel{background:var(--bg2);padding:56px 50px;display:flex;flex-direction:column;justify-content:center;position:relative;}
+.login-panel::before{content:'';position:absolute;left:0;top:10%;bottom:10%;width:2px;background:linear-gradient(to bottom,var(--prob),var(--sol),var(--parc),var(--opor));}
+
+.login-tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);border-radius:11px;padding:4px;margin-bottom:28px;}
+.login-tab{flex:1;padding:9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;color:var(--t3);transition:all .15s;}
+.login-tab.on{background:rgba(46,128,240,.2);color:var(--parc);}
+.login-title{font-size:26px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px;}
+.login-sub{font-size:13px;color:var(--t3);margin-bottom:24px;}
+
+.or-div{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--border2);margin:16px 0;}
+.or-div::before,.or-div::after{content:'';flex:1;height:.5px;background:var(--border);}
+
+.code-blk{display:flex;align-items:center;gap:14px;padding:16px;border-radius:13px;background:var(--gold-bg);border:1.5px solid var(--gold-bd);cursor:pointer;box-shadow:0 0 16px rgba(240,188,64,.08);}
+.code-gem{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--gold-bd);display:flex;align-items:center;justify-content:center;background:rgba(240,188,64,.08);flex-shrink:0;}
+
+/* ═══════════════════════════════════════
+   TELA 2 — PAINEL DO EDUCADOR
+═══════════════════════════════════════ */
+#tela-educador{min-height:100vh;display:flex;flex-direction:column;}
+
+.topbar{
+  background:#0D0D18;border-bottom:.5px solid #1A1A2A;
+  padding:0 20px;height:52px;
+  display:flex;align-items:center;gap:12px;
+  position:relative;flex-shrink:0;
+}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--prob),var(--sol),var(--parc),var(--opor));opacity:.7;}
+.tb-logo{display:flex;align-items:center;gap:8px;}
+.tb-gem{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--gold-bd);display:flex;align-items:center;justify-content:center;background:var(--gold-bg);}
+.tb-sep{width:.5px;height:20px;background:var(--border);margin:0 4px;}
+.tb-sub{font-size:11px;color:var(--t3);}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+.edu-layout{display:grid;grid-template-columns:200px 1fr 270px;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{background:#0D0D18;border-right:.5px solid #1A1A2A;display:flex;flex-direction:column;overflow-y:auto;}
+.sidebar-sec{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);padding:12px 14px 6px;}
+.eq-item{padding:10px 14px;display:flex;align-items:center;gap:9px;cursor:pointer;position:relative;border-left:2px solid transparent;}
+.eq-item.on{background:var(--parc-bg);border-left-color:var(--parc);}
+.eq-av{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.eq-nm{font-size:11px;font-weight:600;}
+.eq-st{font-size:9px;color:var(--t3);margin-top:1px;}
+.eq-dots{display:flex;gap:3px;margin-left:auto;}
+.eq-dot{width:6px;height:6px;border-radius:50%;}
+.sidebar-divider{height:.5px;background:var(--border);margin:8px 14px;}
+.sidebar-action{padding:9px 14px;display:flex;align-items:center;gap:9px;cursor:pointer;font-size:11px;color:var(--t2);}
+.sidebar-action:hover{background:rgba(255,255,255,.04);}
+
+/* CENTRAL */
+.edu-main{padding:16px 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.metric-card{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:14px 16px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.m-val{font-size:28px;font-weight:900;letter-spacing:-.5px;line-height:1;}
+.m-lbl{font-size:10px;color:var(--t3);margin-top:4px;}
+
+.prog-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.prog-card{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:12px 14px;}
+.pc-head{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.pc-icon{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.pc-name{font-size:11px;font-weight:700;}
+.pc-ct{font-size:10px;color:var(--t3);margin-left:auto;}
+.pc-bar{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.pc-fill{height:4px;border-radius:2px;transition:width .5s ease;}
+
+.equipes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.eq-card{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:12px;}
+.eq-card.alert-parada{border-color:var(--gold-bd);box-shadow:0 0 14px rgba(240,188,64,.1);}
+.eq-card.alert-avancada{border-color:var(--parc-bd);box-shadow:0 0 14px rgba(46,128,240,.1);}
+.eq-card-head{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.eq-card-av{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;}
+.eq-card-nm{font-size:11px;font-weight:700;}
+.eq-card-st{font-size:9px;color:var(--t3);margin-top:1px;}
+.eq-prog-bar{height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin:6px 0;}
+.eq-prog-fill{height:3px;border-radius:2px;}
+.eq-card-dots{display:flex;gap:4px;margin-bottom:4px;}
+.eq-card-dot{width:7px;height:7px;border-radius:50%;}
+
+/* DIREITA — alertas + desafio */
+.edu-right{background:#0D0D18;border-left:.5px solid #1A1A2A;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.panel-title{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.alert-card{border-radius:10px;padding:11px 12px;display:flex;gap:9px;}
+.alert-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.alert-nm{font-size:11px;font-weight:700;margin-bottom:2px;}
+.alert-txt{font-size:10px;color:var(--t3);line-height:1.45;}
+.alert-sug{font-size:9px;margin-top:3px;font-style:italic;color:var(--t3);}
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.ctrl-btn{padding:9px 10px;border-radius:9px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:transparent;font-family:inherit;text-align:center;color:var(--t2);}
+.ctrl-btn:hover{background:rgba(255,255,255,.05);}
+
+/* ═══════════════════════════════════════
+   TELA 3 — TABULEIRO DOS JOGADORES
+═══════════════════════════════════════ */
+#tela-jogadores{min-height:100vh;display:flex;flex-direction:column;}
+
+.jog-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px;flex:1;}
+.cenario-card{background:var(--card);border-radius:13px;border:.5px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.cen-icon{width:36px;height:36px;border-radius:10px;background:var(--parc-bg);border:1.5px solid var(--parc-bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+
+.chaves-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.chave-card{border-radius:13px;border:1.5px solid;padding:13px;position:relative;overflow:hidden;transition:all .2s;}
+.chave-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.cc-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.cc-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.cc-name{font-size:13px;font-weight:800;letter-spacing:-.2px;}
+.cc-badge{margin-left:auto;padding:3px 9px;border-radius:10px;font-size:9px;font-weight:700;border:1px solid;}
+.cc-fases{display:flex;flex-direction:column;gap:5px;}
+.cc-fase{padding:7px 10px;border-radius:8px;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.06);cursor:pointer;}
+.cc-fase.active{border-width:1.5px;}
+.cc-fase.locked{opacity:.35;cursor:not-allowed;}
+.cc-fase.done{background:rgba(255,255,255,.06);}
+.cc-fnum{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.cc-fnm{font-size:10px;font-weight:600;color:var(--t2);}
+.cc-ftxt{font-size:9px;color:var(--t3);margin-left:auto;}
+.cc-prog-bar{height:3px;border-radius:2px;margin-top:8px;background:rgba(255,255,255,.07);overflow:hidden;}
+.cc-prog-fill{height:3px;border-radius:2px;}
+
+/* SELETOR DE IDIOMA */
+.lang-sel{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:9px;padding:3px;}
+.lang-btn{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--t3);font-family:inherit;transition:all .15s;}
+.lang-btn.on{background:var(--parc-bg);color:var(--parc);}
+.lang-btn:hover:not(.on){background:rgba(255,255,255,.08);color:var(--t2);}
+
+/* CONCEITOS DAS CHAVES */
+.conceitos-sec{display:flex;flex-direction:column;gap:6px;}
+.conceito-card{border-radius:11px;border:1.5px solid;overflow:hidden;cursor:pointer;transition:all .2s;}
+.conceito-head{display:flex;align-items:center;gap:8px;padding:10px 12px;}
+.conceito-icn{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.conceito-nm{font-size:12px;font-weight:800;flex:1;}
+.conceito-chev{font-size:10px;color:var(--t3);transition:transform .2s;}
+.conceito-card.open .conceito-chev{transform:rotate(90deg);}
+.conceito-body{display:none;padding:0 12px 12px;font-size:11px;color:var(--t2);line-height:1.65;}
+.conceito-card.open .conceito-body{display:block;}
+
+/* TOOLTIP CHAVE */
+.key-help{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;font-size:9px;font-weight:900;cursor:pointer;flex-shrink:0;opacity:.7;transition:opacity .15s;position:relative;background:transparent;line-height:1;vertical-align:middle;}
+.key-help:hover,.key-help:focus{opacity:1;outline:none;}
+.key-tooltip{position:absolute;z-index:9999;top:calc(100% + 6px);left:50%;transform:translateX(-50%);min-width:220px;max-width:260px;background:#1a1f2e;border:1px solid rgba(255,255,255,.15);border-radius:11px;padding:11px 13px;box-shadow:0 8px 32px rgba(0,0,0,.55);pointer-events:none;opacity:0;transition:opacity .15s;}
+.key-help:hover .key-tooltip,.key-help:focus .key-tooltip,.key-tooltip.vis{opacity:1;pointer-events:auto;}
+.kt-title{font-size:10px;font-weight:800;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em;}
+.kt-fase{margin-bottom:5px;}
+.kt-fase-nm{font-size:9px;font-weight:700;color:var(--t2);}
+.kt-fase-desc{font-size:9px;color:var(--t3);margin-top:1px;line-height:1.4;}
+
+/* COMUNICAÇÃO */
+.comm-panel{display:flex;flex-direction:column;gap:12px;}
+.comm-tabs{display:flex;border-bottom:.5px solid var(--border);}
+.comm-tab{flex:1;padding:11px 0;font-size:10px;font-weight:700;text-align:center;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;letter-spacing:.05em;}
+.comm-tab.on{color:var(--parc);border-bottom-color:var(--parc);}
+.comm-content{display:none;flex-direction:column;gap:10px;padding:12px 0;}
+.comm-content.on{display:flex;}
+
+.membros-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.mchip{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;font-size:11px;color:var(--t2);}
+.mchip.sel{background:var(--parc-bg);border-color:var(--parc-bd);color:var(--parc);}
+.mchip-av{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;}
+
+.baloes-lista{display:flex;flex-direction:column;gap:7px;max-height:180px;overflow-y:auto;}
+.balao{border-radius:10px;padding:9px 12px;}
+.balao-proprio{background:var(--parc-bg);border:.5px solid var(--parc-bd);align-self:flex-end;max-width:90%;}
+.balao-outro{background:rgba(255,255,255,.05);border:.5px solid var(--border);align-self:flex-start;max-width:90%;}
+.balao-nm{font-size:9px;font-weight:700;margin-bottom:3px;}
+.balao-txt{font-size:11px;line-height:1.5;}
+.balao-hora{font-size:8px;color:var(--t3);margin-top:3px;text-align:right;}
+
+.chat-body{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;padding:4px 0;}
+.chat-msg{display:flex;gap:8px;}
+.chat-av{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.chat-bubble{background:rgba(255,255,255,.05);border-radius:9px;padding:7px 11px;flex:1;}
+.chat-nm{font-size:9px;font-weight:700;margin-bottom:2px;}
+.chat-txt{font-size:11px;color:var(--t2);line-height:1.5;}
+.chat-hora{font-size:8px;color:var(--t3);margin-top:2px;}
+.chat-cutucar .chat-bubble{background:var(--gold-bg);border:.5px solid var(--gold-bd);}
+.chat-sussurro .chat-bubble{background:var(--parc-bg);border:.5px solid var(--parc-bd);}
+.chat-sistema .chat-bubble{background:var(--prob-bg);border:.5px solid var(--prob-bd);}
+
+.membros-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.membro-card{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:11px 10px;text-align:center;position:relative;}
+.membro-card.parado{border-color:var(--gold-bd);box-shadow:0 0 12px rgba(240,188,64,.1);}
+.membro-card.ativo{border-color:var(--prob-bd);}
+.membro-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;margin:0 auto 6px;}
+.membro-nm{font-size:11px;font-weight:700;}
+.membro-st{font-size:9px;color:var(--t3);margin-top:2px;}
+.cutucar-btn{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:6px;background:var(--gold-bg);border:1px solid var(--gold-bd);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;}
+.cutucar-btn:hover{background:rgba(240,188,64,.25);}
+.notif-cutucar{position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:var(--gold);color:#0A0A10;font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;}
+
+/* ═══════════════════════════════════════
+   TELA 4 — SOCIALIZAÇÃO / PITCH
+═══════════════════════════════════════ */
+#tela-socializacao{min-height:100vh;display:flex;flex-direction:column;}
+.soc-body{padding:18px;display:flex;flex-direction:column;gap:14px;flex:1;}
+.pitch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.pitch-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;}
+.pitch-card-top{display:flex;align-items:center;gap:8px;}
+.pc-eq-av{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
+.pc-eq-nm{font-size:12px;font-weight:700;}
+.pc-ctx{font-size:9px;color:var(--t3);margin-top:1px;}
+.pc-prob{background:rgba(255,255,255,.04);border-radius:9px;padding:9px 10px;border:.5px solid rgba(255,255,255,.07);}
+.pc-prob-lbl{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.pc-prob-txt{font-size:11px;color:var(--t2);line-height:1.5;}
+.pc-chaves{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.pc-chave{border-radius:7px;padding:6px 8px;display:flex;align-items:center;gap:5px;border:1px solid;}
+.pc-prop{border-radius:9px;padding:9px 10px;}
+.pc-prop-lbl{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--t3);}
+.pc-prop-txt{font-size:11px;line-height:1.5;font-weight:500;}
+.pc-prog-bar{display:flex;gap:3px;}
+.pc-prog-seg{flex:1;height:3px;border-radius:2px;}
+.soc-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.sum-card{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:13px 15px;display:flex;align-items:center;gap:11px;}
+.sum-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.sum-val{font-size:22px;font-weight:900;letter-spacing:-.3px;}
+.sum-lbl{font-size:10px;color:var(--t3);margin-top:2px;}
+
+/* ═══════════════════════════════════════
+   MODAL FASE
+═══════════════════════════════════════ */
+#modal-fase .modal{max-width:560px;}
+#modal-fase textarea{height:100px;resize:vertical;}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     TOAST
+════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ════════════════════════════════════
+     TELA 1 — LOGIN
+════════════════════════════════════ -->
+<div id="tela-login">
+  <div class="login-hero">
+    <div class="glow-prob"></div>
+    <div class="glow-parc"></div>
+    <div class="glow-opor"></div>
+    <div class="hero-star">
+      <svg width="540" height="540" viewBox="0 0 100 100" opacity=".12">
+        <path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/>
+        <circle cx="50" cy="50" r="4" fill="#F0BC40"/>
+      </svg>
+    </div>
+    <div class="login-hero-content anim-in">
+      <div class="logo-row">
+        <div class="logo-gem">
+          <svg width="26" height="26" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg>
+        </div>
+        <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE · UFLA</div></div>
+      </div>
+      <div>
+        <div class="hero-hl">Sua ideia</div>
+        <div class="hero-jogo grad">em JOGO</div>
+        <div class="hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
+        <div class="hero-chips">
+          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">🔍 Problema</div>
+          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);">✓ Solução</div>
+          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);">🤝 Parcerias</div>
+          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);">💡 Oportunidades</div>
+        </div>
+        <!-- CONCEITOS DAS CHAVES — HERO -->
+        <div class="hero-conceitos">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:4px;">Conheça as chaves</div>
+
+          <!-- PROBLEMA -->
+          <div class="hc-card" style="background:var(--prob-bg);border-color:var(--prob-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(34,201,122,.15);">🔍</div>
+              <div class="hc-nm" style="color:var(--prob);">Problema</div>
+              <span class="hc-chev" style="color:var(--prob);">›</span>
+            </div>
+            <div class="hc-body">
+              A chave Problema representa o início da dinâmica, uma vez que sua identificação é resultado da interação dos jogadores que, ao compartilhar suas experiências, refletem sobre o contexto investigado (Landry, 1995; Bianchi; Verganti, 2021), delimitando-o e caracterizando-o a partir de vivências estabelecidas com o meio. Nesse processo, a motivação para solucionar o problema torna-se um aspecto compartilhado entre a equipe (Hevner et al., 2004; Bianchi; Verganti, 2021).
+              <br><br>
+              O problema pode ser compreendido a partir de sua identificação no contexto, sendo: ocorrência negativa, avaliação de uma intervenção, utilização de recursos sem planejamento e situações de incerteza (Landry, 1995). Bianchi e Verganti (2021) destacam que a identificação de problemas envolve componentes que não se limitam a processos analíticos, mas na construção interpretativa dos participantes, decorrente de transformações sociais, culturais e tecnológicas.
+            </div>
+          </div>
+
+          <!-- SOLUÇÃO -->
+          <div class="hc-card" style="background:var(--sol-bg);border-color:var(--sol-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(15,212,176,.15);">✓</div>
+              <div class="hc-nm" style="color:var(--sol);">Solução</div>
+              <span class="hc-chev" style="color:var(--sol);">›</span>
+            </div>
+            <div class="hc-body">
+              A chave Solução corresponde à trilha de investigação em que os participantes constroem uma solução aplicável ao contexto, estabelecendo respostas ou alternativas para o problema identificado. Nessa etapa, os participantes exercitam a criatividade e a tomada de decisão diante de proposições viáveis e geradoras de valor (Kujala et al., 2010; Zimmer; Salonen; Wangenheim, 2020; Vogel et al., 2025).
+              <br><br>
+              Diante disso, o comportamento dos jogadores influencia nas possibilidades de criação de novos negócios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).
+            </div>
+          </div>
+
+          <!-- PARCERIAS -->
+          <div class="hc-card" style="background:var(--parc-bg);border-color:var(--parc-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(46,128,240,.15);">🤝</div>
+              <div class="hc-nm" style="color:var(--parc);">Parcerias</div>
+              <span class="hc-chev" style="color:var(--parc);">›</span>
+            </div>
+            <div class="hc-body">
+              Estimula os participantes a analisar o contexto e definir alianças estratégicas para a implementação da proposta empreendedora. Para isso, a combinação dos conhecimentos de diferentes atores, que se organizam em torno de um objetivo comum (Crowley; Karim, 1995; Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021), contribui para o desenvolvimento de projetos, com definição de prazos, responsabilidades (Reed; Reed, 2009), recursos e condições de atuação (Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021).
+            </div>
+          </div>
+
+          <!-- OPORTUNIDADES -->
+          <div class="hc-card" style="background:var(--opor-bg);border-color:var(--opor-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(160,64,224,.15);">💡</div>
+              <div class="hc-nm" style="color:var(--opor);">Oportunidades</div>
+              <span class="hc-chev" style="color:var(--opor);">›</span>
+            </div>
+            <div class="hc-body">
+              A chave Oportunidades representa uma possibilidade identificada pelos participantes por meio da contextualização do problema e de soluções construídas durante a investigação. Dessa forma, a oportunidade torna-se um processo de criação de valor (George et al., 2016), tanto pelo comportamento do empreendedor, na qual utiliza das competências empreendedoras, quanto pelas possíveis transformações no contexto investigado (Wood e Mickinley, 2020).
+              <br><br>
+              Nesse sentido, os autores apresentam a oportunidade como um guarda-chuva que permite compreender processos de criação de novos negócios (Wood; Mickinley, 2020) e o desenvolvimento de ideias (Matzembacher et al., 2019), a partir da descoberta, avaliação e exploração (Shane; Venkataraman, 2000; Wood; Mickinley, 2020).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-foot">© 2025 TdoE · Universidade Federal de Lavras</div>
+    <div class="hero-bar"></div>
+  </div>
+
+  <div class="login-panel">
+    <div class="login-tabs">
+      <div class="login-tab on" onclick="setLoginTab('login')">Entrar</div>
+      <div class="login-tab" onclick="setLoginTab('cadastro')">Criar conta</div>
+      <div class="login-tab" onclick="setLoginTab('codigo')">Código</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login" class="anim-in">
+      <div class="login-title">Bem-vindo de volta</div>
+      <div class="login-sub">Acesse sua conta de educador</div>
+      <div class="field"><label>E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label>Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-primary w100" onclick="fazerLogin()">Entrar →</button>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="form-cadastro" class="hidden anim-in">
+      <div class="login-title">Criar conta</div>
+      <div class="login-sub">Preencha para começar</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field"><label>Nome</label><input id="cad-nome" placeholder="Nome"/></div>
+        <div class="field"><label>Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
+      </div>
+      <div class="field"><label>E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field"><label>Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label>Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
+      </div>
+      <button class="btn btn-primary w100" onclick="fazerCadastro()">Criar conta →</button>
+    </div>
+
+    <!-- CÓDIGO JOGADOR -->
+    <div id="form-codigo" class="hidden anim-in">
+      <div class="login-title">Entrar com código</div>
+      <div class="login-sub">Para jogadores — sem cadastro</div>
+      <div class="field"><label>Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
+      <div class="field"><label>Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
+      <div class="field">
+        <label>Número da equipe</label>
+        <select id="jog-equipe">
+          <option value="1">Equipe 1</option><option value="2">Equipe 2</option>
+          <option value="3">Equipe 3</option><option value="4">Equipe 4</option><option value="5">Equipe 5</option>
+        </select>
+      </div>
+      <button class="btn btn-primary w100" onclick="entrarComCodigo()">Entrar no jogo →</button>
+      <div style="margin-top:12px;">
+        <div class="code-blk">
+          <div class="code-gem"><svg width="20" height="20" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
+          <div><div style="font-size:12px;font-weight:700;">Código fornecido pelo educador</div><div class="small muted" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     TELA 2 — EDUCADOR
+════════════════════════════════════ -->
+<div id="tela-educador" class="hidden">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-gem"><svg width="14" height="14" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
+      <span style="font-size:12px;font-weight:700;">TdoE</span>
+    </div>
+    <div class="tb-sep"></div>
+    <span class="tb-sub" id="tb-sessao-titulo">Painel do educador</span>
+    <div class="tb-right">
+      <div class="badge" id="tb-status" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">⬤ Aguardando</div>
+      <div class="lang-sel" id="lang-sel-edu">
+        <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
+        <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
+        <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="abrirModalNovasSessoes()">☕ Novas funções</button>
+      <button class="btn btn-sm" id="btn-acao-sessao" style="background:var(--parc-bg);color:var(--parc);border:1.5px solid var(--parc-bd);" onclick="acaoSessao()">▶ Iniciar sessão</button>
+      <button class="btn btn-sm" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="edu-layout">
+    <div class="sidebar">
+      <div class="sidebar-sec">Sessões</div>
+      <div id="lista-sessoes"></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-sec">Ações</div>
+      <div class="sidebar-action" onclick="abrirModalCriarSessao()">＋ Nova sessão</div>
+      <div class="sidebar-action" onclick="verificarAlertas()">🔔 Verificar alertas</div>
+      <div class="sidebar-action" onclick="irParaSocializacao()">↗ Socializar</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-sec">Exportar</div>
+      <div class="sidebar-action" onclick="gerarRelatorio()">📋 Relatório de interação</div>
+      <div class="sidebar-action" onclick="exportarPropostas()">📄 Exportar propostas</div>
+      <div class="sidebar-action" onclick="logout()">← Sair</div>
+    </div>
+    <div class="edu-main">
+      <div class="metrics" id="edu-metrics">
+        <div class="metric-card"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--prob);"></div><div class="m-val" style="color:var(--prob);" id="m-equipes">—</div><div class="m-lbl">Equipes ativas</div></div>
+        <div class="metric-card"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--sol);"></div><div class="m-val" id="m-participantes">—</div><div class="m-lbl">Participantes</div></div>
+        <div class="metric-card"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--parc);"></div><div class="m-val" style="color:var(--sol);" id="m-chaves">—</div><div class="m-lbl">Chaves concluídas</div></div>
+        <div class="metric-card"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--opor);"></div><div class="m-val" style="color:var(--gold);" id="m-codigo">—</div><div class="m-lbl">Código de acesso</div></div>
+      </div>
+      <div class="prog-row" id="edu-prog-chaves">
+        <div class="prog-card"><div class="pc-head"><div class="pc-icon" style="background:var(--prob-bg);">🔍</div><div class="pc-name" style="color:var(--prob);">Problema</div><div class="pc-ct" id="prog-prob">0/0</div></div><div class="pc-bar"><div class="pc-fill" id="fill-prob" style="width:0%;background:var(--prob);"></div></div></div>
+        <div class="prog-card"><div class="pc-head"><div class="pc-icon" style="background:var(--sol-bg);">✓</div><div class="pc-name" style="color:var(--sol);">Solução</div><div class="pc-ct" id="prog-sol">0/0</div></div><div class="pc-bar"><div class="pc-fill" id="fill-sol" style="width:0%;background:var(--sol);"></div></div></div>
+        <div class="prog-card"><div class="pc-head"><div class="pc-icon" style="background:var(--parc-bg);">🤝</div><div class="pc-name" style="color:var(--parc);">Parcerias</div><div class="pc-ct" id="prog-parc">0/0</div></div><div class="pc-bar"><div class="pc-fill" id="fill-parc" style="width:0%;background:var(--parc);"></div></div></div>
+        <div class="prog-card"><div class="pc-head"><div class="pc-icon" style="background:var(--opor-bg);">💡</div><div class="pc-name" style="color:var(--opor);">Oportunidades</div><div class="pc-ct" id="prog-opor">0/0</div></div><div class="pc-bar"><div class="pc-fill" id="fill-opor" style="width:0%;background:var(--opor);"></div></div></div>
+      </div>
+      <div class="equipes-grid" id="edu-equipes-grid"></div>
+    </div>
+    <div class="edu-right">
+      <div class="panel-title">Alertas de mediação</div>
+      <div id="edu-alertas"><div style="font-size:11px;color:var(--t3);">Nenhum alerta ativo</div></div>
+      <div class="sidebar-divider"></div>
+      <div class="panel-title">Controles da sessão</div>
+      <div class="ctrl-grid">
+        <div class="ctrl-btn" onclick="acaoSessao()" id="ctrl-iniciar">▶ Iniciar</div>
+        <div class="ctrl-btn" onclick="acaoSessaoEspecifica('pausar')">⏸ Pausar</div>
+        <div class="ctrl-btn" onclick="acaoSessaoEspecifica('retomar')">↺ Retomar</div>
+        <div class="ctrl-btn" onclick="verificarAlertas()">🔔 Alertas</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="panel-title">☕ Novas funções</div>
+      <div id="novas-funcoes-lista" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     TELA 3 — JOGADORES
+════════════════════════════════════ -->
+<div id="tela-jogadores" class="hidden">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-gem"><svg width="14" height="14" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
+      <span style="font-size:12px;font-weight:700;" id="jog-topbar-nm">Tabuleiro</span>
+    </div>
+    <div class="tb-sep"></div>
+    <span class="tb-sub" id="jog-topbar-sessao">—</span>
+    <div class="tb-right">
+      <div class="badge" id="jog-chave-ativa" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);">— sem chave ativa —</div>
+      <div class="lang-sel" id="lang-sel-jog">
+        <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
+        <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
+        <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="jog-btn-sair" onclick="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="jog-layout">
+    <!-- COLUNA ESQUERDA -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="cenario-card">
+        <div class="cen-icon">⌖</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;" id="jog-cenario-titulo">Sessão de investigação</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px;" id="jog-cenario-sub">Você é um agente de transformação.</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Membros da equipe</div>
+        <div class="membros-grid" id="jog-membros-grid">
+          <div style="font-size:11px;color:var(--t3);">Carregando membros...</div>
+        </div>
+      </div>
+      <!-- COMUNICAÇÃO -->
+      <div class="card card-pad">
+        <div class="comm-tabs">
+          <div class="comm-tab on" onclick="setCommTab('coletivo')">📢 Equipe</div>
+          <div class="comm-tab" onclick="setCommTab('individual')">💬 Individual</div>
+          <div class="comm-tab" onclick="setCommTab('registro')">📋 Registro</div>
+        </div>
+        <!-- BALÃO COLETIVO -->
+        <div id="comm-coletivo" class="comm-content on">
+          <div class="baloes-lista" id="baloes-lista"></div>
+          <div style="display:flex;gap:8px;">
+            <input id="balao-input" style="flex:1;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;font-size:12px;color:var(--t1);font-family:inherit;" placeholder="Fale para toda a equipe…" onkeydown="if(event.key==='Enter')enviarBalao()"/>
+            <button class="btn btn-primary btn-sm" onclick="enviarBalao()">↑</button>
+          </div>
+        </div>
+        <!-- SUSSURRO -->
+        <div id="comm-individual" class="comm-content">
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-weight:700;">Para quem?</div>
+          <div class="membros-chips" id="sussurro-chips"></div>
+          <textarea id="sussurro-txt" style="background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--t1);font-family:inherit;resize:none;height:70px;width:100%;" placeholder="Mensagem privada…"></textarea>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:10px;color:var(--t3);flex:1;font-style:italic;">🔒 Só o destinatário lê</div>
+            <button class="btn btn-primary btn-sm" onclick="enviarSussurro()">Enviar →</button>
+          </div>
+        </div>
+        <!-- REGISTRO -->
+        <div id="comm-registro" class="comm-content">
+          <div class="chat-body" id="chat-body"></div>
+          <div style="font-size:9px;color:var(--t3);padding-top:6px;border-top:.5px solid var(--border);">📋 Histórico da sessão · visível ao educador</div>
+        </div>
+      </div>
+    </div>
+    <!-- COLUNA DIREITA — CHAVES -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="chaves-grid" id="jog-chaves-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     TELA 4 — SOCIALIZAÇÃO
+════════════════════════════════════ -->
+<div id="tela-socializacao" class="hidden">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-gem"><svg width="14" height="14" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
+      <span style="font-size:16px;font-weight:800;">Socialização</span>
+    </div>
+    <div class="tb-sep"></div>
+    <span class="tb-sub" id="soc-titulo">Pitch das equipes</span>
+    <div class="tb-right">
+      <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">⬤ Ao vivo</div>
+      <button class="btn btn-ghost btn-sm" onclick="irParaEducador()">← Voltar</button>
+    </div>
+  </div>
+  <div class="quad-bar"></div>
+  <div class="soc-body">
+    <div class="soc-summary" id="soc-summary"></div>
+    <div class="pitch-grid" id="pitch-grid"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">
+      <button class="btn btn-ghost btn-sm" onclick="irParaEducador()">← Voltar ao painel</button>
+      <button class="btn btn-primary btn-sm" onclick="acaoSessaoEspecifica('encerrar')">✓ Encerrar sessão →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAIS -->
+<div id="modal-sessao" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>Nova sessão</h3>
+    <p>Configure a sessão de investigação empreendedora</p>
+    <div class="field"><label>Título da sessão</label><input id="s-titulo" placeholder="Ex: Bairro Novo Horizonte — EJA"/></div>
+    <div class="field">
+      <label>Modo de investigação</label>
+      <select id="s-contexto" onchange="toggleCenario(this.value)">
+        <option value="escolar">🌱 Escolar — as equipes definem o problema</option>
+        <option value="personalizado">✏️ Personalizado — educador define o contexto</option>
+      </select>
+    </div>
+    <div class="field hidden" id="campo-cenario">
+      <label>Contexto de investigação</label>
+      <input id="s-cenario" placeholder="Ex: Vocês são agentes de transformação do bairro Novo Horizonte…"/>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px;">Este texto será exibido para as equipes ao iniciar a sessão.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>Número de equipes</label>
+        <select id="s-equipes">
+          <option value="2">2 equipes</option><option value="3">3 equipes</option>
+          <option value="4">4 equipes</option><option value="5" selected>5 equipes</option>
+          <option value="6">6 equipes</option><option value="8">8 equipes</option><option value="10">10 equipes</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Integrantes por equipe</label>
+        <select id="s-integrantes">
+          <option value="4" selected>4 integrantes</option>
+          <option value="5">5 integrantes</option>
+          <option value="6">6 integrantes</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-sessao')">Cancelar</button>
+      <button class="btn btn-primary" onclick="criarSessao()">Criar sessão →</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-fase" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 id="mf-titulo">Fase 1 — Contexto</h3>
+    <p id="mf-desc">Registre as descobertas da equipe sobre esta fase</p>
+    <div class="field"><label>Conteúdo investigado pela equipe</label><textarea id="mf-conteudo" placeholder="Descreva o que a equipe descobriu…"></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-fase')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-concluir-fase" onclick="concluirFaseConfirmar()">✓ Concluir fase</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-novas" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>☕ Novas funções</h3>
+    <p>Funcionalidades planejadas para as próximas versões do TdoE</p>
+    <div id="modal-novas-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div style="margin-top:20px;">
+      <button class="btn btn-ghost w100" onclick="fecharModal('modal-novas')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+/* ── CONFIG ── */
+const API = 'http://localhost:8000';
+
+/* ── ESTADO GLOBAL ── */
+let state = {
+  token: null,
+  perfil: null,         // 'educador' | 'jogador'
+  usuario: null,
+  sessaoId: null,
+  sessaoStatus: null,
+  equipeId: null,
+  equipeNome: null,
+  participanteId: null,
+  participanteNome: null,
+  chaves: {},
+  sessaoAtual: null,
+  sussurroDestinatario: null,
+};
+
+/* ── UTILIDADES ── */
+function toggleCenario(valor){
+  const campo=document.getElementById('campo-cenario');
+  if(valor==='personalizado'){
+    campo.classList.remove('hidden');
+    document.getElementById('s-cenario').required=true;
+  } else {
+    campo.classList.add('hidden');
+    document.getElementById('s-cenario').required=false;
+    document.getElementById('s-cenario').value='';
+  }
+}
+
+function toast(msg, tipo='ok'){
+  const t=document.createElement('div');
+  t.className=`toast-item toast-${tipo}`;
+  t.textContent=msg;
+  document.getElementById('toast').appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+async function api(method, path, body=null){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),5000);
+  try{
+    const opts={method,signal:ctrl.signal,headers:{'Content-Type':'application/json'}};
+    if(state.token) opts.headers['Authorization']=`Bearer ${state.token}`;
+    if(body) opts.body=JSON.stringify(body);
+    const r=await fetch(API+path,opts);
+    clearTimeout(timer);
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.detail||JSON.stringify(data));
+    return data;
+  }catch(e){clearTimeout(timer);throw e;}
+}
+
+function mostrarBannerDemo(){
+  if(document.getElementById('banner-demo'))return;
+  const b=document.createElement('div');
+  b.id='banner-demo';
+  b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9998;background:rgba(240,188,64,.1);border-bottom:1.5px solid rgba(240,188,64,.28);padding:7px 20px;font-size:11px;font-weight:600;color:#F0BC40;text-align:center;';
+  b.innerHTML='⚡ Modo demonstração — inicie o back-end com <code style="background:rgba(0,0,0,.3);padding:1px 7px;border-radius:4px;font-size:10px;">python tdoe_app.py</code> para dados reais';
+  document.body.prepend(b);
+  document.body.style.paddingTop='34px';
+}
+
+function irPara(tela){
+  ['login','educador','jogadores','socializacao'].forEach(t=>{
+    document.getElementById('tela-'+t).classList.toggle('hidden', t!==tela);
+  });
+}
+
+function fecharModal(id){document.getElementById(id).classList.add('hidden');}
+function abrirModal(id){document.getElementById(id).classList.remove('hidden');}
+
+function corChave(c){
+  return {problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'}[c]||'#888';
+}
+function bgChave(c){
+  return {problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'}[c]||'rgba(255,255,255,.1)';
+}
+function bdChave(c){
+  return {problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'}[c]||'rgba(255,255,255,.2)';
+}
+function iconChave(c){
+  return {problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'}[c]||'●';
+}
+function nomeChave(c){
+  return {problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'}[c]||c;
+}
+
+const CHAVES_INFO={
+  problema:{
+    fases:[
+      {nm:'Contexto',desc:'Onde o problema acontece?'},
+      {nm:'Características',desc:'Como o problema afeta o contexto?'},
+      {nm:'Motivação',desc:'Por que vale a pena investigar esse problema?'},
+    ]
+  },
+  solucao:{
+    fases:[
+      {nm:'Características',desc:'Como será a solução?'},
+      {nm:'Custos',desc:'Quais são as despesas envolvidas para implementar a solução?'},
+      {nm:'Riscos',desc:'Quais barreiras que podem dificultar ou inviabilizar a implementação da solução?'},
+    ]
+  },
+  parcerias:{
+    fases:[
+      {nm:'Recursos',desc:'Quem pode oferecer os serviços ou os produtos na localidade?'},
+      {nm:'Características',desc:'Qual será a responsabilidade de cada parceiro?'},
+      {nm:'Tempo',desc:'Quanto tempo entre a formalização e a execução?'},
+    ]
+  },
+  oportunidades:{
+    fases:[
+      {nm:'Características',desc:'O que é e como a oportunidade foi identificada?'},
+      {nm:'Diferenciação',desc:'Como a ideia é inovadora em relação às atividades existentes?'},
+      {nm:'Aplicabilidade',desc:'Como essa oportunidade pode ser desenvolvida no contexto investigado?'},
+    ]
+  },
+};
+
+function helpChaveHtml(c){
+  const info=CHAVES_INFO[c]; if(!info) return '';
+  const cor=corChave(c);
+  const fasesHtml=info.fases.map(f=>`
+    <div class="kt-fase">
+      <div class="kt-fase-nm" style="color:${cor};">${f.nm}</div>
+      <div class="kt-fase-desc">${f.desc}</div>
+    </div>`).join('');
+  return `<button class="key-help" style="color:${cor};border-color:${cor};" onclick="toggleTooltip(event,this)" title="O que é ${nomeChave(c)}?">?
+    <div class="key-tooltip">
+      <div class="kt-title" style="color:${cor};">${nomeChave(c)}</div>
+      ${fasesHtml}
+    </div>
+  </button>`;
+}
+
+function toggleTooltip(e,btn){
+  e.stopPropagation();
+  const tt=btn.querySelector('.key-tooltip');
+  const isVis=tt.classList.contains('vis');
+  document.querySelectorAll('.key-tooltip.vis').forEach(t=>t.classList.remove('vis'));
+  if(!isVis) tt.classList.add('vis');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.key-tooltip.vis').forEach(t=>t.classList.remove('vis')));
+
+function avatarCor(i){
+  const cores=['linear-gradient(135deg,#1A9055,#0F5E38)','linear-gradient(135deg,#1A4E9E,#0F3370)',
+    'linear-gradient(135deg,#6A28A0,#441870)','linear-gradient(135deg,#E8A830,#C4891A)',
+    'linear-gradient(135deg,#0A8C7A,#065C50)'];
+  return cores[i%cores.length];
+}
+
+/* ── LOGIN TAB ── */
+function setLoginTab(tab){
+  ['login','cadastro','codigo'].forEach(t=>{
+    document.getElementById('form-'+t).classList.toggle('hidden',t!==tab);
+  });
+  document.querySelectorAll('.login-tab').forEach((el,i)=>{
+    el.classList.toggle('on',['login','cadastro','codigo'][i]===tab);
+  });
+}
+
+/* ── AUTH ── */
+async function fazerLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  if(!email){toast('Digite seu e-mail','err');return;}
+  if(!senha){toast('Digite sua senha','err');return;}
+  try{
+    const data=await api('POST','/auth/login',{email,senha});
+    state.token=data.access_token;
+    state.perfil='educador';
+    state.usuario=data.usuario;
+    localStorage.setItem('tdoe_edu_token',data.access_token);
+    localStorage.setItem('tdoe_edu_nome',data.usuario.nome);
+    toast('Bem-vindo, '+data.usuario.nome+'!');
+    await carregarPainelEducador();
+    irPara('educador');
+  }catch(e){
+    state.perfil='educador';
+    state.usuario={nome:email.split('@')[0]||'Educador',email};
+    mostrarBannerDemo();
+    toast('⚡ Modo demo — back-end offline','info');
+    await carregarPainelEducador();
+    irPara('educador');
+  }
+}
+
+async function fazerCadastro(){
+  const nome=document.getElementById('cad-nome').value.trim();
+  const s=document.getElementById('cad-senha').value;
+  const c=document.getElementById('cad-conf').value;
+  if(!nome){toast('Digite seu nome','err');return;}
+  if(s!==c){toast('Senhas não conferem','err');return;}
+  try{
+    const data=await api('POST','/auth/cadastro',{
+      nome,
+      sobrenome:document.getElementById('cad-sobrenome').value,
+      email:document.getElementById('cad-email').value,
+      instituicao:'',
+      senha:s,
+    });
+    state.token=data.access_token;
+    state.perfil='educador';
+    state.usuario=data.usuario;
+    localStorage.setItem('tdoe_edu_token',data.access_token);
+    localStorage.setItem('tdoe_edu_nome',data.usuario.nome);
+    toast('Conta criada! Bem-vindo, '+data.usuario.nome+'!');
+    await carregarPainelEducador();
+    irPara('educador');
+  }catch(e){
+    state.perfil='educador';
+    state.usuario={nome,email:document.getElementById('cad-email').value};
+    mostrarBannerDemo();
+    toast('⚡ Modo demo — conta criada localmente','info');
+    await carregarPainelEducador();
+    irPara('educador');
+  }
+}
+
+async function entrarComCodigo(){
+  const nome=document.getElementById('jog-nome').value.trim();
+  const codigo=document.getElementById('jog-codigo').value.trim().toUpperCase();
+  const equipe=parseInt(document.getElementById('jog-equipe').value);
+  if(!nome){toast('Digite seu nome','err');return;}
+  if(!codigo){toast('Digite o código da sessão','err');return;}
+  try{
+    const data=await api('POST','/entrar',{nome,codigo,numero_equipe:equipe});
+    state.token=data.access_token;
+    state.perfil='jogador';
+    state.sessaoId=data.sessao_id;
+    state.equipeId=data.equipe_id;
+    state.equipeNome=data.equipe_nome;
+    state.participanteNome=nome;
+    const payload=JSON.parse(atob(state.token.split('.')[1]));
+    state.participanteId=payload.sub;
+    toast('Entrando em '+data.equipe_nome+'!');
+    await carregarPainelJogadores();
+    irPara('jogadores');
+  }catch(e){
+    state.perfil='jogador';
+    state.participanteNome=nome;
+    state.equipeNome='Equipe '+equipe;
+    mostrarBannerDemo();
+    toast('⚡ Modo demo — entrando como jogador','info');
+    await carregarPainelJogadores();
+    irPara('jogadores');
+  }
+}
+
+function logout(){
+  state={token:null,perfil:null,usuario:null,sessaoId:null,sessaoStatus:null,
+    equipeId:null,equipeNome:null,participanteId:null,participanteNome:null,
+    chaves:{},sessaoAtual:null,sussurroDestinatario:null};
+  localStorage.removeItem('tdoe_edu_token');
+  localStorage.removeItem('tdoe_edu_nome');
+  const b=document.getElementById('banner-demo');
+  if(b){b.remove();document.body.style.paddingTop='';}
+  irPara('login');
+  toast('Até logo!','info');
+}
+
+/* ── PAINEL EDUCADOR ── */
+async function carregarPainelEducador(){
+  let sessoes=[];
+  try{ sessoes=await api('GET','/sessao'); }catch(e){ sessoes=[]; }
+  if(!sessoes.length){
+    sessoes=[{id:'demo-1',titulo:'Sessão Demo',
+      contexto:'escolar',codigo_acesso:'DEMO01',status:'ativa',
+      criada_em:new Date().toISOString(),alertas:[],
+      equipes:[
+        {id:'eq1',nome:'Equipe 1',numero:1,chaves_concluidas:1,chaves:{problema:{status:'concluida'},solucao:{status:'ativa'},parcerias:{status:'disponivel'},oportunidades:{status:'disponivel'}}},
+        {id:'eq2',nome:'Equipe 2',numero:2,chaves_concluidas:0,chaves:{problema:{status:'ativa'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
+        {id:'eq3',nome:'Equipe 3',numero:3,chaves_concluidas:0,chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
+      ]}];
+  }
+  const lista=document.getElementById('lista-sessoes');
+  lista.innerHTML='';
+  if(sessoes.length===0){
+    lista.innerHTML='<div class="sidebar-action muted small">Nenhuma sessão</div>';
+    return;
+  }
+  sessoes.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='eq-item'+(i===0?' on':'');
+    d.innerHTML=`<div class="eq-av" style="background:${avatarCor(i)};font-size:9px;">S${i+1}</div>
+      <div><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>`;
+    d.onclick=()=>selecionarSessao(s.id);
+    lista.appendChild(d);
+  });
+  if(sessoes.length>0) await selecionarSessao(sessoes[0].id);
+  await carregarNovasFuncoes();
+}
+
+async function selecionarSessao(id){
+  state.sessaoId=id;
+  document.querySelectorAll('.eq-item').forEach(el=>el.classList.remove('on'));
+  try{
+    const s=await api('GET','/sessao/'+id);
+    state.sessaoAtual=s;
+    state.sessaoStatus=s.status;
+    document.getElementById('tb-sessao-titulo').textContent=s.titulo+' · '+s.codigo_acesso;
+    document.getElementById('m-codigo').textContent=s.codigo_acesso;
+    atualizarStatusBadge(s.status);
+    renderEquipasGrid(s.equipes);
+    atualizarMetricas(s.equipes);
+    atualizarBarrasChaves(s.equipes);
+    if(s.alertas&&s.alertas.length>0) renderAlertas(s.alertas);
+  }catch(e){toast(e.message,'err');}
+}
+
+function atualizarStatusBadge(status){
+  const badge=document.getElementById('tb-status');
+  const mapa={
+    aguardando:{bg:'var(--gold-bg)',cor:'var(--gold)',bd:'var(--gold-bd)',txt:'⬤ Aguardando'},
+    ativa:{bg:'var(--prob-bg)',cor:'var(--prob)',bd:'var(--prob-bd)',txt:'⬤ Sessão ativa'},
+    pausada:{bg:'rgba(255,255,255,.07)',cor:'var(--t3)',bd:'var(--border)',txt:'⏸ Pausada'},
+    socializando:{bg:'var(--opor-bg)',cor:'var(--opor)',bd:'var(--opor-bd)',txt:'↗ Socializando'},
+    encerrada:{bg:'rgba(255,80,80,.1)',cor:'#ff6b6b',bd:'rgba(255,80,80,.3)',txt:'✗ Encerrada'},
+  };
+  const m=mapa[status]||mapa.aguardando;
+  badge.style.background=m.bg; badge.style.color=m.cor; badge.style.borderColor=m.bd;
+  badge.textContent=m.txt;
+  // atualizar botão ação
+  const btn=document.getElementById('btn-acao-sessao');
+  const ctrl=document.getElementById('ctrl-iniciar');
+  if(status==='aguardando'){btn.textContent='▶ Iniciar sessão';ctrl.textContent='▶ Iniciar';}
+  else if(status==='ativa'){btn.textContent='⏸ Pausar';ctrl.textContent='⏸ Pausar';}
+  else if(status==='pausada'){btn.textContent='↺ Retomar';ctrl.textContent='↺ Retomar';}
+}
+
+function renderEquipasGrid(equipes){
+  const grid=document.getElementById('edu-equipes-grid');
+  grid.innerHTML='';
+  equipes.forEach((eq,i)=>{
+    const concluidas=eq.chaves_concluidas||0;
+    const total=4;
+    const pct=Math.round((concluidas/total)*100);
+    const chaveAtiva=Object.entries(eq.chaves||{}).find(([k,v])=>v.status==='ativa');
+    const nmAtiva=chaveAtiva?nomeChave(chaveAtiva[0]):'—';
+    const div=document.createElement('div');
+    div.className='eq-card';
+    div.innerHTML=`
+      <div class="eq-card-head">
+        <div class="eq-card-av" style="background:${avatarCor(i)};">E${eq.numero}</div>
+        <div><div class="eq-card-nm">${eq.nome}</div><div class="eq-card-st">${nmAtiva}</div></div>
+      </div>
+      <div class="eq-card-dots">
+        ${['problema','solucao','parcerias','oportunidades'].map(c=>{
+          const st=eq.chaves?.[c]?.status||'nao_iniciada';
+          const op=st==='concluida'?'1':st==='ativa'?'0.6':'0.15';
+          return `<div class="eq-card-dot" style="background:${corChave(c)};opacity:${op};"></div>`;
+        }).join('')}
+      </div>
+      <div class="eq-prog-bar"><div class="eq-prog-fill" style="width:${pct}%;background:${chaveAtiva?corChave(chaveAtiva[0]):'var(--t3)'};"></div></div>
+      <div class="badge tiny" style="background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border);">${concluidas}/4 chaves</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function atualizarMetricas(equipes){
+  document.getElementById('m-equipes').textContent=equipes.length;
+  document.getElementById('m-participantes').textContent='—';
+  const total=equipes.reduce((a,eq)=>a+(eq.chaves_concluidas||0),0);
+  document.getElementById('m-chaves').textContent=total;
+}
+
+function atualizarBarrasChaves(equipes){
+  const n=equipes.length||1;
+  ['problema','solucao','parcerias','oportunidades'].forEach(c=>{
+    const concluidas=equipes.filter(eq=>eq.chaves?.[c]?.status==='concluida').length;
+    const pct=Math.round((concluidas/n)*100);
+    const sfx={problema:'prob',solucao:'sol',parcerias:'parc',oportunidades:'opor'}[c];
+    document.getElementById('prog-'+sfx).textContent=concluidas+'/'+n;
+    document.getElementById('fill-'+sfx).style.width=pct+'%';
+  });
+}
+
+function renderAlertas(alertas){
+  const div=document.getElementById('edu-alertas');
+  div.innerHTML='';
+  alertas.forEach(a=>{
+    const el=document.createElement('div');
+    const corTipo=a.tipo==='equipe_avancada'?'rgba(46,128,240,.1)':'rgba(240,188,64,.1)';
+    const bdTipo=a.tipo==='equipe_avancada'?'1.5px solid rgba(46,128,240,.3)':'1.5px solid rgba(240,188,64,.3)';
+    const icone=a.tipo==='equipe_avancada'?'★':'⏱';
+    const corTxt=a.tipo==='equipe_avancada'?'var(--parc)':'var(--gold)';
+    el.className='alert-card';
+    el.style.background=corTipo; el.style.border=bdTipo;
+    el.innerHTML=`<div class="alert-icon" style="background:${corTipo};font-size:14px;">${icone}</div>
+      <div><div class="alert-nm" style="color:${corTxt};">${a.mensagem}</div>
+      <div class="alert-sug">${a.sugestao||''}</div></div>`;
+    div.appendChild(el);
+  });
+}
+
+async function acaoSessao(){
+  if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  const mapa={aguardando:'iniciar',ativa:'pausar',pausada:'retomar'};
+  const acao=mapa[state.sessaoStatus];
+  if(!acao){toast('Ação não disponível neste estado','err');return;}
+  await acaoSessaoEspecifica(acao);
+}
+
+async function acaoSessaoEspecifica(acao){
+  if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  try{
+    const data=await api('PATCH','/sessao/'+state.sessaoId+'/acao',{acao});
+    state.sessaoStatus=data.status;
+    atualizarStatusBadge(data.status);
+    toast('Sessão: '+data.status,'ok');
+  }catch(e){toast(e.message,'err');}
+}
+
+async function verificarAlertas(){
+  if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  try{
+    const data=await api('POST','/alertas/'+state.sessaoId+'/verificar');
+    if(data.total>0){
+      renderAlertas(data.novos_alertas);
+      toast(data.total+' novo(s) alerta(s)','info');
+    }else{
+      toast('Nenhum alerta novo','ok');
+    }
+  }catch(e){toast(e.message,'err');}
+}
+
+function abrirModalCriarSessao(){abrirModal('modal-sessao');}
+
+async function criarSessao(){
+  const titulo=document.getElementById('s-titulo').value.trim();
+  const contexto=document.getElementById('s-contexto').value;
+  const cenario=document.getElementById('s-cenario').value.trim()||null;
+  if(!titulo){toast('Digite um título para a sessão','err');return;}
+  if(contexto==='personalizado'&&!cenario){
+    toast('Descreva o contexto de investigação','err');
+    document.getElementById('s-cenario').focus();
+    return;
+  }
+  try{
+    const data=await api('POST','/sessao',{
+      titulo,
+      contexto,
+      cenario,
+      num_equipes:parseInt(document.getElementById('s-equipes').value),
+      integrantes_por_equipe:parseInt(document.getElementById('s-integrantes').value),
+    });
+    fecharModal('modal-sessao');
+    toast('Sessão criada! Código: '+data.codigo_acesso,'ok');
+    await carregarPainelEducador();
+    await selecionarSessao(data.id);
+  }catch(e){
+    fecharModal('modal-sessao');
+    const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
+    const integrantes=parseInt(document.getElementById('s-integrantes').value)||4;
+    const nEq=parseInt(document.getElementById('s-equipes').value)||3;
+    const equipes=Array.from({length:nEq},(_,i)=>({
+      id:'eq'+(i+1),nome:'Equipe '+(i+1),numero:i+1,
+      integrantes,chaves_concluidas:0,
+      chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},
+              parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}},
+    }));
+    const sessaoDemo={id:'demo-'+Date.now(),titulo,contexto,cenario,
+      codigo_acesso:codigo,status:'aguardando',
+      criada_em:new Date().toISOString(),alertas:[],equipes};
+    state.sessaoAtual=sessaoDemo; state.sessaoId=sessaoDemo.id; state.sessaoStatus='aguardando';
+    mostrarBannerDemo();
+    toast('⚡ Sessão demo criada — código: '+codigo,'gold');
+    document.getElementById('tb-sessao-titulo').textContent=titulo+' · '+codigo;
+    document.getElementById('m-codigo').textContent=codigo;
+    atualizarStatusBadge('aguardando');
+    renderEquipasGrid(equipes); atualizarMetricas(equipes); atualizarBarrasChaves(equipes);
+  }
+}
+
+async function carregarNovasFuncoes(){
+  try{
+    const data=await api('GET','/novas-funcoes');
+    const lista=document.getElementById('novas-funcoes-lista');
+    const mLista=document.getElementById('modal-novas-lista');
+    lista.innerHTML=''; mLista.innerHTML='';
+    data.funcionalidades.forEach(f=>{
+      const html=`<div style="background:var(--gold-bg);border:1px solid var(--gold-bd);border-radius:9px;padding:9px 11px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);">${f.icone} ${f.nome}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:3px;">${f.descricao}</div>
+        <div style="font-size:8px;color:rgba(240,188,64,.5);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;">Em breve</div></div>`;
+      lista.innerHTML+=html; mLista.innerHTML+=html;
+    });
+  }catch(e){}
+}
+
+function abrirModalNovasSessoes(){abrirModal('modal-novas');}
+
+async function irParaSocializacao(){
+  if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  try{
+    const data=await api('GET','/pitch/'+state.sessaoId);
+    document.getElementById('soc-titulo').textContent=data.titulo;
+    renderPitch(data);
+    irPara('socializacao');
+  }catch(e){toast(e.message,'err');}
+}
+
+function renderPitch(data){
+  const equipes=data.equipes||[];
+  // summary
+  const totalChaves=equipes.reduce((a,e)=>a+e.chaves_concluidas,0);
+  document.getElementById('soc-summary').innerHTML=`
+    <div class="sum-card"><div class="sum-icon" style="background:var(--prob-bg);">👥</div><div><div class="sum-val" style="color:var(--prob);">${equipes.length}</div><div class="sum-lbl">Equipes</div></div></div>
+    <div class="sum-card"><div class="sum-icon" style="background:var(--sol-bg);">✓</div><div><div class="sum-val" style="color:var(--sol);">${totalChaves}</div><div class="sum-lbl">Chaves concluídas</div></div></div>
+    <div class="sum-card"><div class="sum-icon" style="background:var(--parc-bg);">📋</div><div><div class="sum-val" style="color:var(--parc);">${data.contexto}</div><div class="sum-lbl">Contexto</div></div></div>
+    <div class="sum-card"><div class="sum-icon" style="background:var(--gold-bg);">★</div><div><div class="sum-val" style="color:var(--gold);">${equipes[0]?.equipe_nome||'—'}</div><div class="sum-lbl">Mais avançada</div></div></div>`;
+
+  const grid=document.getElementById('pitch-grid');
+  grid.innerHTML='';
+  equipes.forEach((eq,i)=>{
+    const chaves=['problema','solucao','parcerias','oportunidades'];
+    const card=document.createElement('div');
+    card.className='pitch-card';
+    const prob=eq.chaves?.problema;
+    const proposta=eq.proposta&&eq.proposta!=='Em construção...'?eq.proposta:null;
+    card.innerHTML=`
+      <div style="position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,${bgChave(Object.keys(eq.chaves||{}).find(c=>eq.chaves[c]==='concluida')||'problema').replace('bg','')?.replace('var(--','rgba(').replace('-bg)',', .1)')}.15) 0%,transparent 70%);pointer-events:none;"></div>
+      <div class="pitch-card-top">
+        <div class="pc-eq-av" style="background:${avatarCor(i)};">E${i+1}</div>
+        <div><div class="pc-eq-nm">${eq.equipe_nome}</div><div class="pc-ctx">${data.contexto}</div></div>
+        ${i===0?'<div style="font-size:9px;color:var(--parc);font-weight:700;margin-left:auto;">★ mais avançada</div>':''}
+      </div>
+      <div class="pc-prob">
+        <div class="pc-prob-lbl" style="color:var(--prob);">🔍 Problema</div>
+        <div class="pc-prob-txt">${prob==='concluida'?'Investigada':'Em investigação...'}</div>
+      </div>
+      <div class="pc-chaves">
+        ${chaves.map(c=>`
+          <div class="pc-chave" style="background:${eq.chaves?.[c]==='concluida'?bgChave(c):'rgba(255,255,255,.04)'};border-color:${eq.chaves?.[c]==='concluida'?bdChave(c):'rgba(255,255,255,.08)'};">
+            <span style="font-size:11px;">${iconChave(c)}</span>
+            <span style="font-size:9px;font-weight:700;color:${eq.chaves?.[c]==='concluida'?corChave(c):'var(--t3)'};">${nomeChave(c).substring(0,4)}</span>
+            <span style="margin-left:auto;font-size:9px;color:${eq.chaves?.[c]==='concluida'?corChave(c):'var(--t3)'};">${eq.chaves?.[c]==='concluida'?'✓':eq.chaves?.[c]==='disponivel'?'○':'—'}</span>
+          </div>`).join('')}
+      </div>
+      ${proposta?`<div class="pc-prop" style="background:${bgChave('problema')};border:.5px solid ${bdChave('problema')};">
+        <div class="pc-prop-lbl">💡 Proposta</div>
+        <div class="pc-prop-txt" style="color:var(--prob);">${proposta.substring(0,80)}${proposta.length>80?'…':''}</div></div>`
+        :'<div class="pc-prop" style="background:rgba(255,255,255,.03);border:.5px solid var(--border);"><div class="pc-prop-txt muted small" style="font-style:italic;">Em construção...</div></div>'}
+      <div class="pc-prog-bar">
+        ${chaves.map(c=>`<div class="pc-prog-seg" style="background:${eq.chaves?.[c]==='concluida'?corChave(c):'rgba(255,255,255,.07)'};"></div>`).join('')}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function irParaEducador(){irPara('educador');}
+
+/* ── PAINEL JOGADORES ── */
+async function carregarPainelJogadores(){
+  document.getElementById('jog-topbar-nm').textContent=state.equipeNome;
+  document.getElementById('jog-topbar-sessao').textContent='Sessão ativa';
+  document.getElementById('jog-cenario-titulo').textContent='Sessão de investigação — '+state.equipeNome;
+  await carregarChaves();
+  renderMembrosSimulados();
+  carregarBaloes();
+  carregarRegistro();
+}
+
+async function carregarChaves(){
+  try{
+    const data=await api('GET','/chaves/'+state.equipeId);
+    state.chaves=data;
+    renderChaves(data);
+    atualizarChaveAtivaBadge(data);
+    carregarSussurroChips();
+  }catch(e){
+    // modo demo: inicializa chaves disponíveis sem backend
+    if(!state.chavesDemo) state.chavesDemo={};
+    renderChavesDemo();
+    atualizarChaveAtivaBadge({});
+  }
+}
+
+function atualizarChaveAtivaBadge(chaves){
+  const ativa=Object.entries(chaves).find(([k,v])=>v.status==='ativa');
+  const badge=document.getElementById('jog-chave-ativa');
+  if(ativa){
+    badge.textContent='▶ '+nomeChave(ativa[0]);
+    badge.style.background=bgChave(ativa[0]);
+    badge.style.color=corChave(ativa[0]);
+    badge.style.borderColor=bdChave(ativa[0]);
+  }else{
+    badge.textContent='— nenhuma chave ativa —';
+    badge.style.background='rgba(255,255,255,.05)';
+    badge.style.color='var(--t3)';
+    badge.style.borderColor='var(--border)';
+  }
+}
+
+function renderChaves(chaves){
+  const grid=document.getElementById('jog-chaves-grid');
+  grid.innerHTML='';
+  Object.entries(chaves).forEach(([c,dados])=>{
+    const concluida=dados.status==='concluida';
+    const ativa=dados.status==='ativa';
+    const disponivel=dados.status==='disponivel';
+    const naoIniciada=dados.status==='nao_iniciada';
+    const cor=corChave(c); const bg=bgChave(c); const bd=bdChave(c);
+    const pct=Math.round((dados.fases.filter(f=>f.status==='concluida').length/3)*100);
+    const bdStyle=concluida?`1.5px solid ${bd}`:(ativa?`2px solid ${bd}`:(disponivel?`1px dashed ${bd}`:'1px solid rgba(255,255,255,.06)'));
+    const bgStyle=concluida?bg:(ativa?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.06)`:'rgba(255,255,255,.02)');
+    const card=document.createElement('div');
+    card.className='chave-card';
+    card.style.cssText=`background:${bgStyle};border:${bdStyle};`;
+    const topBar=document.createElement('div');
+    topBar.style.cssText=`position:absolute;top:0;left:0;right:0;height:2px;background:${concluida||ativa||disponivel?cor:'rgba(255,255,255,.1)'};${ativa?'box-shadow:0 0 8px '+cor:''};`;
+    card.appendChild(topBar);
+    let badgeTxt=''; let badgeStyle='';
+    if(concluida){badgeTxt='✓ Feita';badgeStyle=`background:${bg};color:${cor};border-color:${bd}`;}
+    else if(ativa){badgeTxt='⏱ Ativa';badgeStyle='background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd)';}
+    else if(disponivel){badgeTxt='▶ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
+    else{badgeTxt='○ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
+    let fasesHtml='';
+    dados.fases.forEach(f=>{
+      const fd=f.status==='concluida'; const fa=f.status==='ativa'||f.status==='disponivel'; const fl=f.status==='bloqueada';
+      fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa&&!fl?' active':''}${fl?' locked':''}" 
+        style="${fa&&!fl?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
+        onclick="${fl?'':('abrirFase("'+c+'",'+f.numero+',"'+f.nome+'")')}">
+        <div class="cc-fnum" style="${fd?'background:'+cor+';color:#fff;':fa?'background:'+bg+';color:'+cor+';':'background:rgba(255,255,255,.08);color:var(--t3);'}">${fd?'✓':f.numero}</div>
+        <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${f.nome}</div>
+        <div class="cc-ftxt">${fd?'✓':(fa?'clique':'🔒')}</div>
+      </div>`;
+    });
+    card.innerHTML+=`
+      <div class="cc-head">
+        <div class="cc-icon" style="background:${bg};">${iconChave(c)}</div>
+        <div class="cc-name" style="color:${concluida||ativa||disponivel?cor:'rgba(255,255,255,.4)'};">${nomeChaveLocale(c)}</div>
+        ${helpChaveHtml(c)}
+        <div class="cc-badge" style="${badgeStyle};margin-left:4px;">${badgeTxt}</div>
+      </div>
+      <div class="cc-fases">${fasesHtml}</div>
+      <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:${pct}%;background:${cor};${ativa?'box-shadow:0 0 6px '+cor:''}"></div></div>`;
+    if(!concluida&&(disponivel||naoIniciada)){
+      const btnAtivar=document.createElement('button');
+      btnAtivar.className='btn btn-primary w100 btn-sm';
+      btnAtivar.style.marginTop='8px';
+      btnAtivar.textContent='Iniciar '+nomeChaveLocale(c);
+      btnAtivar.onclick=()=>ativarChave(c);
+      card.appendChild(btnAtivar);
+    }
+    grid.appendChild(card);
+  });
+}
+
+async function ativarChave(chave){
+  try{
+    await api('POST','/chaves/'+state.equipeId+'/ativar',{chave});
+    toast(nomeChave(chave)+' ativada!','ok');
+    await carregarChaves();
+  }catch(e){
+    // fallback demo
+    if(!state.chavesDemo) state.chavesDemo={};
+    Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
+    state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
+    toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
+    renderChavesDemo();
+  }
+}
+
+function renderChavesDemo(){
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const chavesData=state.chavesDemo||{};
+  const grid=document.getElementById('jog-chaves-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+  chaves.forEach(c=>{
+    const cd=chavesData[c]||{status:'disponivel',fases:{}};
+    const cor=corChave(c); const nm=nomeChaveLocale(c);
+    const icn={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'}[c];
+    const ativa=cd.status==='ativa';
+    const div=document.createElement('div');
+    div.className='chave-card';
+    div.style=`background:${ativa?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.07)`:'rgba(255,255,255,.02)'};border:${ativa?'2px':'1px dashed'} ${ativa?`var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bd)`:'rgba(255,255,255,.12)'};`;
+    const faseNomes={problema:['Contexto','Características','Motivação'],solucao:['Características','Custos','Riscos'],parcerias:['Recursos','Características','Tempo'],oportunidades:['Características','Diferenciação','Aplicabilidade']};
+    const fasesHtml=faseNomes[c].map((fn,i)=>{
+      const fst=(cd.fases&&cd.fases[i+1])||{status:ativa&&i===0?'disponivel':'bloqueada'};
+      const bloq=fst.status==='bloqueada'||!ativa;
+      return `<div class="cc-fase${bloq?' locked':''}" style="${!bloq?`border-color:var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bd);`:''}">
+        <div class="cc-fnum" style="background:${!bloq?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.15)`:'rgba(255,255,255,.06)'};color:${!bloq?cor:'var(--t3)'};">${i+1}</div>
+        <div class="cc-fnm" style="${!bloq?'color:var(--t1);':''}">${fn}</div>
+        <div class="cc-ftxt">${bloq?'🔒':'clique'}</div>
+      </div>`;
+    }).join('');
+    div.innerHTML=`
+      ${ativa?`<div style="position:absolute;top:0;left:0;right:0;height:2px;background:${cor};box-shadow:0 0 8px ${cor};border-radius:2px 2px 0 0;"></div>`:''}
+      <div class="cc-head">
+        <div class="cc-icon" style="background:var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bg);">${icn}</div>
+        <div class="cc-name" style="color:${ativa?cor:'rgba(255,255,255,.4)'};">${nm}</div>
+        ${helpChaveHtml(c)}
+        ${ativa?`<div class="cc-badge" style="background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd);margin-left:auto;">⏱ Ativa</div>`:''}
+      </div>
+      <div class="cc-fases">${fasesHtml}</div>
+      <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:0%;background:${cor};"></div></div>
+      ${!ativa?`<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`:''}
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// Estado para modal de fase
+let _fasePendente={chave:null,numero:null,nome:null};
+
+function abrirFase(chave,numero,nome){
+  _fasePendente={chave,numero,nome};
+  document.getElementById('mf-titulo').textContent='Fase '+numero+' — '+nome;
+  document.getElementById('mf-desc').textContent='Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
+  document.getElementById('mf-conteudo').value='';
+  abrirModal('modal-fase');
+}
+
+async function concluirFaseConfirmar(){
+  const conteudo=document.getElementById('mf-conteudo').value.trim();
+  if(!conteudo){toast('Descreva o que a equipe descobriu','err');return;}
+  try{
+    await api('POST','/chaves/'+state.equipeId+'/concluir-fase',{
+      chave:_fasePendente.chave,
+      numero_fase:_fasePendente.numero,
+      conteudo,
+    });
+    fecharModal('modal-fase');
+    toast('Fase '+_fasePendente.numero+' de '+nomeChave(_fasePendente.chave)+' concluída!','ok');
+    await carregarChaves();
+    adicionarEventoRegistro('sistema','Sistema','✓ Fase '+_fasePendente.nome+' de '+nomeChave(_fasePendente.chave)+' concluída');
+  }catch(e){toast(e.message,'err');}
+}
+
+/* ── MEMBROS SIMULADOS (visual) ── */
+function renderMembrosSimulados(){
+  const grid=document.getElementById('jog-membros-grid');
+  const membros=[
+    {nome:state.participanteNome||'Você',eu:true},
+    {nome:'Membro 2',eu:false},{nome:'Membro 3',eu:false},{nome:'Membro 4',eu:false}
+  ];
+  grid.innerHTML='';
+  membros.forEach((m,i)=>{
+    const d=document.createElement('div');
+    d.className='membro-card ativo';
+    d.innerHTML=`
+      <div class="membro-av" style="background:${avatarCor(i)};">${m.nome.substring(0,2).toUpperCase()}</div>
+      <div class="membro-nm">${m.nome}</div>
+      <div class="membro-st" style="${m.eu?'color:var(--parc)':''}">● ativo</div>
+      ${m.eu?'<div style="font-size:8px;color:var(--parc);margin-top:3px;font-weight:600;">você</div>':'<div class="cutucar-btn" title="Cutucar" onclick="enviarCutucar(\''+m.nome+'\')">👆</div>'}`;
+    grid.appendChild(d);
+  });
+}
+
+function enviarCutucar(nome){
+  toast('👆 Você cutucou '+nome,'info');
+  adicionarEventoRegistro('cutucar','Você','Você cutucou '+nome);
+}
+
+/* ── COMUNICAÇÃO ── */
+function setCommTab(tab){
+  ['coletivo','individual','registro'].forEach(t=>{
+    document.getElementById('comm-'+t).classList.toggle('on',t===tab);
+  });
+  document.querySelectorAll('.comm-tab').forEach((el,i)=>{
+    el.classList.toggle('on',['coletivo','individual','registro'][i]===tab);
+  });
+  if(tab==='registro') carregarRegistro();
+  if(tab==='individual') carregarSussurroChips();
+}
+
+async function carregarBaloes(){
+  try{
+    const data=await api('GET','/comunicacao/balao/'+state.equipeId);
+    const lista=document.getElementById('baloes-lista');
+    lista.innerHTML='';
+    data.baloes.forEach(b=>adicionarBalao(b));
+  }catch(e){}
+}
+
+function adicionarBalao(b){
+  const lista=document.getElementById('baloes-lista');
+  const proprio=b.de_id===state.participanteId;
+  const div=document.createElement('div');
+  div.className='balao '+(proprio?'balao-proprio':'balao-outro');
+  div.innerHTML=`<div class="balao-nm" style="color:${proprio?'var(--parc)':'var(--t2)'};">${proprio?'Você':b.de_nome}</div>
+    <div class="balao-txt">${b.mensagem}</div>
+    <div class="balao-hora">${b.criado_em?.substring(11,16)||''}</div>`;
+  lista.appendChild(div);
+  lista.scrollTop=lista.scrollHeight;
+}
+
+async function enviarBalao(){
+  const input=document.getElementById('balao-input');
+  const msg=input.value.trim();
+  if(!msg||!state.equipeId||!state.participanteId){
+    if(!state.participanteId) toast('Apenas jogadores podem enviar mensagens','err');
+    return;
+  }
+  try{
+    const data=await api('POST','/comunicacao/balao',{
+      equipe_id:state.equipeId,
+      participante_id:state.participanteId,
+      mensagem:msg,
+    });
+    input.value='';
+    adicionarBalao(data.registro);
+    adicionarEventoRegistro('coletivo','Você',msg);
+  }catch(e){toast(e.message,'err');}
+}
+
+function carregarSussurroChips(){
+  const chips=document.getElementById('sussurro-chips');
+  if(!chips) return;
+  chips.innerHTML='';
+  // membros simulados exceto o próprio
+  const membros=[{id:'m2',nome:'Membro 2',i:1},{id:'m3',nome:'Membro 3',i:2},{id:'m4',nome:'Membro 4',i:3}];
+  membros.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='mchip'+(state.sussurroDestinatario===m.id?' sel':'');
+    div.innerHTML=`<div class="mchip-av" style="background:${avatarCor(m.i)};">${m.nome.substring(0,2)}</div>${m.nome}`;
+    div.onclick=()=>{state.sussurroDestinatario=m.id; carregarSussurroChips();};
+    chips.appendChild(div);
+  });
+}
+
+async function enviarSussurro(){
+  const txt=document.getElementById('sussurro-txt').value.trim();
+  if(!txt){toast('Escreva a mensagem','err');return;}
+  if(!state.sussurroDestinatario){toast('Selecione o destinatário','err');return;}
+  toast('💬 Sussurro enviado com sucesso','ok');
+  document.getElementById('sussurro-txt').value='';
+  adicionarEventoRegistro('sussurro','Você','Você → '+state.sussurroDestinatario+' (sussurro)');
+}
+
+function carregarRegistro(){
+  const body=document.getElementById('chat-body');
+  if(!body) return;
+  // Evento de sistema inicial
+  if(body.innerHTML.trim()===''){
+    adicionarEventoRegistro('sistema','Sistema','Sessão iniciada');
+  }
+}
+
+function adicionarEventoRegistro(tipo,nome,txt){
+  const body=document.getElementById('chat-body');
+  if(!body) return;
+  const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const cores={sistema:'var(--prob-bg)',sussurro:'var(--parc-bg)',cutucar:'var(--gold-bg)',coletivo:'rgba(255,255,255,.05)'};
+  const avCores={sistema:'rgba(34,201,122,.2)',sussurro:'rgba(46,128,240,.2)',cutucar:'rgba(240,188,64,.2)',coletivo:'rgba(255,255,255,.1)'};
+  const icons={sistema:'★',sussurro:'💬',cutucar:'👆',coletivo:'●'};
+  const div=document.createElement('div');
+  div.className=`chat-msg chat-${tipo}`;
+  div.innerHTML=`<div class="chat-av" style="background:${avCores[tipo]||avCores.coletivo};font-size:11px;">${icons[tipo]||'●'}</div>
+    <div class="chat-bubble" style="background:${cores[tipo]||cores.coletivo};">
+      <div class="chat-nm">${nome}</div>
+      <div class="chat-txt">${txt}</div>
+      <div class="chat-hora">${hora}</div>
+    </div>`;
+  body.appendChild(div);
+  body.scrollTop=body.scrollHeight;
+}
+
+/* ── RELOAD PERIÓDICO (educador) ── */
+setInterval(async()=>{
+  if(state.perfil==='educador'&&state.sessaoId){
+    try{
+      const s=await api('GET','/sessao/'+state.sessaoId);
+      renderEquipasGrid(s.equipes);
+      atualizarBarrasChaves(s.equipes);
+    }catch(e){}
+  }
+  if(state.perfil==='jogador'&&state.equipeId){
+    try{await carregarBaloes();}catch(e){}
+  }
+},10000);
+
+/* ── SISTEMA DE IDIOMAS ── */
+const I18N={
+  pt:{
+    sair:'Sair', iniciarSessao:'▶ Iniciar sessão', socializar:'↗ Socializar',
+    lblConceitos:'Conceitos das Chaves', expandir:'▼ expandir', recolher:'▲ recolher',
+    chaveAtivaBadge:'— sem chave ativa —',
+    chaves:{
+      problema:{
+        nome:'Problema',
+        conceito:`A chave Problema representa o início da dinâmica: ao compartilhar experiências, a equipe reflete sobre o contexto investigado, delimitando-o e caracterizando-o a partir de vivências com o meio. A motivação para solucionar o problema torna-se um aspecto compartilhado.
+O problema pode ser compreendido como: ocorrência negativa, avaliação de uma intervenção, utilização de recursos sem planejamento ou situações de incerteza (Landry, 1995). Bianchi e Verganti (2021) destacam que a identificação de problemas envolve componentes não apenas analíticos, mas também construções interpretativas decorrentes de transformações sociais, culturais e tecnológicas.`,
+        fases:[
+          {nm:'Contexto',desc:'Onde o problema acontece?'},
+          {nm:'Características',desc:'Como o problema afeta o contexto?'},
+          {nm:'Motivação',desc:'Por que vale a pena investigar esse problema?'},
+        ]
+      },
+      solucao:{
+        nome:'Solução',
+        conceito:`A chave Solução corresponde à trilha de investigação em que a equipe constrói uma solução aplicável ao contexto, estabelecendo respostas ou alternativas para o problema identificado. Nessa etapa, os participantes exercitam a criatividade e a tomada de decisão diante de proposições viáveis e geradoras de valor (Kujala et al., 2010; Vogel et al., 2025).
+O comportamento dos jogadores influencia nas possibilidades de criação de novos negócios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).`,
+        fases:[
+          {nm:'Características',desc:'Como será a solução?'},
+          {nm:'Custos',desc:'Quais são as despesas envolvidas para implementar a solução?'},
+          {nm:'Riscos',desc:'Quais barreiras que podem dificultar ou inviabilizar a implementação da solução?'},
+        ]
+      },
+      parcerias:{
+        nome:'Parcerias',
+        conceito:`A chave Parcerias estimula os participantes a analisar o contexto e definir alianças estratégicas para a implementação da proposta empreendedora. A combinação de conhecimentos de diferentes atores, organizados em torno de um objetivo comum (Crowley; Karim, 1995; Zahoor et al., 2021), contribui para o desenvolvimento de projetos com definição de prazos, responsabilidades (Reed; Reed, 2009), recursos e condições de atuação (Seo, 2020).`,
+        fases:[
+          {nm:'Recursos',desc:'Quem pode oferecer os serviços ou os produtos na localidade?'},
+          {nm:'Características',desc:'Qual será a responsabilidade de cada parceiro?'},
+          {nm:'Tempo',desc:'Quanto tempo entre a formalização e a execução?'},
+        ]
+      },
+      oportunidades:{
+        nome:'Oportunidades',
+        conceito:`A chave Oportunidades representa uma possibilidade identificada pelos participantes por meio da contextualização do problema e das soluções construídas durante a investigação. A oportunidade torna-se um processo de criação de valor (George et al., 2016), tanto pelo comportamento empreendedor quanto pelas transformações no contexto investigado.
+Os autores apresentam a oportunidade como um guarda-chuva que permite compreender a criação de novos negócios (Wood; McKinley, 2020) a partir da descoberta, avaliação e exploração (Shane; Venkataraman, 2000).`,
+        fases:[
+          {nm:'Características',desc:'O que é e como a oportunidade foi identificada?'},
+          {nm:'Diferenciação',desc:'Como a ideia é inovadora em relação às atividades existentes?'},
+          {nm:'Aplicabilidade',desc:'Como essa oportunidade pode ser desenvolvida no contexto investigado?'},
+        ]
+      },
+    }
+  },
+  en:{
+    sair:'Log out', iniciarSessao:'▶ Start session', socializar:'↗ Showcase',
+    lblConceitos:'Key Concepts', expandir:'▼ expand', recolher:'▲ collapse',
+    chaveAtivaBadge:'— no active key —',
+    chaves:{
+      problema:{
+        nome:'Problem',
+        conceito:`The Problem key marks the start of the game dynamic. By sharing experiences, the team reflects on the investigated context, characterizing it based on lived interactions with the environment. The motivation to solve the problem becomes a shared aspect within the team.
+The problem can be understood as: a negative occurrence, evaluation of an intervention, unplanned use of resources, or situations of uncertainty (Landry, 1995). Bianchi and Verganti (2021) highlight that problem identification involves not only analytical components but also interpretive constructions arising from social, cultural, and technological transformations.`,
+        fases:[
+          {nm:'Context',desc:'Where does the problem occur?'},
+          {nm:'Characteristics',desc:'How does the problem affect the context?'},
+          {nm:'Motivation',desc:'Why is it worth investigating this problem?'},
+        ]
+      },
+      solucao:{
+        nome:'Solution',
+        conceito:`The Solution key is the investigation trail in which participants build a solution applicable to the context, establishing responses or alternatives for the identified problem. At this stage, participants exercise creativity and decision-making in the face of viable, value-generating propositions (Kujala et al., 2010; Vogel et al., 2025).
+Players' behavior influences the possibilities for creating new businesses (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).`,
+        fases:[
+          {nm:'Characteristics',desc:'What will the solution look like?'},
+          {nm:'Costs',desc:'What expenses are involved in implementing the solution?'},
+          {nm:'Risks',desc:'What barriers could hinder or prevent implementation of the solution?'},
+        ]
+      },
+      parcerias:{
+        nome:'Partnerships',
+        conceito:`The Partnerships key encourages participants to analyze the context and define strategic alliances for implementing the entrepreneurial proposal. The combination of knowledge from different actors organized around a common goal (Crowley; Karim, 1995; Zahoor et al., 2021) contributes to project development with defined timelines, responsibilities (Reed; Reed, 2009), resources, and operating conditions (Seo, 2020).`,
+        fases:[
+          {nm:'Resources',desc:'Who can provide services or products locally?'},
+          {nm:'Characteristics',desc:'What will be each partner\'s responsibility?'},
+          {nm:'Timeline',desc:'How long between formalization and execution?'},
+        ]
+      },
+      oportunidades:{
+        nome:'Opportunities',
+        conceito:`The Opportunities key represents a possibility identified by participants through contextualizing the problem and solutions built during the investigation. Opportunity becomes a value-creation process (George et al., 2016), both through entrepreneurial behavior and through possible transformations in the investigated context.
+The authors present opportunity as an umbrella concept encompassing the creation of new businesses (Wood; McKinley, 2020) through discovery, evaluation, and exploration (Shane; Venkataraman, 2000).`,
+        fases:[
+          {nm:'Characteristics',desc:'What is it and how was the opportunity identified?'},
+          {nm:'Differentiation',desc:'How is the idea innovative compared to existing activities?'},
+          {nm:'Applicability',desc:'How can this opportunity be developed in the investigated context?'},
+        ]
+      },
+    }
+  },
+  es:{
+    sair:'Salir', iniciarSessao:'▶ Iniciar sesión', socializar:'↗ Socializar',
+    lblConceitos:'Conceptos de las Claves', expandir:'▼ expandir', recolher:'▲ colapsar',
+    chaveAtivaBadge:'— sin clave activa —',
+    chaves:{
+      problema:{
+        nome:'Problema',
+        conceito:`La clave Problema representa el inicio de la dinámica: al compartir experiencias, el equipo reflexiona sobre el contexto investigado, delimitándolo y caracterizándolo a partir de vivencias con el entorno. La motivación para resolver el problema se convierte en un aspecto compartido.
+El problema puede comprenderse como: ocurrencia negativa, evaluación de una intervención, uso no planificado de recursos o situaciones de incertidumbre (Landry, 1995). Bianchi y Verganti (2021) destacan que la identificación de problemas implica no solo componentes analíticos, sino también construcciones interpretativas derivadas de transformaciones sociales, culturales y tecnológicas.`,
+        fases:[
+          {nm:'Contexto',desc:'¿Dónde ocurre el problema?'},
+          {nm:'Características',desc:'¿Cómo afecta el problema al contexto?'},
+          {nm:'Motivación',desc:'¿Por qué vale la pena investigar este problema?'},
+        ]
+      },
+      solucao:{
+        nome:'Solución',
+        conceito:`La clave Solución corresponde a la ruta de investigación en la que los participantes construyen una solución aplicable al contexto, estableciendo respuestas o alternativas al problema identificado. En esta etapa, los participantes ejercitan la creatividad y la toma de decisiones ante propuestas viables y generadoras de valor (Kujala et al., 2010; Vogel et al., 2025).
+El comportamiento de los jugadores influye en las posibilidades de crear nuevos negocios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).`,
+        fases:[
+          {nm:'Características',desc:'¿Cómo será la solución?'},
+          {nm:'Costos',desc:'¿Cuáles son los gastos involucrados en implementar la solución?'},
+          {nm:'Riesgos',desc:'¿Qué barreras podrían dificultar o inviabilizar la implementación de la solución?'},
+        ]
+      },
+      parcerias:{
+        nome:'Alianzas',
+        conceito:`La clave Alianzas estimula a los participantes a analizar el contexto y definir alianzas estratégicas para la implementación de la propuesta emprendedora. La combinación de conocimientos de distintos actores organizados en torno a un objetivo común (Crowley; Karim, 1995; Zahoor et al., 2021) contribuye al desarrollo de proyectos con plazos, responsabilidades (Reed; Reed, 2009), recursos y condiciones de actuación (Seo, 2020).`,
+        fases:[
+          {nm:'Recursos',desc:'¿Quién puede ofrecer servicios o productos en la localidad?'},
+          {nm:'Características',desc:'¿Cuál será la responsabilidad de cada aliado?'},
+          {nm:'Tiempo',desc:'¿Cuánto tiempo entre la formalización y la ejecución?'},
+        ]
+      },
+      oportunidades:{
+        nome:'Oportunidades',
+        conceito:`La clave Oportunidades representa una posibilidad identificada por los participantes a través de la contextualización del problema y las soluciones construidas durante la investigación. La oportunidad se convierte en un proceso de creación de valor (George et al., 2016), tanto por el comportamiento emprendedor como por las posibles transformaciones en el contexto investigado.
+Los autores presentan la oportunidad como un paraguas que permite comprender la creación de nuevos negocios (Wood; McKinley, 2020) a partir del descubrimiento, evaluación y exploración (Shane; Venkataraman, 2000).`,
+        fases:[
+          {nm:'Características',desc:'¿Qué es y cómo fue identificada la oportunidad?'},
+          {nm:'Diferenciación',desc:'¿Cómo la idea es innovadora respecto a las actividades existentes?'},
+          {nm:'Aplicabilidad',desc:'¿Cómo puede desarrollarse esta oportunidad en el contexto investigado?'},
+        ]
+      },
+    }
+  }
+};
+
+let _idiomaAtual='pt';
+
+function setIdioma(lang){
+  _idiomaAtual=lang;
+  // Atualizar botões de idioma
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    const isOn=b.getAttribute('onclick').includes("'"+lang+"'");
+    b.classList.toggle('on',isOn);
+  });
+  // Atualizar textos da interface
+  const t=I18N[lang];
+  document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
+  const jogSair=document.getElementById('jog-btn-sair');
+  if(jogSair) jogSair.textContent=t.sair;
+  const jogAtivaBadge=document.getElementById('jog-chave-ativa');
+  // Só atualiza o badge se ainda estiver vazio/padrão
+  if(jogAtivaBadge&&jogAtivaBadge.textContent.includes('sem chave')||jogAtivaBadge&&jogAtivaBadge.textContent.includes('no active')||jogAtivaBadge&&jogAtivaBadge.textContent.includes('sin clave')){
+    jogAtivaBadge.textContent=t.chaveAtivaBadge;
+  }
+  const lblC=document.getElementById('lbl-conceitos');
+  if(lblC) lblC.textContent=t.lblConceitos;
+  // Rerender conceitos
+  renderConceitos();
+  // Atualizar o CHAVES_INFO com o idioma atual (para tooltips)
+  atualizarChavesInfo(lang);
+  // Atualizar nome das chaves visíveis nos cards já renderizados
+  if(state.chaves) renderChaves(state.chaves);
+}
+
+function atualizarChavesInfo(lang){
+  const t=I18N[lang];
+  ['problema','solucao','parcerias','oportunidades'].forEach(c=>{
+    if(t.chaves[c]){
+      CHAVES_INFO[c].fases=t.chaves[c].fases;
+      CHAVES_INFO[c].nomeLocale=t.chaves[c].nome;
+    }
+  });
+}
+
+function nomeChaveLocale(c){
+  const t=I18N[_idiomaAtual];
+  return t?.chaves?.[c]?.nome||nomeChave(c);
+}
+
+/* CONCEITOS */
+function toggleConceitos(){
+  const lista=document.getElementById('conceitos-lista');
+  const btn=document.getElementById('btn-toggle-conceitos');
+  const t=I18N[_idiomaAtual];
+  const isOpen=lista.style.display!=='none';
+  lista.style.display=isOpen?'none':'flex';
+  btn.textContent=isOpen?t.expandir:t.recolher;
+}
+
+function renderConceitos(){
+  const lista=document.getElementById('conceitos-lista');
+  if(!lista) return;
+  const t=I18N[_idiomaAtual];
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+  const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+  const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+  // Manter estado aberto/fechado de cada card
+  const estadoAberto={};
+  lista.querySelectorAll('.conceito-card').forEach(el=>{
+    estadoAberto[el.dataset.chave]=el.classList.contains('open');
+  });
+  lista.innerHTML='';
+  chaves.forEach(c=>{
+    const info=t.chaves[c];
+    const cor=corMap[c]; const bg=bgMap[c]; const bd=bdMap[c];
+    const wasOpen=estadoAberto[c];
+    const fasesHtml=info.fases.map(f=>`
+      <div style="margin-bottom:8px;">
+        <span style="font-weight:700;color:${cor};font-size:10px;">↳ ${f.nm}:</span>
+        <span style="color:var(--t3);font-size:10px;"> ${f.desc}</span>
+      </div>`).join('');
+    const div=document.createElement('div');
+    div.className='conceito-card'+(wasOpen?' open':'');
+    div.dataset.chave=c;
+    div.style.cssText=`background:${bg};border-color:${bd};`;
+    div.innerHTML=`
+      <div class="conceito-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="conceito-icn" style="background:${cor}22;">${icnMap[c]}</div>
+        <div class="conceito-nm" style="color:${cor};">${info.nome}</div>
+        <span class="conceito-chev">›</span>
+      </div>
+      <div class="conceito-body">
+        <p style="margin-bottom:10px;">${info.conceito.replace(/\n/g,'<br><br>')}</p>
+        <div style="border-top:1px solid ${bd};padding-top:8px;margin-top:4px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${cor};margin-bottom:6px;">Fases / Phases</div>
+          ${fasesHtml}
+        </div>
+      </div>`;
+    lista.appendChild(div);
+  });
+}
+
+/* ── RELATÓRIO DE INTERAÇÃO ── */
+function gerarRelatorio(){
+  const sessao=state.sessaoAtual;
+  if(!sessao){toast('Nenhuma sessão selecionada','err');return;}
+  const equipes=sessao.equipes||[];
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const totalChaves=equipes.reduce((a,e)=>a+(Object.values(e.chaves||{}).filter(v=>v.status==='concluida').length),0);
+  const maxChave=equipes.length?equipes.reduce((best,e)=>{const n=Object.values(e.chaves||{}).filter(v=>v.status==='concluida').length;return n>best.n?{nm:e.nome,n}:best},{nm:'—',n:0}):{nm:'—',n:0};
+  const dataAtual=new Date().toLocaleString('pt-BR');
+  const corMap={problema:'#22C97A',solucao:'#0FD4B0',parcerias:'#2E80F0',oportunidades:'#A040E0'};
+  const nmMap={problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'};
+  const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+
+  const equipesRows=equipes.map((eq,i)=>{
+    const chavesConcluidas=chaves.filter(c=>eq.chaves?.[c]?.status==='concluida');
+    const chaveAtiva=chaves.find(c=>eq.chaves?.[c]?.status==='ativa');
+    const pct=Math.round((chavesConcluidas.length/4)*100);
+    const dots=chaves.map(c=>{
+      const st=eq.chaves?.[c]?.status||'nao_iniciada';
+      const cor=corMap[c];
+      const op=st==='concluida'?'1':st==='ativa'?'0.5':'0.15';
+      return `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${cor};opacity:${op};margin:0 2px;"></span>`;
+    }).join('');
+    return `<tr>
+      <td style="padding:10px 12px;font-weight:600;">${eq.nome||'Equipe '+(i+1)}</td>
+      <td style="padding:10px 12px;text-align:center;">${dots}</td>
+      <td style="padding:10px 12px;text-align:center;">${chavesConcluidas.length}/4</td>
+      <td style="padding:10px 12px;text-align:center;">
+        <div style="background:#eee;border-radius:4px;height:8px;width:80px;margin:0 auto;">
+          <div style="background:#2E80F0;height:8px;border-radius:4px;width:${pct}%;"></div>
+        </div>
+        <span style="font-size:10px;color:#666;">${pct}%</span>
+      </td>
+      <td style="padding:10px 12px;text-align:center;">${chaveAtiva?`<span style="color:${corMap[chaveAtiva]};font-weight:600;">${icnMap[chaveAtiva]} ${nmMap[chaveAtiva]}</span>`:'<span style="color:#bbb;">—</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  const fasesSummary=chaves.map(c=>{
+    const concluidas=equipes.filter(e=>e.chaves?.[c]?.status==='concluida').length;
+    const ativas=equipes.filter(e=>e.chaves?.[c]?.status==='ativa').length;
+    const cor=corMap[c];
+    const pct=equipes.length?Math.round((concluidas/equipes.length)*100):0;
+    return `<div style="padding:12px;border-radius:10px;border:1.5px solid ${cor}30;background:${cor}08;">
+      <div style="font-weight:800;color:${cor};margin-bottom:6px;">${icnMap[c]} ${nmMap[c]}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:4px;">Concluídas: <b style="color:${cor};">${concluidas}</b> equipe(s)</div>
+      <div style="font-size:12px;color:#555;margin-bottom:8px;">Em progresso: <b>${ativas}</b> equipe(s)</div>
+      <div style="background:#eee;border-radius:4px;height:6px;">
+        <div style="background:${cor};height:6px;border-radius:4px;width:${pct}%;"></div>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:3px;">${pct}% das equipes concluíram</div>
+    </div>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Relatório de Interação — TdoE</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#222;background:#f5f5f5;padding:24px;}
+    .page{max-width:800px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.1);}
+    h1{font-size:22px;font-weight:800;margin-bottom:4px;}
+    .sub{font-size:13px;color:#666;margin-bottom:24px;}
+    h2{font-size:15px;font-weight:700;margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid #eee;}
+    table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+    th{background:#f0f0f0;padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:#555;}
+    tr:nth-child(even){background:#fafafa;}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+    .sum-card{background:#f8f8f8;border-radius:10px;padding:14px;text-align:center;}
+    .sum-val{font-size:26px;font-weight:900;color:#2E80F0;}
+    .sum-lbl{font-size:11px;color:#888;margin-top:3px;}
+    .chaves-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .footer{margin-top:28px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center;}
+    @media print{body{background:#fff;padding:0;}.page{box-shadow:none;border-radius:0;}}
+  </style></head><body>
+  <div class="page">
+    <h1>📋 Relatório de Interação — TdoE</h1>
+    <div class="sub">Sessão: <b>${sessao.titulo}</b> · Código: <b>${sessao.codigo_acesso}</b> · Gerado em: ${dataAtual}</div>
+    <div class="summary-grid">
+      <div class="sum-card"><div class="sum-val" style="color:#22C97A;">${equipes.length}</div><div class="sum-lbl">Equipes</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#2E80F0;">${equipes.reduce((a,e)=>a+(e.membros?.length||0),0)||equipes.length*4}</div><div class="sum-lbl">Participantes (est.)</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#0FD4B0;">${totalChaves}</div><div class="sum-lbl">Chaves concluídas</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#A040E0;">${maxChave.nm}</div><div class="sum-lbl">Equipe mais avançada</div></div>
+    </div>
+    <h2>Progresso por Equipe</h2>
+    <table>
+      <thead><tr>
+        <th>Equipe</th><th style="text-align:center;">Chaves</th><th style="text-align:center;">Concluídas</th>
+        <th style="text-align:center;">Progresso</th><th style="text-align:center;">Chave atual</th>
+      </tr></thead>
+      <tbody>${equipesRows}</tbody>
+    </table>
+    <h2>Síntese por Chave</h2>
+    <div class="chaves-grid">${fasesSummary}</div>
+    <div class="footer">TdoE – Tabuleiro do Empreendedor · UFLA · Daniela Meirelles Andrade</div>
+  </div>
+  <script>window.print();<\/script>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  toast('Relatório aberto para impressão','ok');
+}
+
+/* ── EXPORTAR PROPOSTAS (MODELO DE NEGÓCIO) ── */
+function exportarPropostas(){
+  const sessao=state.sessaoAtual;
+  if(!sessao){toast('Nenhuma sessão selecionada','err');return;}
+  const equipes=sessao.equipes||[];
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const corMap={problema:'#22C97A',solucao:'#0FD4B0',parcerias:'#2E80F0',oportunidades:'#A040E0'};
+  const nmMap={problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'};
+  const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+  const descMap={
+    problema:'O que foi investigado? Onde acontece e por que é relevante?',
+    solucao:'Como a equipe propõe resolver? Custos e riscos identificados?',
+    parcerias:'Quem pode apoiar? Recursos locais e parcerias mapeadas?',
+    oportunidades:'Qual oportunidade foi identificada? Como pode ser desenvolvida?',
+  };
+  const dataAtual=new Date().toLocaleString('pt-BR');
+
+  const pagesHtml=equipes.map((eq,i)=>{
+    const quadrantes=chaves.map(c=>{
+      const status=eq.chaves?.[c]?.status||'nao_iniciada';
+      const concluida=status==='concluida';
+      const cor=corMap[c];
+      const fasesInfo=CHAVES_INFO[c]?.fases||[];
+      const fasesText=fasesInfo.map(f=>`<div style="margin-bottom:6px;"><span style="font-size:10px;font-weight:700;color:${cor};">${f.nm}</span><div style="font-size:11px;color:#555;margin-top:2px;">${concluida?'Investigado pela equipe.':'(a ser preenchido)'}</div></div>`).join('');
+      return `<div style="border:2px solid ${cor}${concluida?'':'44'};border-radius:10px;padding:14px;background:${cor}${concluida?'0D':'05'};">
+        <div style="font-weight:800;font-size:13px;color:${cor};margin-bottom:8px;">${icnMap[c]} ${nmMap[c]}</div>
+        ${fasesText}
+        ${!concluida?`<div style="font-size:10px;color:#bbb;font-style:italic;margin-top:8px;">Chave não concluída</div>`:''}
+      </div>`;
+    });
+    const numConcluidas=chaves.filter(c=>eq.chaves?.[c]?.status==='concluida').length;
+    return `<div class="page-break" style="page-break-after:always;padding:24px;max-width:800px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #eee;">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#1A4E9E,#0F3370);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;">E${i+1}</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;">${eq.nome||'Equipe '+(i+1)}</div>
+          <div style="font-size:12px;color:#888;">Sessão: ${sessao.titulo} · ${numConcluidas}/4 chaves concluídas</div>
+        </div>
+        <div style="margin-left:auto;font-size:11px;color:#aaa;">${dataAtual}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        ${quadrantes.join('')}
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:#f5f5f5;border-radius:8px;font-size:10px;color:#888;text-align:center;">
+        TdoE – Tabuleiro do Empreendedor · UFLA · Modelo de Negócio da Equipe
+      </div>
+    </div>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Propostas — TdoE — ${sessao.titulo}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#222;background:#fff;}
+    @media print{.page-break{page-break-after:always;}body{background:#fff;}}
+    @media screen{body{background:#eee;padding:20px;}.page-break{background:#fff;border-radius:12px;margin-bottom:24px;box-shadow:0 2px 16px rgba(0,0,0,.1);}}
+  </style></head><body>
+  ${pagesHtml}
+  <script>window.print();<\/script>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  toast('Propostas abertas para impressão','ok');
+}
+
+/* ── INIT ── */
+(function(){
+  const t=localStorage.getItem('tdoe_edu_token');
+  const n=localStorage.getItem('tdoe_edu_nome');
+  if(t){state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};}
+})();
+irPara('login');
+</script>
+</body>
+</html>
