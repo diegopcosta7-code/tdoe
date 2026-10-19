@@ -358,6 +358,116 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 ═══════════════════════════════════════ */
 #modal-fase .modal{max-width:560px;}
 #modal-fase textarea{height:100px;resize:vertical;}
+
+/* ═══════════════════════════════════════
+   PONTUAÇÃO POR FASE — faixa do jogador
+═══════════════════════════════════════ */
+.score-strip{
+  background:#0D0D18;border-bottom:.5px solid #1A1A2A;
+  padding:6px 20px;display:flex;align-items:center;gap:12px;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.score-label{color:var(--t3);font-size:10px;text-transform:uppercase;letter-spacing:.06em;}
+.score-val{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:-.5px;line-height:1;}
+.score-pts{font-size:9px;color:var(--t3);margin-top:1px;}
+@keyframes scoreUp{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-24px);opacity:0}}
+.score-bump{animation:scoreUp .8s ease forwards;color:var(--prob);font-size:14px;font-weight:900;position:absolute;pointer-events:none;}
+
+/* ═══════════════════════════════════════
+   RELÓGIO VISÍVEL
+═══════════════════════════════════════ */
+.timer-strip{
+  background:#0D0D18;border-bottom:.5px solid #1A1A2A;
+  padding:5px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.timer-ring-wrap{position:relative;width:36px;height:36px;flex-shrink:0;}
+.timer-ring-wrap svg{transform:rotate(-90deg);}
+.timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:3;}
+.timer-prog{fill:none;stroke:var(--sol);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .9s linear;stroke-dasharray:100.5;stroke-dashoffset:0;}
+.timer-prog.urgent{stroke:var(--opor);}
+.timer-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--t1);}
+.timer-display{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--t1);font-variant-numeric:tabular-nums;}
+.timer-display.urgent{color:var(--opor);}
+.timer-lbl{font-size:10px;color:var(--t3);}
+/* controles do educador */
+.timer-edu-block{display:flex;flex-direction:column;gap:6px;padding:10px 0;}
+.timer-presets{display:flex;gap:4px;flex-wrap:wrap;}
+.timer-preset-btn{padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--t2);font-family:inherit;}
+.timer-preset-btn:hover{background:rgba(255,255,255,.06);}
+.timer-preset-btn.sel{background:var(--sol-bg);border-color:var(--sol-bd);color:var(--sol);}
+.timer-ctrl-row{display:flex;gap:5px;}
+.timer-ctrl-btn{flex:1;padding:8px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit;text-align:center;}
+.timer-start{background:var(--prob-bg);color:var(--prob);border:1.5px solid var(--prob-bd);}
+.timer-stop{background:rgba(255,80,80,.1);color:#ff6b6b;border:1.5px solid rgba(255,80,80,.3);}
+.timer-custom-row{display:flex;gap:5px;align-items:center;}
+.timer-custom-input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--t1);font-family:inherit;text-align:center;}
+
+/* ═══════════════════════════════════════
+   FEEDBACK DE CONCLUSÃO DE FASE
+═══════════════════════════════════════ */
+#overlay-congrats{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.congrats-box{
+  background:var(--bg2);border-radius:22px;border:.5px solid var(--border2);
+  padding:36px 40px;text-align:center;max-width:420px;width:100%;
+  animation:fadein .35s ease;position:relative;overflow:hidden;
+}
+.congrats-stars{font-size:40px;margin-bottom:12px;display:flex;justify-content:center;gap:6px;}
+@keyframes starPop{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.25) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.congrats-star{display:inline-block;animation:starPop .5s ease both;}
+.congrats-star:nth-child(1){animation-delay:.05s;}
+.congrats-star:nth-child(2){animation-delay:.18s;}
+.congrats-star:nth-child(3){animation-delay:.31s;}
+.congrats-title{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;}
+.congrats-sub{font-size:13px;color:var(--t2);margin-bottom:18px;}
+.congrats-pts-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 22px;border-radius:30px;
+  background:var(--gold-bg);border:1.5px solid var(--gold-bd);
+  color:var(--gold);font-size:22px;font-weight:900;letter-spacing:-.3px;
+  margin-bottom:22px;
+}
+@keyframes ptsCount{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.congrats-pts-badge{animation:ptsCount .4s .45s ease both;}
+
+/* ═══════════════════════════════════════
+   CARTA-DESAFIO
+═══════════════════════════════════════ */
+/* notificação para jogadores */
+.carta-notif{
+  margin:8px 16px 0;border-radius:11px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  border:1.5px solid;animation:fadein .3s ease;
+}
+/* overlay da carta para jogadores */
+#overlay-carta{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.carta-box{
+  background:var(--bg2);border-radius:22px;border:1.5px solid;
+  padding:32px 36px;max-width:440px;width:100%;
+  animation:fadein .35s ease;
+}
+.carta-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.carta-icone{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.carta-tipo{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:2px;}
+.carta-titulo{font-size:20px;font-weight:900;letter-spacing:-.3px;}
+.carta-corpo{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:22px;}
+/* painel do educador — lançador de cartas */
+.carta-launcher{display:flex;flex-direction:column;gap:5px;}
+.carta-launcher-btn{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;
+  border-radius:10px;cursor:pointer;border:1.5px solid;
+  background:transparent;font-family:inherit;text-align:left;
+  transition:all .15s;
+}
+.carta-launcher-btn:hover{filter:brightness(1.15);}
+.carta-launcher-icone{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.carta-launcher-nm{font-size:11px;font-weight:700;color:var(--t1);}
+.carta-launcher-sub{font-size:9px;color:var(--t3);margin-top:1px;}
 </style>
 </head>
 <body>
@@ -584,6 +694,48 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <div class="ctrl-btn" onclick="verificarAlertas()">🔔 Alertas</div>
       </div>
       <div class="sidebar-divider"></div>
+      <!-- RELÓGIO — controle do educador -->
+      <div class="panel-title">⏱ Relógio da fase</div>
+      <div class="timer-edu-block">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:4px;">Duração</div>
+        <div class="timer-presets">
+          <button class="timer-preset-btn" onclick="setTimerPreset(5)">5 min</button>
+          <button class="timer-preset-btn" onclick="setTimerPreset(15)">15 min</button>
+          <button class="timer-preset-btn" onclick="setTimerPreset(20)">20 min</button>
+          <button class="timer-preset-btn" onclick="setTimerPreset(30)">30 min</button>
+        </div>
+        <div class="timer-custom-row" style="margin-top:4px;">
+          <input class="timer-custom-input" id="edu-timer-min" type="number" min="1" max="120" placeholder="min" style="width:64px;"/>
+          <button class="timer-preset-btn" onclick="setTimerCustom()">Definir</button>
+        </div>
+        <div style="font-size:26px;font-weight:900;color:var(--t1);letter-spacing:-.5px;text-align:center;margin:6px 0 4px;font-variant-numeric:tabular-nums;" id="edu-timer-display">—</div>
+        <div class="timer-ctrl-row">
+          <button class="timer-ctrl-btn timer-start" onclick="iniciarTimerEdu()">▶ Iniciar</button>
+          <button class="timer-ctrl-btn timer-stop" onclick="pararTimerEdu()">⏹ Parar</button>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <!-- CARTA-DESAFIO — lançador do educador -->
+      <div class="panel-title">🃏 Carta-desafio</div>
+      <div class="carta-launcher" id="edu-carta-launcher">
+        <button class="carta-launcher-btn" style="border-color:var(--prob-bd);background:var(--prob-bg);" onclick="lancarCartaDesafio('problema','🔍','Desafio Problema','Identifiquem um problema ainda mais específico no contexto investigado e proponham uma nova perspectiva.')">
+          <div class="carta-launcher-icone" style="background:rgba(34,201,122,.15);">🔍</div>
+          <div><div class="carta-launcher-nm">Problema</div><div class="carta-launcher-sub">Aprofundar investigação</div></div>
+        </button>
+        <button class="carta-launcher-btn" style="border-color:var(--sol-bd);background:var(--sol-bg);" onclick="lancarCartaDesafio('solucao','✓','Desafio Solução','Revisem a solução proposta considerando novos critérios de viabilidade e impacto.')">
+          <div class="carta-launcher-icone" style="background:rgba(15,212,176,.15);">✓</div>
+          <div><div class="carta-launcher-nm">Solução</div><div class="carta-launcher-sub">Revisar proposta</div></div>
+        </button>
+        <button class="carta-launcher-btn" style="border-color:var(--parc-bd);background:var(--parc-bg);" onclick="lancarCartaDesafio('parcerias','🤝','Desafio Parcerias','Mapeiem pelo menos três novos parceiros estratégicos e justifiquem o papel de cada um.')">
+          <div class="carta-launcher-icone" style="background:rgba(46,128,240,.15);">🤝</div>
+          <div><div class="carta-launcher-nm">Parcerias</div><div class="carta-launcher-sub">Ampliar alianças</div></div>
+        </button>
+        <button class="carta-launcher-btn" style="border-color:var(--opor-bd);background:var(--opor-bg);" onclick="lancarCartaDesafio('oportunidades','💡','Desafio Oportunidades','Identifiquem uma oportunidade de mercado não explorada e descreva como aproveitá-la.')">
+          <div class="carta-launcher-icone" style="background:rgba(160,64,224,.15);">💡</div>
+          <div><div class="carta-launcher-nm">Oportunidades</div><div class="carta-launcher-sub">Descobrir novo caminho</div></div>
+        </button>
+      </div>
+      <div class="sidebar-divider"></div>
       <div class="panel-title">☕ Novas funções</div>
       <div id="novas-funcoes-lista" style="display:flex;flex-direction:column;gap:6px;"></div>
     </div>
@@ -610,6 +762,36 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
       </div>
       <button class="btn btn-ghost btn-sm" id="jog-btn-sair" onclick="logout()">Sair</button>
     </div>
+  </div>
+  <!-- FAIXA DE PONTUAÇÃO -->
+  <div class="score-strip" id="jog-score-strip">
+    <div>
+      <div class="score-label">Pontos de investigação</div>
+      <div style="display:flex;align-items:baseline;gap:5px;position:relative;">
+        <div class="score-val" id="jog-score-val">0</div>
+        <div class="score-pts">pts</div>
+      </div>
+    </div>
+    <div style="flex:1;"></div>
+    <div id="jog-carta-notif-inline" class="hidden"></div>
+  </div>
+  <!-- FAIXA DO RELÓGIO (só visível quando timer ativo) -->
+  <div class="timer-strip hidden" id="jog-timer-strip">
+    <div class="timer-ring-wrap">
+      <svg width="36" height="36" viewBox="0 0 36 36">
+        <circle class="timer-track" cx="18" cy="18" r="16"/>
+        <circle class="timer-prog" id="jog-timer-ring" cx="18" cy="18" r="16"/>
+      </svg>
+      <div class="timer-center" id="jog-timer-pct">100%</div>
+    </div>
+    <div>
+      <div class="timer-display" id="jog-timer-display">00:00</div>
+      <div class="timer-lbl">Tempo da fase</div>
+    </div>
+    <div style="flex:1;"></div>
+  </div>
+  <!-- NOTIF CARTA-DESAFIO (banner clicável) -->
+  <div id="jog-carta-notif" class="hidden">
   </div>
   <div class="jog-layout">
     <!-- COLUNA ESQUERDA -->
@@ -760,6 +942,43 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 </div>
 
 <!-- ════════════════════════════════════
+     OVERLAY — FEEDBACK DE CONCLUSÃO
+════════════════════════════════════ -->
+<div id="overlay-congrats" class="hidden">
+  <div class="congrats-box">
+    <div class="congrats-stars">
+      <span class="congrats-star">⭐</span>
+      <span class="congrats-star">🌟</span>
+      <span class="congrats-star">⭐</span>
+    </div>
+    <div class="congrats-title" id="congrats-titulo">Fase concluída!</div>
+    <div class="congrats-sub" id="congrats-sub">Você avançou na investigação</div>
+    <div class="congrats-pts-badge">+<span id="congrats-pts">80</span> pontos de investigação</div>
+    <button class="btn btn-primary" style="width:100%;" onclick="fecharCongrats()">Continuar investigando →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     OVERLAY — CARTA-DESAFIO (JOGADOR)
+════════════════════════════════════ -->
+<div id="overlay-carta" class="hidden">
+  <div class="carta-box" id="carta-box-inner">
+    <div class="carta-header">
+      <div class="carta-icone" id="carta-icone-el">🎯</div>
+      <div>
+        <div class="carta-tipo" id="carta-tipo-el">Carta-Desafio</div>
+        <div class="carta-titulo" id="carta-titulo-el">Novo desafio!</div>
+      </div>
+    </div>
+    <div class="carta-corpo" id="carta-corpo-el">O educador lançou um desafio especial para sua equipe.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="fecharCartaOverlay()">Fechar</button>
+      <button class="btn btn-primary" style="flex:1;" id="carta-aceitar-btn" onclick="aceitarCarta()">Aceitar desafio ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
      JAVASCRIPT
 ════════════════════════════════════ -->
 <script>
@@ -780,6 +999,13 @@ let state = {
   chaves: {},
   sessaoAtual: null,
   sussurroDestinatario: null,
+  // elementos lúdicos
+  pontuacao: 0,
+  timerTotal: 0,
+  timerRestante: 0,
+  timerRodando: false,
+  timerInterval: null,
+  cartaDesafioAtiva: null,
 };
 
 /* ── UTILIDADES ── */
@@ -1493,7 +1719,17 @@ async function concluirFaseConfirmar(){
     toast('Fase '+_fasePendente.numero+' de '+nomeChave(_fasePendente.chave)+' concluída!','ok');
     await carregarChaves();
     adicionarEventoRegistro('sistema','Sistema','✓ Fase '+_fasePendente.nome+' de '+nomeChave(_fasePendente.chave)+' concluída');
-  }catch(e){toast(e.message,'err');}
+    mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
+  }catch(e){
+    // fallback demo: mostra feedback mesmo sem backend
+    if(e.name==='AbortError'||e.message.includes('fetch')||e.message.includes('NetworkError')){
+      fecharModal('modal-fase');
+      await carregarChaves();
+      mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
+    } else {
+      toast(e.message,'err');
+    }
+  }
 }
 
 /* ── MEMBROS SIMULADOS (visual) ── */
@@ -1637,6 +1873,8 @@ setInterval(async()=>{
   if(state.perfil==='jogador'&&state.equipeId){
     try{await carregarBaloes();}catch(e){}
   }
+  // polling lúdico (timer + carta-desafio via localStorage)
+  pollingLudicoJogador();
 },10000);
 
 /* ── SISTEMA DE IDIOMAS ── */
@@ -2048,6 +2286,197 @@ function exportarPropostas(){
   const url=URL.createObjectURL(blob);
   window.open(url,'_blank');
   toast('Propostas abertas para impressão','ok');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ELEMENTOS LÚDICOS — Pontuação, Relógio, Feedback, Carta-Desafio
+═══════════════════════════════════════════════════════════════ */
+
+/* ── PONTUAÇÃO ── */
+const PONTOS_POR_FASE = 80;
+function atualizarScoreJogador(pts){
+  state.pontuacao=pts;
+  const el=document.getElementById('jog-score-val');
+  if(el) el.textContent=pts;
+}
+
+/* ── FEEDBACK DE CONCLUSÃO ── */
+function mostrarFeedbackConclusao(chave,numeroFase,nomeFase){
+  const pontos=PONTOS_POR_FASE;
+  const total=state.pontuacao+pontos;
+  atualizarScoreJogador(total);
+  try{localStorage.setItem('tdoe_pontuacao_'+(state.equipeId||'demo'),total);}catch(e){}
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const cor=corMap[chave]||'var(--gold)';
+  const tEl=document.getElementById('congrats-titulo');
+  const sEl=document.getElementById('congrats-sub');
+  const pEl=document.getElementById('congrats-pts');
+  if(tEl) tEl.textContent='Fase '+numeroFase+' concluída!';
+  if(sEl) sEl.textContent=(nomeFase||'Fase')+' · '+nomeChave(chave);
+  if(pEl){
+    pEl.textContent='0';
+    let c=0;
+    const iv=setInterval(()=>{c=Math.min(c+8,pontos);pEl.textContent=c;if(c>=pontos)clearInterval(iv);},30);
+  }
+  const badge=document.querySelector('.congrats-pts-badge');
+  if(badge) badge.style.color=cor;
+  const ov=document.getElementById('overlay-congrats');
+  if(ov) ov.classList.remove('hidden');
+}
+function fecharCongrats(){
+  const ov=document.getElementById('overlay-congrats');
+  if(ov) ov.classList.add('hidden');
+}
+
+/* ── RELÓGIO — helpers ── */
+const TIMER_KEY='tdoe_timer_state';
+function salvarTimerStorage(){
+  try{localStorage.setItem(TIMER_KEY,JSON.stringify({total:state.timerTotal,restante:state.timerRestante,rodando:state.timerRodando,ts:Date.now()}));}catch(e){}
+}
+function lerTimerStorage(){
+  try{
+    const raw=localStorage.getItem(TIMER_KEY);
+    if(!raw) return null;
+    const d=JSON.parse(raw);
+    if(d.rodando){const el=Math.floor((Date.now()-d.ts)/1000);d.restante=Math.max(0,d.restante-el);}
+    return d;
+  }catch(e){return null;}
+}
+function fmt(seg){return String(Math.floor(seg/60)).padStart(2,'0')+':'+String(seg%60).padStart(2,'0');}
+function atualizarDisplayTimer(){
+  const r=state.timerRestante,t=state.timerTotal||1;
+  const pct=Math.round((r/t)*100);
+  const urg=r<=60&&r>0;
+  const eD=document.getElementById('edu-timer-display');
+  if(eD) eD.textContent=state.timerTotal>0?fmt(r):'—';
+  const jS=document.getElementById('jog-timer-strip');
+  const jD=document.getElementById('jog-timer-display');
+  const jP=document.getElementById('jog-timer-pct');
+  const jR=document.getElementById('jog-timer-ring');
+  if(state.timerTotal>0&&jS) jS.classList.remove('hidden');
+  if(jD){jD.textContent=fmt(r);jD.classList.toggle('urgent',urg);}
+  if(jP) jP.textContent=pct+'%';
+  if(jR){
+    const circ=100.53;
+    jR.style.strokeDashoffset=circ-(pct/100)*circ;
+    jR.classList.toggle('urgent',urg);
+  }
+}
+
+/* ── RELÓGIO — controles do educador ── */
+function setTimerPreset(min){
+  document.querySelectorAll('.timer-preset-btn').forEach(b=>{b.classList.toggle('sel',b.textContent.trim()===min+' min');});
+  state.timerTotal=min*60;state.timerRestante=min*60;state.timerRodando=false;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  atualizarDisplayTimer();salvarTimerStorage();
+}
+function setTimerCustom(){
+  const inp=document.getElementById('edu-timer-min');
+  const min=parseInt(inp&&inp.value);
+  if(isNaN(min)||min<1||min>120){toast('Informe entre 1 e 120 minutos','err');return;}
+  document.querySelectorAll('.timer-preset-btn').forEach(b=>b.classList.remove('sel'));
+  state.timerTotal=min*60;state.timerRestante=min*60;state.timerRodando=false;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  atualizarDisplayTimer();salvarTimerStorage();toast('Timer: '+min+' min','ok');
+}
+function iniciarTimerEdu(){
+  if(state.timerTotal===0){toast('Defina a duração antes','err');return;}
+  if(state.timerRodando){toast('Timer já rodando','info');return;}
+  state.timerRodando=true;salvarTimerStorage();toast('⏱ Timer iniciado','ok');
+  state.timerInterval=setInterval(()=>{
+    if(state.timerRestante<=0){pararTimerEdu(true);return;}
+    state.timerRestante--;atualizarDisplayTimer();salvarTimerStorage();
+  },1000);
+}
+function pararTimerEdu(natural=false){
+  state.timerRodando=false;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  if(natural){state.timerRestante=0;toast('⏱ Tempo esgotado!','info');}
+  else toast('⏱ Timer parado','info');
+  atualizarDisplayTimer();salvarTimerStorage();
+}
+
+/* ── RELÓGIO — polling jogador ── */
+function atualizarTimerJogador(){
+  const d=lerTimerStorage();
+  if(!d||d.total===0) return;
+  state.timerTotal=d.total;state.timerRestante=d.restante;state.timerRodando=d.rodando;
+  atualizarDisplayTimer();
+}
+
+/* ── CARTA-DESAFIO — lançar (educador) ── */
+function lancarCartaDesafio(chave,icone,titulo,corpo){
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+  const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+  const carta={chave,icone,titulo,corpo,cor:corMap[chave]||'var(--gold)',bg:bgMap[chave]||'var(--gold-bg)',bd:bdMap[chave]||'var(--gold-bd)'};
+  try{localStorage.setItem('tdoe_carta_desafio',JSON.stringify({...carta,ts:Date.now()}));}catch(e){}
+  receberCartaDesafio(carta);
+  toast('🃏 Carta enviada: '+titulo,'ok');
+}
+
+/* ── CARTA-DESAFIO — receber (jogador) ── */
+function receberCartaDesafio(carta){
+  state.cartaDesafioAtiva=carta;
+  const ni=document.getElementById('jog-carta-notif-inline');
+  if(ni){
+    ni.classList.remove('hidden');
+    ni.innerHTML=`<div class="carta-notif" style="background:${carta.bg};border-color:${carta.bd};color:${carta.cor};" onclick="abrirCartaJogador()">
+      <span style="font-size:18px;">${carta.icone}</span>
+      <div><div style="font-size:11px;font-weight:700;">${carta.titulo}</div><div style="font-size:9px;opacity:.75;">Carta-desafio — toque para abrir</div></div>
+      <span style="margin-left:auto;">→</span>
+    </div>`;
+  }
+}
+function abrirCartaJogador(){
+  const carta=state.cartaDesafioAtiva;if(!carta) return;
+  const box=document.getElementById('carta-box-inner');
+  const iEl=document.getElementById('carta-icone-el');
+  const tpEl=document.getElementById('carta-tipo-el');
+  const ttEl=document.getElementById('carta-titulo-el');
+  const cpEl=document.getElementById('carta-corpo-el');
+  const abEl=document.getElementById('carta-aceitar-btn');
+  if(iEl){iEl.textContent=carta.icone;iEl.style.background=carta.bg;}
+  if(tpEl){tpEl.textContent='Carta-Desafio · '+nomeChave(carta.chave);tpEl.style.color=carta.cor;}
+  if(ttEl) ttEl.textContent=carta.titulo;
+  if(cpEl) cpEl.textContent=carta.corpo;
+  if(box) box.style.borderColor=carta.bd;
+  if(abEl){abEl.style.background=carta.cor;abEl.style.color='#fff';}
+  const ov=document.getElementById('overlay-carta');
+  if(ov) ov.classList.remove('hidden');
+}
+function fecharCartaOverlay(){
+  const ov=document.getElementById('overlay-carta');if(ov) ov.classList.add('hidden');
+}
+function aceitarCarta(){
+  const carta=state.cartaDesafioAtiva;
+  fecharCartaOverlay();
+  toast('✓ Desafio aceito! Boa investigação 🚀','ok');
+  adicionarEventoRegistro('sistema','Sistema','🃏 Carta "'+carta?.titulo+'" aceita');
+  const ni=document.getElementById('jog-carta-notif-inline');
+  if(ni) ni.classList.add('hidden');
+  state.cartaDesafioAtiva=null;
+  try{localStorage.removeItem('tdoe_carta_desafio');}catch(e){}
+}
+
+/* ── POLLING LÚDICO — jogador verifica timer e carta a cada 5s ── */
+function pollingLudicoJogador(){
+  if(state.perfil!=='jogador') return;
+  // timer
+  atualizarTimerJogador();
+  // carta
+  try{
+    const raw=localStorage.getItem('tdoe_carta_desafio');
+    if(raw&&!state.cartaDesafioAtiva){
+      const carta=JSON.parse(raw);
+      if(Date.now()-carta.ts<60000) receberCartaDesafio(carta);
+    }
+  }catch(e){}
+  // pontuação salva
+  try{
+    const pts=parseInt(localStorage.getItem('tdoe_pontuacao_'+(state.equipeId||'demo'))||'0');
+    if(pts&&state.pontuacao===0) atualizarScoreJogador(pts);
+  }catch(e){}
 }
 
 /* ── INIT ── */
