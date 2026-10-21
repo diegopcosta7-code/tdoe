@@ -1047,7 +1047,7 @@ function toast(msg, tipo='ok'){
 async function api(method, path, body=null){
   const ctrl=new AbortController();
   // DELETE e POST de ação demoram mais (Render pode estar dormindo)
-  const longRoutes=['/ativar','/acao','/concluir','/entrar','/auth/login'];
+  const longRoutes=['/ativar','/acao','/concluir','/entrar','/auth/login','/chaves/','/sessao/'];
   const isLong=method==='DELETE'||longRoutes.some(r=>path.includes(r));
   const timeout=isLong?35000:8000;
   const timer=setTimeout(()=>ctrl.abort(),timeout);
@@ -1554,7 +1554,16 @@ async function criarSessao(){
     document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
     lista.prepend(d);
     d.onclick=()=>selecionarSessao(data.id);
-    await selecionarSessao(data.id);
+    // preenche painel imediatamente com dados do POST (sem novo request)
+    state.sessaoId=data.id;
+    state.sessaoAtual=data;
+    state.sessaoStatus=data.status||'aguardando';
+    document.getElementById('tb-sessao-titulo').textContent=titulo+' · '+data.codigo_acesso;
+    document.getElementById('m-codigo').textContent=data.codigo_acesso;
+    atualizarStatusBadge(data.status||'aguardando');
+    renderEquipasGrid(data.equipes||[]);
+    atualizarMetricas(data.equipes||[]);
+    atualizarBarrasChaves(data.equipes||[]);
   }catch(e){
     fecharModal('modal-sessao');
     const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
@@ -1670,6 +1679,8 @@ async function carregarPainelJogadores(){
 
 async function carregarChaves(){
   try{
+    const grid=document.getElementById('jog-chaves-grid');
+    if(grid&&!state.chaves) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--t3);font-size:12px;">⏳ Conectando ao servidor…</div>';
     const data=await api('GET','/chaves/'+state.equipeId);
     state.chaves=data;
     renderChaves(data);
