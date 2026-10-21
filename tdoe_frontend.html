@@ -1710,13 +1710,21 @@ function renderChaves(chaves){
       </div>
       <div class="cc-fases">${fasesHtml}</div>
       <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:${pct}%;background:${cor};${ativa?'box-shadow:0 0 6px '+cor:''}"></div></div>`;
-    if(!concluida&&(disponivel||naoIniciada)){
+    const problemaConcluida=chaves['problema']?.status==='concluida';
+    const chavesDependentes=['solucao','parcerias','oportunidades'];
+    const bloqueadaPorProblema=chavesDependentes.includes(c)&&!problemaConcluida;
+    if(!concluida&&!ativa&&!bloqueadaPorProblema&&(disponivel||naoIniciada)){
       const btnAtivar=document.createElement('button');
       btnAtivar.className='btn btn-primary w100 btn-sm';
       btnAtivar.style.marginTop='8px';
       btnAtivar.textContent='Iniciar '+nomeChaveLocale(c);
       btnAtivar.onclick=()=>ativarChave(c);
       card.appendChild(btnAtivar);
+    } else if(!concluida&&!ativa&&bloqueadaPorProblema){
+      const lblBloq=document.createElement('div');
+      lblBloq.style.cssText='margin-top:8px;font-size:10px;color:var(--t3);text-align:center;padding:6px;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed rgba(255,255,255,.08);';
+      lblBloq.textContent='🔒 Complete Problema primeiro';
+      card.appendChild(lblBloq);
     }
     grid.appendChild(card);
   });
@@ -1726,6 +1734,12 @@ async function ativarChave(chave){
   // modo demo: equipeId null → ativa localmente sem API
   if(!state.equipeId){
     if(!state.chavesDemo) state.chavesDemo={};
+    // bloqueia chaves dependentes se problema não concluída
+    const chavesDep=['solucao','parcerias','oportunidades'];
+    if(chavesDep.includes(chave)&&state.chavesDemo['problema']?.status!=='concluida'){
+      toast('🔒 Conclua Problema antes de ativar '+nomeChave(chave),'err');
+      return;
+    }
     Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
     state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
     toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
@@ -1775,7 +1789,12 @@ function renderChavesDemo(){
       </div>
       <div class="cc-fases">${fasesHtml}</div>
       <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:0%;background:${cor};"></div></div>
-      ${!ativa?`<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`:''}
+      ${!ativa?(()=>{
+        const problemaConcluida=chavesData['problema']?.status==='concluida';
+        const dep=['solucao','parcerias','oportunidades'].includes(c);
+        if(dep&&!problemaConcluida) return `<div style="margin-top:8px;font-size:10px;color:var(--t3);text-align:center;padding:6px;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed rgba(255,255,255,.08);">🔒 Complete Problema primeiro</div>`;
+        return `<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`;
+      })():''}
     `;
     grid.appendChild(div);
   });
@@ -2622,8 +2641,12 @@ function pararTimerEdu(natural=false){
 /* ── RELÓGIO — polling jogador ── */
 function atualizarTimerJogador(){
   const d=lerTimerStorage();
-  if(!d||d.total===0) return;
+  // ignora timer zerado/parado que veio do educador antes do estudante entrar
+  if(!d||d.total===0||(!d.rodando&&d.restante===0)) return;
+  const jaRodava=state.timerRodando;
   state.timerTotal=d.total;state.timerRestante=d.restante;state.timerRodando=d.rodando;
+  // só avisa "tempo esgotado" se o timer estava rodando nesta sessão do estudante
+  if(jaRodava&&!d.rodando&&d.restante===0) toast('⏱ Tempo esgotado!','info');
   atualizarDisplayTimer();
 }
 
