@@ -1309,8 +1309,13 @@ async function verificarVersaoBackend(){
 async function carregarPainelEducador(selecionarId=null){
   let sessoes=[];
   let backendOnline=false;
-  try{ sessoes=await api('GET','/sessao'); backendOnline=true; }catch(e){ sessoes=[]; }
-  // só injeta sessão demo se o backend estiver offline (erro de rede)
+  try{ sessoes=await api('GET','/sessao'); backendOnline=true; }catch(e){
+    // backend online se o erro veio de HTTP (não de rede/timeout)
+    // TypeError = rede; AbortError = timeout; outros = resposta HTTP (401, 500…)
+    if(e.name!=='TypeError' && e.name!=='AbortError') backendOnline=true;
+    sessoes=[];
+  }
+  // só injeta sessão demo se o backend estiver offline (erro de rede/timeout)
   if(!backendOnline && !sessoes.length){
     sessoes=[{id:'demo-1',titulo:'Sessão Demo',
       contexto:'escolar',codigo_acesso:'DEMO01',status:'ativa',
