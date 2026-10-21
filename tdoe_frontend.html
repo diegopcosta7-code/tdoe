@@ -1683,6 +1683,9 @@ async function carregarChaves(){
     if(grid&&!state.chaves) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--t3);font-size:12px;">⏳ Conectando ao servidor…</div>';
     const data=await api('GET','/chaves/'+state.equipeId);
     state.chaves=data;
+    // diagnóstico: mostra status das chaves recebidas
+    const statusLog=Object.entries(data).map(([k,v])=>k+':'+v.status).join(' | ');
+    toast('Chaves: '+statusLog,'info');
     renderChaves(data);
     atualizarChaveAtivaBadge(data);
     carregarSussurroChips();
@@ -1756,7 +1759,8 @@ function renderChaves(chaves){
     const problemaConcluida=chaves['problema']?.status==='concluida';
     const chavesDependentes=['solucao','parcerias','oportunidades'];
     const bloqueadaPorProblema=chavesDependentes.includes(c)&&!problemaConcluida;
-    if(!concluida&&!ativa&&!bloqueadaPorProblema&&(disponivel||naoIniciada)){
+    // mostra botão para qualquer status que não seja ativa/concluida (inclui bloqueada, nao_iniciada, disponivel, etc)
+    if(!concluida&&!ativa&&!bloqueadaPorProblema){
       const btnAtivar=document.createElement('button');
       btnAtivar.className='btn btn-primary w100 btn-sm';
       btnAtivar.style.marginTop='8px';
