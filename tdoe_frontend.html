@@ -986,7 +986,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 // URL do backend: prioridade para variável global (injetada no deploy),
 // depois variável de ambiente via meta tag, depois localhost para desenvolvimento local.
 const API = (()=>{
-  // Permite sobrescrever via: <script>window.TDOE_API_URL='https://...'</script> antes deste arquivo
+  // Permite sobrescrever via: window.TDOE_API_URL='https://...' (definir antes deste arquivo)
   if(window.TDOE_API_URL) return window.TDOE_API_URL.replace(/\/$/,'');
   // Detecta automaticamente: se abrindo de file:// ou localhost, usa localhost
   const h = location.hostname;
