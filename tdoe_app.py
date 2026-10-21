@@ -370,6 +370,29 @@ def detalhar_sessao(sessao_id: str, edu=Depends(get_educador)):
     return {**sessao, "equipes": resultado, "alertas": alertas}
 
 
+@app.delete("/sessao/{sessao_id}", tags=["Sessão"])
+def excluir_sessao(sessao_id: str, edu=Depends(get_educador)):
+    sessao = db_get("sessoes", sessao_id)
+    if not sessao:
+        raise HTTPException(404, "Sessão não encontrada.")
+    if sessao["educador_id"] != edu["id"]:
+        raise HTTPException(403, "Você não tem permissão para excluir esta sessão.")
+    equipes = db_list("equipes", {"sessao_id": sessao_id})
+    for eq in equipes:
+        progs = db_list("progresso_chaves", {"equipe_id": eq["id"]})
+        for prog in progs:
+            supabase.table("progresso_fases").delete().eq("progresso_chave_id", prog["id"]).execute()
+        supabase.table("progresso_chaves").delete().eq("equipe_id", eq["id"]).execute()
+        supabase.table("participantes").delete().eq("equipe_id", eq["id"]).execute()
+        supabase.table("cutucar").delete().eq("equipe_id", eq["id"]).execute()
+        supabase.table("sussurros").delete().eq("equipe_id", eq["id"]).execute()
+        supabase.table("baloes_coletivos").delete().eq("equipe_id", eq["id"]).execute()
+    supabase.table("equipes").delete().eq("sessao_id", sessao_id).execute()
+    supabase.table("alertas").delete().eq("sessao_id", sessao_id).execute()
+    supabase.table("sessoes").delete().eq("id", sessao_id).execute()
+    return {"ok": True, "excluida": sessao_id}
+
+
 @app.patch("/sessao/{sessao_id}/acao", tags=["Sessão"])
 def acao_sessao(sessao_id: str, dados: SessaoAcao, edu=Depends(get_educador)):
     sessao = db_get("sessoes", sessao_id)
