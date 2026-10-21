@@ -2603,19 +2603,6 @@ function fecharCongrats(){
 }
 
 /* ── RELÓGIO — helpers ── */
-const TIMER_KEY='tdoe_timer_state';
-function salvarTimerStorage(){
-  try{localStorage.setItem(TIMER_KEY,JSON.stringify({total:state.timerTotal,restante:state.timerRestante,rodando:state.timerRodando,ts:Date.now()}));}catch(e){}
-}
-function lerTimerStorage(){
-  try{
-    const raw=localStorage.getItem(TIMER_KEY);
-    if(!raw) return null;
-    const d=JSON.parse(raw);
-    if(d.rodando){const el=Math.floor((Date.now()-d.ts)/1000);d.restante=Math.max(0,d.restante-el);}
-    return d;
-  }catch(e){return null;}
-}
 function fmt(seg){return String(Math.floor(seg/60)).padStart(2,'0')+':'+String(seg%60).padStart(2,'0');}
 function atualizarDisplayTimer(){
   const r=state.timerRestante,t=state.timerTotal||1;
@@ -2628,6 +2615,7 @@ function atualizarDisplayTimer(){
   const jP=document.getElementById('jog-timer-pct');
   const jR=document.getElementById('jog-timer-ring');
   if(state.timerTotal>0&&jS) jS.classList.remove('hidden');
+  else if(jS) jS.classList.add('hidden');
   if(jD){jD.textContent=fmt(r);jD.classList.toggle('urgent',urg);}
   if(jP) jP.textContent=pct+'%';
   if(jR){
@@ -2636,13 +2624,29 @@ function atualizarDisplayTimer(){
     jR.classList.toggle('urgent',urg);
   }
 }
+function aplicarTimerDaAPI(t){
+  if(!t||!t.total) return;
+  const jaRodava=state.timerRodando;
+  // calcula restante atual se estiver rodando (compensa latência)
+  let restante=t.restante||0;
+  if(t.rodando&&t.ts){
+    const elapsed=Math.floor((Date.now()/1000)-t.ts);
+    restante=Math.max(0,restante-elapsed);
+  }
+  state.timerTotal=t.total;
+  state.timerRestante=restante;
+  state.timerRodando=t.rodando||false;
+  if(jaRodava&&!t.rodando&&restante===0) toast('⏱ Tempo esgotado!','info');
+  atualizarDisplayTimer();
+}
 
-/* ── RELÓGIO — controles do educador ── */
+/* ── RELÓGIO — controles do educador (via API) ── */
 function setTimerPreset(min){
   document.querySelectorAll('.timer-preset-btn').forEach(b=>{b.classList.toggle('sel',b.textContent.trim()===min+' min');});
   state.timerTotal=min*60;state.timerRestante=min*60;state.timerRodando=false;
   if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
-  atualizarDisplayTimer();salvarTimerStorage();
+  atualizarDisplayTimer();
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'definir',total:min*60}).catch(()=>{});
 }
 function setTimerCustom(){
   const inp=document.getElementById('edu-timer-min');
@@ -2651,35 +2655,36 @@ function setTimerCustom(){
   document.querySelectorAll('.timer-preset-btn').forEach(b=>b.classList.remove('sel'));
   state.timerTotal=min*60;state.timerRestante=min*60;state.timerRodando=false;
   if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
-  atualizarDisplayTimer();salvarTimerStorage();toast('Timer: '+min+' min','ok');
+  atualizarDisplayTimer();toast('Timer: '+min+' min','ok');
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'definir',total:min*60}).catch(()=>{});
 }
-function iniciarTimerEdu(){
+async function iniciarTimerEdu(){
   if(state.timerTotal===0){toast('Defina a duração antes','err');return;}
   if(state.timerRodando){toast('Timer já rodando','info');return;}
-  state.timerRodando=true;salvarTimerStorage();toast('⏱ Timer iniciado','ok');
+  state.timerRodando=true;toast('⏱ Timer iniciado','ok');
   state.timerInterval=setInterval(()=>{
     if(state.timerRestante<=0){pararTimerEdu(true);return;}
-    state.timerRestante--;atualizarDisplayTimer();salvarTimerStorage();
+    state.timerRestante--;atualizarDisplayTimer();
   },1000);
+  atualizarDisplayTimer();
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'iniciar'}).catch(()=>{});
 }
-function pararTimerEdu(natural=false){
+async function pararTimerEdu(natural=false){
   state.timerRodando=false;
   if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
   if(natural){state.timerRestante=0;toast('⏱ Tempo esgotado!','info');}
   else toast('⏱ Timer parado','info');
-  atualizarDisplayTimer();salvarTimerStorage();
+  atualizarDisplayTimer();
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'parar'}).catch(()=>{});
 }
 
-/* ── RELÓGIO — polling jogador ── */
-function atualizarTimerJogador(){
-  const d=lerTimerStorage();
-  // ignora timer zerado/parado que veio do educador antes do estudante entrar
-  if(!d||d.total===0||(!d.rodando&&d.restante===0)) return;
-  const jaRodava=state.timerRodando;
-  state.timerTotal=d.total;state.timerRestante=d.restante;state.timerRodando=d.rodando;
-  // só avisa "tempo esgotado" se o timer estava rodando nesta sessão do estudante
-  if(jaRodava&&!d.rodando&&d.restante===0) toast('⏱ Tempo esgotado!','info');
-  atualizarDisplayTimer();
+/* ── RELÓGIO — polling jogador (via API) ── */
+async function atualizarTimerJogador(){
+  if(!state.sessaoId) return;
+  try{
+    const d=await api('GET','/sessao/'+state.sessaoId+'/timer');
+    if(d&&d.timer) aplicarTimerDaAPI(d.timer);
+  }catch(e){}
 }
 
 /* ── CARTA-DESAFIO — lançar (educador) ── */
@@ -2737,10 +2742,19 @@ function aceitarCarta(){
   try{localStorage.removeItem('tdoe_carta_desafio');}catch(e){}
 }
 
-/* ── POLLING LÚDICO — jogador verifica timer e carta a cada 5s ── */
+/* ── POLLING LÚDICO — jogador verifica timer e carta a cada 10s ── */
+// Timer: sinc com API a cada 5s + tick local a cada 1s para display suave
+setInterval(()=>{
+  if(state.perfil==='jogador'&&state.sessaoId) atualizarTimerJogador();
+},5000);
+setInterval(()=>{
+  if(state.perfil==='jogador'&&state.timerRodando&&state.timerRestante>0){
+    state.timerRestante--;atualizarDisplayTimer();
+  }
+},1000);
 function pollingLudicoJogador(){
   if(state.perfil!=='jogador') return;
-  // timer
+  // timer já tem seu próprio interval acima
   atualizarTimerJogador();
   // carta
   try{
