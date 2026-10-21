@@ -1348,17 +1348,15 @@ async function excluirSessao(id, titulo, btn){
   try{
     await api('DELETE','/sessao/'+id);
     toast('Sessão excluída','ok');
+    const el=document.getElementById('sessao-item-'+id);
+    if(el) el.remove();
+    if(state.sessaoId===id){
+      const prox=document.querySelector('#lista-sessoes .eq-item');
+      if(prox) prox.click();
+      else { state.sessaoId=null; state.sessaoAtual=null; }
+    }
   }catch(e){
-    // se backend não tem rota DELETE, remove só da UI
-    toast('Sessão removida da lista','ok');
-  }
-  const el=document.getElementById('sessao-item-'+id);
-  if(el) el.remove();
-  // se era a sessão atual, seleciona a primeira disponível
-  if(state.sessaoId===id){
-    const prox=document.querySelector('#lista-sessoes .eq-item');
-    if(prox) prox.click();
-    else { state.sessaoId=null; state.sessaoAtual=null; }
+    toast('Erro ao excluir: '+e.message,'err');
   }
 }
 
@@ -1471,9 +1469,16 @@ function renderAlertas(alertas){
 
 async function acaoSessao(){
   if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  // se status não está carregado, busca do servidor
+  if(!state.sessaoStatus){
+    try{
+      const d=await api('GET','/sessao/'+state.sessaoId);
+      state.sessaoStatus=d.status;
+    }catch(e){}
+  }
   const mapa={aguardando:'iniciar',ativa:'pausar',pausada:'retomar'};
   const acao=mapa[state.sessaoStatus];
-  if(!acao){toast('Ação não disponível neste estado','err');return;}
+  if(!acao){toast('Ação não disponível neste estado: '+state.sessaoStatus,'err');return;}
   await acaoSessaoEspecifica(acao);
 }
 
