@@ -1306,7 +1306,7 @@ async function verificarVersaoBackend(){
 }
 
 /* ── PAINEL EDUCADOR ── */
-async function carregarPainelEducador(){
+async function carregarPainelEducador(selecionarId=null){
   let sessoes=[];
   try{ sessoes=await api('GET','/sessao'); }catch(e){ sessoes=[]; }
   if(!sessoes.length){
@@ -1327,19 +1327,46 @@ async function carregarPainelEducador(){
   }
   sessoes.forEach((s,i)=>{
     const d=document.createElement('div');
+    d.id='sessao-item-'+s.id;
     d.className='eq-item'+(i===0?' on':'');
+    d.style.position='relative';
     d.innerHTML=`<div class="eq-av" style="background:${avatarCor(i)};font-size:9px;">S${i+1}</div>
-      <div><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>`;
+      <div style="flex:1;min-width:0;"><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>
+      <button onclick="event.stopPropagation();excluirSessao('${s.id}','${s.titulo.replace(/'/g,"\\'")}',this)" title="Excluir sessão"
+        style="background:none;border:none;cursor:pointer;color:rgba(255,80,80,.5);font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0;"
+        onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='rgba(255,80,80,.5)'">✕</button>`;
     d.onclick=()=>selecionarSessao(s.id);
     lista.appendChild(d);
   });
-  if(sessoes.length>0) await selecionarSessao(sessoes[0].id);
+  const idParaSelecionar=selecionarId||sessoes[0]?.id;
+  if(idParaSelecionar) await selecionarSessao(idParaSelecionar);
   await carregarNovasFuncoes();
+}
+
+async function excluirSessao(id, titulo, btn){
+  if(!confirm('Excluir a sessão "'+titulo+'"? Esta ação não pode ser desfeita.')) return;
+  try{
+    await api('DELETE','/sessao/'+id);
+    toast('Sessão excluída','ok');
+  }catch(e){
+    // se backend não tem rota DELETE, remove só da UI
+    toast('Sessão removida da lista','ok');
+  }
+  const el=document.getElementById('sessao-item-'+id);
+  if(el) el.remove();
+  // se era a sessão atual, seleciona a primeira disponível
+  if(state.sessaoId===id){
+    const prox=document.querySelector('#lista-sessoes .eq-item');
+    if(prox) prox.click();
+    else { state.sessaoId=null; state.sessaoAtual=null; }
+  }
 }
 
 async function selecionarSessao(id){
   state.sessaoId=id;
-  document.querySelectorAll('.eq-item').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
+  const item=document.getElementById('sessao-item-'+id);
+  if(item) item.classList.add('on');
   try{
     const s=await api('GET','/sessao/'+id);
     state.sessaoAtual=s;
@@ -1495,8 +1522,7 @@ async function criarSessao(){
     });
     fecharModal('modal-sessao');
     toast('Sessão criada! Código: '+data.codigo_acesso,'ok');
-    await carregarPainelEducador();
-    await selecionarSessao(data.id);
+    await carregarPainelEducador(data.id);
   }catch(e){
     fecharModal('modal-sessao');
     const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
