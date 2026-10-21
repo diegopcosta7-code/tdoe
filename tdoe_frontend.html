@@ -1738,10 +1738,12 @@ function renderChaves(chaves){
     else{badgeTxt='○ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     let fasesHtml='';
     dados.fases.forEach(f=>{
-      const fd=f.status==='concluida'; const fa=f.status==='ativa'||f.status==='disponivel'; const fl=f.status==='bloqueada';
-      fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa&&!fl?' active':''}${fl?' locked':''}" 
-        style="${fa&&!fl?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
-        onclick="${fl?'':("abrirFase('"+c+"',"+f.numero+",'"+f.nome+"')")}">
+      const fd=f.status==='concluida';
+      const fl=f.status==='bloqueada';
+      const fa=!fd&&!fl;
+      fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa?' active':''}${fl?' locked':''}"
+        style="${fa?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
+        onclick="abrirFase('${c}',${f.numero},'${f.nome}')">
         <div class="cc-fnum" style="${fd?'background:'+cor+';color:#fff;':fa?'background:'+bg+';color:'+cor+';':'background:rgba(255,255,255,.08);color:var(--t3);'}">${fd?'✓':f.numero}</div>
         <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${f.nome}</div>
         <div class="cc-ftxt">${fd?'✓':(fa?'clique':'🔒')}</div>
@@ -1852,6 +1854,7 @@ function renderChavesDemo(){
 let _fasePendente={chave:null,numero:null,nome:null};
 
 function abrirFase(chave,numero,nome){
+  toast('abrirFase chamada: '+chave+' fase '+numero,'info');
   _fasePendente={chave,numero,nome};
   document.getElementById('mf-titulo').textContent='Fase '+numero+' — '+nome;
   document.getElementById('mf-desc').textContent='Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
