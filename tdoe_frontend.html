@@ -653,8 +653,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
       </div>
       <button class="btn btn-gold btn-sm" onclick="abrirModalNovasSessoes()">☕ Novas funções</button>
       <button class="btn btn-sm" id="btn-acao-sessao" style="background:var(--parc-bg);color:var(--parc);border:1.5px solid var(--parc-bd);" onclick="acaoSessao()">▶ Iniciar sessão</button>
-      <button class="btn btn-sm" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+      <button class="btn btn-sm" id="btn-socializar" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
+      <button class="btn btn-ghost btn-sm" id="btn-edu-sair" onclick="logout()">Sair</button>
     </div>
   </div>
   <div class="edu-layout">
@@ -1046,15 +1046,38 @@ function toast(msg, tipo='ok'){
 
 async function api(method, path, body=null){
   const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),5000);
+  const timer=setTimeout(()=>ctrl.abort(),8000);
   try{
+    // Garante que o token está sempre atualizado do localStorage
+    if(!state.token){
+      const t=localStorage.getItem('tdoe_edu_token');
+      if(t) state.token=t;
+    }
     const opts={method,signal:ctrl.signal,headers:{'Content-Type':'application/json'}};
     if(state.token) opts.headers['Authorization']=`Bearer ${state.token}`;
     if(body) opts.body=JSON.stringify(body);
     const r=await fetch(API+path,opts);
     clearTimeout(timer);
     const data=await r.json();
-    if(!r.ok) throw new Error(data.detail||JSON.stringify(data));
+    if(!r.ok){
+      // Token inválido/expirado — limpar sessão e pedir novo login
+      if(r.status===401){
+        const msg=data.detail||'Sessão expirada';
+        if(msg.includes('Token não informado')||msg.includes('Token inválido')||msg.includes('expirado')){
+          localStorage.removeItem('tdoe_edu_token');
+          localStorage.removeItem('tdoe_edu_nome');
+          state.token=null;
+          // Redireciona para login apenas se for educador na tela errada
+          if(state.perfil==='educador'){
+            setTimeout(()=>{
+              toast('Sessão expirada — faça login novamente','err');
+              logout();
+            },100);
+          }
+        }
+      }
+      throw new Error(data.detail||JSON.stringify(data));
+    }
     return data;
   }catch(e){clearTimeout(timer);throw e;}
 }
@@ -1181,6 +1204,7 @@ async function fazerLogin(){
     localStorage.setItem('tdoe_edu_token',data.access_token);
     localStorage.setItem('tdoe_edu_nome',data.usuario.nome);
     toast('Bem-vindo, '+data.usuario.nome+'!');
+    verificarVersaoBackend(); // verifica versão em background
     await carregarPainelEducador();
     irPara('educador');
   }catch(e){
@@ -1267,6 +1291,20 @@ function logout(){
   toast('Até logo!','info');
 }
 
+/* ── VERIFICAR VERSÃO DO BACKEND ── */
+async function verificarVersaoBackend(){
+  try{
+    const r=await fetch(API+'/health',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    if(d.versao&&d.versao!=='1.3.0'){
+      toast('⚠ Backend v'+d.versao+' (esperado 1.3.0 com Supabase) — verifique o deploy no Render','err');
+    }else if(d.db&&d.db!=='supabase'){
+      toast('⚠ Backend sem Supabase — dados não persistem após sleep do Render','err');
+    }
+    return d;
+  }catch(e){return null;}
+}
+
 /* ── PAINEL EDUCADOR ── */
 async function carregarPainelEducador(){
   let sessoes=[];
@@ -1328,12 +1366,15 @@ function atualizarStatusBadge(status){
   const m=mapa[status]||mapa.aguardando;
   badge.style.background=m.bg; badge.style.color=m.cor; badge.style.borderColor=m.bd;
   badge.textContent=m.txt;
-  // atualizar botão ação
+  // atualizar botão ação respeitando idioma atual
+  const t2=I18N[_idiomaAtual]||I18N.pt;
   const btn=document.getElementById('btn-acao-sessao');
   const ctrl=document.getElementById('ctrl-iniciar');
-  if(status==='aguardando'){btn.textContent='▶ Iniciar sessão';ctrl.textContent='▶ Iniciar';}
-  else if(status==='ativa'){btn.textContent='⏸ Pausar';ctrl.textContent='⏸ Pausar';}
-  else if(status==='pausada'){btn.textContent='↺ Retomar';ctrl.textContent='↺ Retomar';}
+  if(btn&&ctrl){
+    if(status==='aguardando'){btn.textContent=t2.iniciarSessao||'▶ Iniciar sessão';ctrl.textContent=t2.iniciar||'▶ Iniciar';}
+    else if(status==='ativa'){btn.textContent=t2.pausarSessao||'⏸ Pausar';ctrl.textContent=t2.pausar||'⏸ Pausar';}
+    else if(status==='pausada'){btn.textContent=t2.retomarSessao||'↺ Retomar';ctrl.textContent=t2.retomar||'↺ Retomar';}
+  }
 }
 
 function renderEquipasGrid(equipes){
@@ -1895,7 +1936,9 @@ setInterval(async()=>{
 /* ── SISTEMA DE IDIOMAS ── */
 const I18N={
   pt:{
-    sair:'Sair', iniciarSessao:'▶ Iniciar sessão', socializar:'↗ Socializar',
+    sair:'Sair', iniciarSessao:'▶ Iniciar sessão', pausarSessao:'⏸ Pausar', retomarSessao:'↺ Retomar',
+    iniciar:'▶ Iniciar', pausar:'⏸ Pausar', retomar:'↺ Retomar',
+    socializar:'↗ Socializar',
     lblConceitos:'Conceitos das Chaves', expandir:'▼ expandir', recolher:'▲ recolher',
     chaveAtivaBadge:'— sem chave ativa —',
     login:{
@@ -1958,7 +2001,9 @@ Os autores apresentam a oportunidade como um guarda-chuva que permite compreende
     }
   },
   en:{
-    sair:'Log out', iniciarSessao:'▶ Start session', socializar:'↗ Showcase',
+    sair:'Log out', iniciarSessao:'▶ Start session', pausarSessao:'⏸ Pause', retomarSessao:'↺ Resume',
+    iniciar:'▶ Start', pausar:'⏸ Pause', retomar:'↺ Resume',
+    socializar:'↗ Showcase',
     lblConceitos:'Key Concepts', expandir:'▼ expand', recolher:'▲ collapse',
     chaveAtivaBadge:'— no active key —',
     login:{
@@ -2021,7 +2066,9 @@ The authors present opportunity as an umbrella concept encompassing the creation
     }
   },
   es:{
-    sair:'Salir', iniciarSessao:'▶ Iniciar sesión', socializar:'↗ Socializar',
+    sair:'Salir', iniciarSessao:'▶ Iniciar sesión', pausarSessao:'⏸ Pausar', retomarSessao:'↺ Reanudar',
+    iniciar:'▶ Iniciar', pausar:'⏸ Pausar', retomar:'↺ Reanudar',
+    socializar:'↗ Socializar',
     lblConceitos:'Conceptos de las Claves', expandir:'▼ expandir', recolher:'▲ colapsar',
     chaveAtivaBadge:'— sin clave activa —',
     login:{
@@ -2146,7 +2193,22 @@ function setIdioma(lang){
       if(t.chaves[chaveKeys[i]]) el.innerHTML=t.chaves[chaveKeys[i]].conceito.replace(/\n/g,'<br><br>');
     });
   }
-  // ── Tabuleiros ──
+  // ── Tabuleiro Educador ──
+  const btnAcao=document.getElementById('btn-acao-sessao');
+  if(btnAcao){
+    const mapa={aguardando:t.iniciarSessao,ativa:t.pausarSessao,pausada:t.retomarSessao};
+    btnAcao.textContent=mapa[state.sessaoStatus||'aguardando']||t.iniciarSessao;
+  }
+  const btnSocial=document.getElementById('btn-socializar');
+  if(btnSocial) btnSocial.textContent=t.socializar;
+  const btnEduSair=document.getElementById('btn-edu-sair');
+  if(btnEduSair) btnEduSair.textContent=t.sair;
+  const ctrlIniciar=document.getElementById('ctrl-iniciar');
+  if(ctrlIniciar){
+    const mapaCtrl={aguardando:t.iniciar||'▶',ativa:t.pausar||'⏸',pausada:t.retomar||'↺'};
+    ctrlIniciar.textContent=(mapaCtrl[state.sessaoStatus||'aguardando']);
+  }
+  // ── Tabuleiro Jogador ──
   document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
   const jogSair=document.getElementById('jog-btn-sair');
   if(jogSair) jogSair.textContent=t.sair;
@@ -2602,7 +2664,26 @@ function pollingLudicoJogador(){
 (function(){
   const t=localStorage.getItem('tdoe_edu_token');
   const n=localStorage.getItem('tdoe_edu_nome');
-  if(t){state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};}
+  if(t){
+    // Valida JWT localmente antes de usar
+    try{
+      const parts=t.split('.');
+      if(parts.length===3){
+        const payload=JSON.parse(atob(parts[1]));
+        const agora=Math.floor(Date.now()/1000);
+        if(payload.exp&&payload.exp<agora){
+          // Token expirado — limpar
+          localStorage.removeItem('tdoe_edu_token');
+          localStorage.removeItem('tdoe_edu_nome');
+        }else{
+          state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};
+        }
+      }
+    }catch(e){
+      localStorage.removeItem('tdoe_edu_token');
+      localStorage.removeItem('tdoe_edu_nome');
+    }
+  }
 })();
 // Restaurar idioma salvo
 (()=>{try{const l=localStorage.getItem('tdoe_lang');if(l&&I18N[l])setIdioma(l);}catch(e){}})();
