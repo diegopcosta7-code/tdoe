@@ -1697,17 +1697,21 @@ function renderChaves(chaves){
 }
 
 async function ativarChave(chave){
-  try{
-    await api('POST','/chaves/'+state.equipeId+'/ativar',{chave});
-    toast(nomeChave(chave)+' ativada!','ok');
-    await carregarChaves();
-  }catch(e){
-    // fallback demo
+  // modo demo: equipeId null → ativa localmente sem API
+  if(!state.equipeId){
     if(!state.chavesDemo) state.chavesDemo={};
     Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
     state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
     toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
     renderChavesDemo();
+    return;
+  }
+  try{
+    await api('POST','/chaves/'+state.equipeId+'/ativar',{chave});
+    toast(nomeChave(chave)+' ativada!','ok');
+    await carregarChaves();
+  }catch(e){
+    toast('Erro ao ativar: '+e.message,'err');
   }
 }
 
@@ -1765,6 +1769,25 @@ function abrirFase(chave,numero,nome){
 async function concluirFaseConfirmar(){
   const conteudo=document.getElementById('mf-conteudo').value.trim();
   if(!conteudo){toast('Descreva o que a equipe descobriu','err');return;}
+  // modo demo: equipeId null → conclui localmente sem API
+  if(!state.equipeId){
+    if(!state.chavesDemo) state.chavesDemo={};
+    const ch=_fasePendente.chave;
+    if(!state.chavesDemo[ch]) state.chavesDemo[ch]={status:'ativa',fases:{}};
+    state.chavesDemo[ch].fases[_fasePendente.numero]={status:'concluida',conteudo};
+    const totalFases=FASES_POR_CHAVE_NOMES?.[ch]?.length||3;
+    const proxNum=_fasePendente.numero+1;
+    if(proxNum<=totalFases){
+      state.chavesDemo[ch].fases[proxNum]={status:'disponivel'};
+    } else {
+      state.chavesDemo[ch].status='concluida';
+    }
+    fecharModal('modal-fase');
+    toast('Fase '+_fasePendente.numero+' de '+nomeChave(ch)+' concluída! (demo)','ok');
+    renderChavesDemo();
+    mostrarFeedbackConclusao(ch, _fasePendente.numero, _fasePendente.nome);
+    return;
+  }
   try{
     await api('POST','/chaves/'+state.equipeId+'/concluir-fase',{
       chave:_fasePendente.chave,
@@ -1777,14 +1800,7 @@ async function concluirFaseConfirmar(){
     adicionarEventoRegistro('sistema','Sistema','✓ Fase '+_fasePendente.nome+' de '+nomeChave(_fasePendente.chave)+' concluída');
     mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
   }catch(e){
-    // fallback demo: mostra feedback mesmo sem backend
-    if(e.name==='AbortError'||e.message.includes('fetch')||e.message.includes('NetworkError')){
-      fecharModal('modal-fase');
-      await carregarChaves();
-      mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
-    } else {
-      toast(e.message,'err');
-    }
+    toast(e.message,'err');
   }
 }
 
