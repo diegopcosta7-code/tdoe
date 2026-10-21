@@ -1774,10 +1774,11 @@ function renderChaves(chaves){
 }
 
 async function ativarChave(chave){
+  // diagnóstico: mostra estado atual
+  toast('equipeId='+state.equipeId+' perfil='+state.perfil,'info');
   // modo demo: equipeId null → ativa localmente sem API
   if(!state.equipeId){
     if(!state.chavesDemo) state.chavesDemo={};
-    // bloqueia chaves dependentes se problema não concluída
     const chavesDep=['solucao','parcerias','oportunidades'];
     if(chavesDep.includes(chave)&&state.chavesDemo['problema']?.status!=='concluida'){
       toast('🔒 Conclua Problema antes de ativar '+nomeChave(chave),'err');
