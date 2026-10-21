@@ -1683,9 +1683,6 @@ async function carregarChaves(){
     if(grid&&!state.chaves) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--t3);font-size:12px;">⏳ Conectando ao servidor…</div>';
     const data=await api('GET','/chaves/'+state.equipeId);
     state.chaves=data;
-    // diagnóstico: mostra status das chaves recebidas
-    const statusLog=Object.entries(data).map(([k,v])=>k+':'+v.status).join(' | ');
-    toast('Chaves: '+statusLog,'info');
     renderChaves(data);
     atualizarChaveAtivaBadge(data);
     carregarSussurroChips();
@@ -1780,8 +1777,6 @@ function renderChaves(chaves){
 }
 
 async function ativarChave(chave){
-  // diagnóstico: mostra estado atual
-  toast('equipeId='+state.equipeId+' perfil='+state.perfil,'info');
   // modo demo: equipeId null → ativa localmente sem API
   if(!state.equipeId){
     if(!state.chavesDemo) state.chavesDemo={};
@@ -1854,7 +1849,6 @@ function renderChavesDemo(){
 let _fasePendente={chave:null,numero:null,nome:null};
 
 function abrirFase(chave,numero,nome){
-  toast('abrirFase chamada: '+chave+' fase '+numero,'info');
   _fasePendente={chave,numero,nome};
   document.getElementById('mf-titulo').textContent='Fase '+numero+' — '+nome;
   document.getElementById('mf-desc').textContent='Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
@@ -2586,7 +2580,8 @@ function exportarPropostas(){
 ═══════════════════════════════════════════════════════════════ */
 
 /* ── PONTUAÇÃO ── */
-const PONTOS_POR_FASE = 80;
+const PONTOS_POR_CHAVE = 60;
+const TOTAL_FASES = 3;
 function atualizarScoreJogador(pts){
   state.pontuacao=pts;
   const el=document.getElementById('jog-score-val');
@@ -2595,23 +2590,33 @@ function atualizarScoreJogador(pts){
 
 /* ── FEEDBACK DE CONCLUSÃO ── */
 function mostrarFeedbackConclusao(chave,numeroFase,nomeFase){
-  const pontos=PONTOS_POR_FASE;
-  const total=state.pontuacao+pontos;
-  atualizarScoreJogador(total);
-  try{localStorage.setItem('tdoe_pontuacao_'+(state.equipeId||'demo'),total);}catch(e){}
+  const chaveConcluida = numeroFase >= TOTAL_FASES;
   const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
   const cor=corMap[chave]||'var(--gold)';
   const tEl=document.getElementById('congrats-titulo');
   const sEl=document.getElementById('congrats-sub');
   const pEl=document.getElementById('congrats-pts');
-  if(tEl) tEl.textContent='Fase '+numeroFase+' concluída!';
-  if(sEl) sEl.textContent=(nomeFase||'Fase')+' · '+nomeChave(chave);
-  if(pEl){
-    pEl.textContent='0';
-    let c=0;
-    const iv=setInterval(()=>{c=Math.min(c+8,pontos);pEl.textContent=c;if(c>=pontos)clearInterval(iv);},30);
-  }
   const badge=document.querySelector('.congrats-pts-badge');
+  if(chaveConcluida){
+    // pontuação só na conclusão da chave inteira
+    const pontos=PONTOS_POR_CHAVE;
+    const total=state.pontuacao+pontos;
+    atualizarScoreJogador(total);
+    try{localStorage.setItem('tdoe_pontuacao_'+(state.equipeId||'demo'),total);}catch(e){}
+    if(tEl) tEl.textContent='Chave concluída! 🎉';
+    if(sEl) sEl.textContent=nomeChave(chave)+' · todas as fases completas';
+    if(pEl){
+      pEl.textContent='0';
+      let c=0;
+      const iv=setInterval(()=>{c=Math.min(c+12,pontos);pEl.textContent=c;if(c>=pontos)clearInterval(iv);},30);
+    }
+    if(badge) badge.style.display='';
+  } else {
+    // fases intermediárias: feedback sem pontos
+    if(tEl) tEl.textContent='Fase '+numeroFase+' concluída!';
+    if(sEl) sEl.textContent=(nomeFase||'Fase')+' · '+nomeChave(chave);
+    if(badge) badge.style.display='none';
+  }
   if(badge) badge.style.color=cor;
   const ov=document.getElementById('overlay-congrats');
   if(ov) ov.classList.remove('hidden');
