@@ -1308,8 +1308,10 @@ async function verificarVersaoBackend(){
 /* ── PAINEL EDUCADOR ── */
 async function carregarPainelEducador(selecionarId=null){
   let sessoes=[];
-  try{ sessoes=await api('GET','/sessao'); }catch(e){ sessoes=[]; }
-  if(!sessoes.length){
+  let backendOnline=false;
+  try{ sessoes=await api('GET','/sessao'); backendOnline=true; }catch(e){ sessoes=[]; }
+  // só injeta sessão demo se o backend estiver offline (erro de rede)
+  if(!backendOnline && !sessoes.length){
     sessoes=[{id:'demo-1',titulo:'Sessão Demo',
       contexto:'escolar',codigo_acesso:'DEMO01',status:'ativa',
       criada_em:new Date().toISOString(),alertas:[],
