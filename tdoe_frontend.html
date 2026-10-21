@@ -497,16 +497,21 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
           <svg width="26" height="26" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg>
         </div>
         <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE · UFLA</div></div>
+        <div class="lang-sel" id="lang-sel-login" style="margin-left:auto;">
+          <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
+          <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
+          <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
+        </div>
       </div>
       <div>
-        <div class="hero-hl">Sua ideia</div>
-        <div class="hero-jogo grad">em JOGO</div>
-        <div class="hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
+        <div class="hero-hl" id="login-hero-hl">Sua ideia</div>
+        <div class="hero-jogo grad" id="login-hero-jogo">em JOGO</div>
+        <div class="hero-tag" id="login-hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
         <div class="hero-chips">
-          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">🔍 Problema</div>
-          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);">✓ Solução</div>
-          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);">🤝 Parcerias</div>
-          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);">💡 Oportunidades</div>
+          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);" id="chip-prob">🔍 Problema</div>
+          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);" id="chip-sol">✓ Solução</div>
+          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);" id="chip-parc">🤝 Parcerias</div>
+          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);" id="chip-opor">💡 Oportunidades</div>
         </div>
         <!-- CONCEITOS DAS CHAVES — HERO -->
         <div class="hero-conceitos">
@@ -574,54 +579,54 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 
   <div class="login-panel">
     <div class="login-tabs">
-      <div class="login-tab on" onclick="setLoginTab('login')">Entrar</div>
-      <div class="login-tab" onclick="setLoginTab('cadastro')">Criar conta</div>
-      <div class="login-tab" onclick="setLoginTab('codigo')">Código</div>
+      <div class="login-tab on" id="tab-login" onclick="setLoginTab('login')">Entrar</div>
+      <div class="login-tab" id="tab-cadastro" onclick="setLoginTab('cadastro')">Criar conta</div>
+      <div class="login-tab" id="tab-codigo" onclick="setLoginTab('codigo')">Código</div>
     </div>
 
     <!-- LOGIN -->
     <div id="form-login" class="anim-in">
-      <div class="login-title">Bem-vindo de volta</div>
-      <div class="login-sub">Acesse sua conta de educador</div>
-      <div class="field"><label>E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
-      <div class="field"><label>Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
-      <button class="btn btn-primary w100" onclick="fazerLogin()">Entrar →</button>
+      <div class="login-title" id="login-title-edu">Bem-vindo de volta</div>
+      <div class="login-sub" id="login-sub-edu">Acesse sua conta de educador</div>
+      <div class="field"><label id="lbl-email-edu">E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label id="lbl-senha-edu">Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-primary w100" id="btn-entrar-edu" onclick="fazerLogin()">Entrar →</button>
     </div>
 
     <!-- CADASTRO -->
     <div id="form-cadastro" class="hidden anim-in">
-      <div class="login-title">Criar conta</div>
-      <div class="login-sub">Preencha para começar</div>
+      <div class="login-title" id="login-title-cad">Criar conta</div>
+      <div class="login-sub" id="login-sub-cad">Preencha para começar</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field"><label>Nome</label><input id="cad-nome" placeholder="Nome"/></div>
-        <div class="field"><label>Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
+        <div class="field"><label id="lbl-nome-cad">Nome</label><input id="cad-nome" placeholder="Nome"/></div>
+        <div class="field"><label id="lbl-sob-cad">Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
       </div>
-      <div class="field"><label>E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label id="lbl-email-cad">E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field"><label>Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
-        <div class="field"><label>Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label id="lbl-senha-cad">Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label id="lbl-conf-cad">Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
       </div>
-      <button class="btn btn-primary w100" onclick="fazerCadastro()">Criar conta →</button>
+      <button class="btn btn-primary w100" id="btn-criar-conta" onclick="fazerCadastro()">Criar conta →</button>
     </div>
 
     <!-- CÓDIGO JOGADOR -->
     <div id="form-codigo" class="hidden anim-in">
-      <div class="login-title">Entrar com código</div>
-      <div class="login-sub">Para jogadores — sem cadastro</div>
-      <div class="field"><label>Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
-      <div class="field"><label>Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
+      <div class="login-title" id="login-title-cod">Entrar com código</div>
+      <div class="login-sub" id="login-sub-cod">Para jogadores — sem cadastro</div>
+      <div class="field"><label id="lbl-nome-jog">Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
+      <div class="field"><label id="lbl-codigo-jog">Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
       <div class="field">
-        <label>Número da equipe</label>
+        <label id="lbl-equipe-jog">Número da equipe</label>
         <select id="jog-equipe">
-          <option value="1">Equipe 1</option><option value="2">Equipe 2</option>
-          <option value="3">Equipe 3</option><option value="4">Equipe 4</option><option value="5">Equipe 5</option>
+          <option value="1" id="opt-eq1">Equipe 1</option><option value="2" id="opt-eq2">Equipe 2</option>
+          <option value="3" id="opt-eq3">Equipe 3</option><option value="4" id="opt-eq4">Equipe 4</option><option value="5" id="opt-eq5">Equipe 5</option>
         </select>
       </div>
-      <button class="btn btn-primary w100" onclick="entrarComCodigo()">Entrar no jogo →</button>
+      <button class="btn btn-primary w100" id="btn-entrar-jog" onclick="entrarComCodigo()">Entrar no jogo →</button>
       <div style="margin-top:12px;">
         <div class="code-blk">
           <div class="code-gem"><svg width="20" height="20" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
-          <div><div style="font-size:12px;font-weight:700;">Código fornecido pelo educador</div><div class="small muted" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
+          <div><div class="small muted" id="code-hint1" style="font-size:12px;font-weight:700;color:var(--t2);">Código fornecido pelo educador</div><div class="small muted" id="code-hint2" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
         </div>
       </div>
     </div>
@@ -1893,6 +1898,23 @@ const I18N={
     sair:'Sair', iniciarSessao:'▶ Iniciar sessão', socializar:'↗ Socializar',
     lblConceitos:'Conceitos das Chaves', expandir:'▼ expandir', recolher:'▲ recolher',
     chaveAtivaBadge:'— sem chave ativa —',
+    login:{
+      heroHl:'Sua ideia', heroJogo:'em JOGO',
+      heroTag:'Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.',
+      chips:['🔍 Problema','✓ Solução','🤝 Parcerias','💡 Oportunidades'],
+      tabLogin:'Entrar', tabCadastro:'Criar conta', tabCodigo:'Código',
+      loginTitle:'Bem-vindo de volta', loginSub:'Acesse sua conta de educador',
+      lblEmail:'E-mail', lblSenha:'Senha', btnEntrar:'Entrar →',
+      cadTitle:'Criar conta', cadSub:'Preencha para começar',
+      lblNome:'Nome', lblSobrenome:'Sobrenome', lblConf:'Confirmar',
+      btnCriar:'Criar conta →',
+      codTitle:'Entrar com código', codSub:'Para jogadores — sem cadastro',
+      lblNomeJog:'Seu nome', lblCodigo:'Código da sessão', lblEquipe:'Número da equipe',
+      btnEntrarJog:'Entrar no jogo →',
+      codeHint1:'Código fornecido pelo educador', codeHint2:'Peça o código de 6 letras para começar',
+      equipes:['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5'],
+      conhecaChaves:'Conheça as chaves',
+    },
     chaves:{
       problema:{
         nome:'Problema',
@@ -1939,6 +1961,23 @@ Os autores apresentam a oportunidade como um guarda-chuva que permite compreende
     sair:'Log out', iniciarSessao:'▶ Start session', socializar:'↗ Showcase',
     lblConceitos:'Key Concepts', expandir:'▼ expand', recolher:'▲ collapse',
     chaveAtivaBadge:'— no active key —',
+    login:{
+      heroHl:'Your idea', heroJogo:'in PLAY',
+      heroTag:'An active methodology that transforms real problems into impactful proposals — investigating, building solutions, forming partnerships and revealing opportunities.',
+      chips:['🔍 Problem','✓ Solution','🤝 Partnerships','💡 Opportunities'],
+      tabLogin:'Sign in', tabCadastro:'Create account', tabCodigo:'Code',
+      loginTitle:'Welcome back', loginSub:'Sign in to your educator account',
+      lblEmail:'Email', lblSenha:'Password', btnEntrar:'Sign in →',
+      cadTitle:'Create account', cadSub:'Fill in to get started',
+      lblNome:'First name', lblSobrenome:'Last name', lblConf:'Confirm',
+      btnCriar:'Create account →',
+      codTitle:'Enter with code', codSub:'For players — no registration needed',
+      lblNomeJog:'Your name', lblCodigo:'Session code', lblEquipe:'Team number',
+      btnEntrarJog:'Join the game →',
+      codeHint1:'Code provided by the educator', codeHint2:'Ask for the 6-letter code to begin',
+      equipes:['Team 1','Team 2','Team 3','Team 4','Team 5'],
+      conhecaChaves:'About the keys',
+    },
     chaves:{
       problema:{
         nome:'Problem',
@@ -1985,6 +2024,23 @@ The authors present opportunity as an umbrella concept encompassing the creation
     sair:'Salir', iniciarSessao:'▶ Iniciar sesión', socializar:'↗ Socializar',
     lblConceitos:'Conceptos de las Claves', expandir:'▼ expandir', recolher:'▲ colapsar',
     chaveAtivaBadge:'— sin clave activa —',
+    login:{
+      heroHl:'Tu idea', heroJogo:'en JUEGO',
+      heroTag:'Una metodología activa que transforma problemas reales en propuestas de impacto — investigando, construyendo soluciones, formando alianzas y revelando oportunidades.',
+      chips:['🔍 Problema','✓ Solución','🤝 Alianzas','💡 Oportunidades'],
+      tabLogin:'Entrar', tabCadastro:'Crear cuenta', tabCodigo:'Código',
+      loginTitle:'Bienvenido de vuelta', loginSub:'Accede a tu cuenta de educador',
+      lblEmail:'Correo electrónico', lblSenha:'Contraseña', btnEntrar:'Entrar →',
+      cadTitle:'Crear cuenta', cadSub:'Completa para comenzar',
+      lblNome:'Nombre', lblSobrenome:'Apellido', lblConf:'Confirmar',
+      btnCriar:'Crear cuenta →',
+      codTitle:'Entrar con código', codSub:'Para jugadores — sin registro',
+      lblNomeJog:'Tu nombre', lblCodigo:'Código de sesión', lblEquipe:'Número de equipo',
+      btnEntrarJog:'Unirse al juego →',
+      codeHint1:'Código proporcionado por el educador', codeHint2:'Pide el código de 6 letras para comenzar',
+      equipes:['Equipo 1','Equipo 2','Equipo 3','Equipo 4','Equipo 5'],
+      conhecaChaves:'Conoce las claves',
+    },
     chaves:{
       problema:{
         nome:'Problema',
@@ -2040,6 +2096,57 @@ function setIdioma(lang){
   });
   // Atualizar textos da interface
   const t=I18N[lang];
+  // ── Tela de login ──
+  if(t.login){
+    const L=t.login;
+    const set=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
+    const setph=(id,txt)=>{const el=document.getElementById(id);if(el)el.placeholder=txt;};
+    set('login-hero-hl',L.heroHl);
+    set('login-hero-jogo',L.heroJogo);
+    set('login-hero-tag',L.heroTag);
+    const chips=['chip-prob','chip-sol','chip-parc','chip-opor'];
+    chips.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=L.chips[i];});
+    set('tab-login',L.tabLogin);
+    set('tab-cadastro',L.tabCadastro);
+    set('tab-codigo',L.tabCodigo);
+    set('login-title-edu',L.loginTitle);
+    set('login-sub-edu',L.loginSub);
+    set('lbl-email-edu',L.lblEmail);
+    set('lbl-senha-edu',L.lblSenha);
+    set('btn-entrar-edu',L.btnEntrar);
+    set('login-title-cad',L.cadTitle);
+    set('login-sub-cad',L.cadSub);
+    set('lbl-nome-cad',L.lblNome);
+    set('lbl-sob-cad',L.lblSobrenome);
+    set('lbl-email-cad',L.lblEmail);
+    set('lbl-senha-cad',L.lblSenha);
+    set('lbl-conf-cad',L.lblConf);
+    set('btn-criar-conta',L.btnCriar);
+    set('login-title-cod',L.codTitle);
+    set('login-sub-cod',L.codSub);
+    set('lbl-nome-jog',L.lblNomeJog);
+    set('lbl-codigo-jog',L.lblCodigo);
+    set('lbl-equipe-jog',L.lblEquipe);
+    set('btn-entrar-jog',L.btnEntrarJog);
+    set('code-hint1',L.codeHint1);
+    set('code-hint2',L.codeHint2);
+    // Equipes no select
+    L.equipes.forEach((nm,i)=>{const el=document.getElementById('opt-eq'+(i+1));if(el)el.textContent=nm;});
+    // Seção "Conheça as chaves" no hero
+    const conheca=document.querySelector('.hero-conceitos>div:first-child');
+    if(conheca) conheca.textContent=L.conhecaChaves;
+    // Atualiza nomes das chaves nos cards do hero
+    const chaveKeys=['problema','solucao','parcerias','oportunidades'];
+    document.querySelectorAll('.hc-nm').forEach((el,i)=>{
+      if(t.chaves[chaveKeys[i]]) el.textContent=t.chaves[chaveKeys[i]].nome;
+    });
+    // Atualiza conceitos expandíveis do hero
+    const corpos=document.querySelectorAll('.hc-body');
+    corpos.forEach((el,i)=>{
+      if(t.chaves[chaveKeys[i]]) el.innerHTML=t.chaves[chaveKeys[i]].conceito.replace(/\n/g,'<br><br>');
+    });
+  }
+  // ── Tabuleiros ──
   document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
   const jogSair=document.getElementById('jog-btn-sair');
   if(jogSair) jogSair.textContent=t.sair;
@@ -2056,6 +2163,8 @@ function setIdioma(lang){
   atualizarChavesInfo(lang);
   // Atualizar nome das chaves visíveis nos cards já renderizados
   if(state.chaves) renderChaves(state.chaves);
+  // Salvar preferência
+  try{localStorage.setItem('tdoe_lang',lang);}catch(e){}
 }
 
 function atualizarChavesInfo(lang){
@@ -2495,6 +2604,8 @@ function pollingLudicoJogador(){
   const n=localStorage.getItem('tdoe_edu_nome');
   if(t){state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};}
 })();
+// Restaurar idioma salvo
+(()=>{try{const l=localStorage.getItem('tdoe_lang');if(l&&I18N[l])setIdioma(l);}catch(e){}})();
 irPara('login');
 </script>
 </body>
