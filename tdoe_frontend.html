@@ -497,21 +497,16 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
           <svg width="26" height="26" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg>
         </div>
         <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE · UFLA</div></div>
-        <div class="lang-sel" id="lang-sel-login" style="margin-left:auto;">
-          <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
-          <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
-          <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
-        </div>
       </div>
       <div>
-        <div class="hero-hl" id="login-hero-hl">Sua ideia</div>
-        <div class="hero-jogo grad" id="login-hero-jogo">em JOGO</div>
-        <div class="hero-tag" id="login-hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
+        <div class="hero-hl">Sua ideia</div>
+        <div class="hero-jogo grad">em JOGO</div>
+        <div class="hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
         <div class="hero-chips">
-          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);" id="chip-prob">🔍 Problema</div>
-          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);" id="chip-sol">✓ Solução</div>
-          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);" id="chip-parc">🤝 Parcerias</div>
-          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);" id="chip-opor">💡 Oportunidades</div>
+          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">🔍 Problema</div>
+          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);">✓ Solução</div>
+          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);">🤝 Parcerias</div>
+          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);">💡 Oportunidades</div>
         </div>
         <!-- CONCEITOS DAS CHAVES — HERO -->
         <div class="hero-conceitos">
@@ -579,54 +574,54 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 
   <div class="login-panel">
     <div class="login-tabs">
-      <div class="login-tab on" id="tab-login" onclick="setLoginTab('login')">Entrar</div>
-      <div class="login-tab" id="tab-cadastro" onclick="setLoginTab('cadastro')">Criar conta</div>
-      <div class="login-tab" id="tab-codigo" onclick="setLoginTab('codigo')">Código</div>
+      <div class="login-tab on" onclick="setLoginTab('login')">Entrar</div>
+      <div class="login-tab" onclick="setLoginTab('cadastro')">Criar conta</div>
+      <div class="login-tab" onclick="setLoginTab('codigo')">Código</div>
     </div>
 
     <!-- LOGIN -->
     <div id="form-login" class="anim-in">
-      <div class="login-title" id="login-title-edu">Bem-vindo de volta</div>
-      <div class="login-sub" id="login-sub-edu">Acesse sua conta de educador</div>
-      <div class="field"><label id="lbl-email-edu">E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
-      <div class="field"><label id="lbl-senha-edu">Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
-      <button class="btn btn-primary w100" id="btn-entrar-edu" onclick="fazerLogin()">Entrar →</button>
+      <div class="login-title">Bem-vindo de volta</div>
+      <div class="login-sub">Acesse sua conta de educador</div>
+      <div class="field"><label>E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label>Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-primary w100" onclick="fazerLogin()">Entrar →</button>
     </div>
 
     <!-- CADASTRO -->
     <div id="form-cadastro" class="hidden anim-in">
-      <div class="login-title" id="login-title-cad">Criar conta</div>
-      <div class="login-sub" id="login-sub-cad">Preencha para começar</div>
+      <div class="login-title">Criar conta</div>
+      <div class="login-sub">Preencha para começar</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field"><label id="lbl-nome-cad">Nome</label><input id="cad-nome" placeholder="Nome"/></div>
-        <div class="field"><label id="lbl-sob-cad">Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
+        <div class="field"><label>Nome</label><input id="cad-nome" placeholder="Nome"/></div>
+        <div class="field"><label>Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
       </div>
-      <div class="field"><label id="lbl-email-cad">E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label>E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field"><label id="lbl-senha-cad">Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
-        <div class="field"><label id="lbl-conf-cad">Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label>Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label>Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
       </div>
-      <button class="btn btn-primary w100" id="btn-criar-conta" onclick="fazerCadastro()">Criar conta →</button>
+      <button class="btn btn-primary w100" onclick="fazerCadastro()">Criar conta →</button>
     </div>
 
     <!-- CÓDIGO JOGADOR -->
     <div id="form-codigo" class="hidden anim-in">
-      <div class="login-title" id="login-title-cod">Entrar com código</div>
-      <div class="login-sub" id="login-sub-cod">Para jogadores — sem cadastro</div>
-      <div class="field"><label id="lbl-nome-jog">Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
-      <div class="field"><label id="lbl-codigo-jog">Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
+      <div class="login-title">Entrar com código</div>
+      <div class="login-sub">Para jogadores — sem cadastro</div>
+      <div class="field"><label>Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
+      <div class="field"><label>Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
       <div class="field">
-        <label id="lbl-equipe-jog">Número da equipe</label>
+        <label>Número da equipe</label>
         <select id="jog-equipe">
-          <option value="1" id="opt-eq1">Equipe 1</option><option value="2" id="opt-eq2">Equipe 2</option>
-          <option value="3" id="opt-eq3">Equipe 3</option><option value="4" id="opt-eq4">Equipe 4</option><option value="5" id="opt-eq5">Equipe 5</option>
+          <option value="1">Equipe 1</option><option value="2">Equipe 2</option>
+          <option value="3">Equipe 3</option><option value="4">Equipe 4</option><option value="5">Equipe 5</option>
         </select>
       </div>
-      <button class="btn btn-primary w100" id="btn-entrar-jog" onclick="entrarComCodigo()">Entrar no jogo →</button>
+      <button class="btn btn-primary w100" onclick="entrarComCodigo()">Entrar no jogo →</button>
       <div style="margin-top:12px;">
         <div class="code-blk">
           <div class="code-gem"><svg width="20" height="20" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
-          <div><div class="small muted" id="code-hint1" style="font-size:12px;font-weight:700;color:var(--t2);">Código fornecido pelo educador</div><div class="small muted" id="code-hint2" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
+          <div><div style="font-size:12px;font-weight:700;">Código fornecido pelo educador</div><div class="small muted" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
         </div>
       </div>
     </div>
@@ -653,8 +648,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
       </div>
       <button class="btn btn-gold btn-sm" onclick="abrirModalNovasSessoes()">☕ Novas funções</button>
       <button class="btn btn-sm" id="btn-acao-sessao" style="background:var(--parc-bg);color:var(--parc);border:1.5px solid var(--parc-bd);" onclick="acaoSessao()">▶ Iniciar sessão</button>
-      <button class="btn btn-sm" id="btn-socializar" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
-      <button class="btn btn-ghost btn-sm" id="btn-edu-sair" onclick="logout()">Sair</button>
+      <button class="btn btn-sm" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
     </div>
   </div>
   <div class="edu-layout">
@@ -991,13 +986,13 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 // URL do backend: prioridade para variável global (injetada no deploy),
 // depois variável de ambiente via meta tag, depois localhost para desenvolvimento local.
 const API = (()=>{
-  // Permite sobrescrever via: window.TDOE_API_URL='https://...' (definir antes deste arquivo)
+  // Permite sobrescrever via: <script>window.TDOE_API_URL='https://...'</script> antes deste arquivo
   if(window.TDOE_API_URL) return window.TDOE_API_URL.replace(/\/$/,'');
   // Detecta automaticamente: se abrindo de file:// ou localhost, usa localhost
   const h = location.hostname;
   if(!h || h==='localhost' || h==='127.0.0.1') return 'http://localhost:8000';
   // Em produção (GitHub Pages), usa a URL do Render configurada aqui:
-  return 'https://tdoe.onrender.com'; // URL do backend Render
+  return 'https://tdoe-api.onrender.com'; // ← SUBSTITUA pela URL do seu Render
 })();
 
 /* ── ESTADO GLOBAL ── */
@@ -1046,38 +1041,15 @@ function toast(msg, tipo='ok'){
 
 async function api(method, path, body=null){
   const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),8000);
+  const timer=setTimeout(()=>ctrl.abort(),5000);
   try{
-    // Garante que o token está sempre atualizado do localStorage
-    if(!state.token){
-      const t=localStorage.getItem('tdoe_edu_token');
-      if(t) state.token=t;
-    }
     const opts={method,signal:ctrl.signal,headers:{'Content-Type':'application/json'}};
     if(state.token) opts.headers['Authorization']=`Bearer ${state.token}`;
     if(body) opts.body=JSON.stringify(body);
     const r=await fetch(API+path,opts);
     clearTimeout(timer);
     const data=await r.json();
-    if(!r.ok){
-      // Token inválido/expirado — limpar sessão e pedir novo login
-      if(r.status===401){
-        const msg=data.detail||'Sessão expirada';
-        if(msg.includes('Token não informado')||msg.includes('Token inválido')||msg.includes('expirado')){
-          localStorage.removeItem('tdoe_edu_token');
-          localStorage.removeItem('tdoe_edu_nome');
-          state.token=null;
-          // Redireciona para login apenas se for educador na tela errada
-          if(state.perfil==='educador'){
-            setTimeout(()=>{
-              toast('Sessão expirada — faça login novamente','err');
-              logout();
-            },100);
-          }
-        }
-      }
-      throw new Error(data.detail||JSON.stringify(data));
-    }
+    if(!r.ok) throw new Error(data.detail||JSON.stringify(data));
     return data;
   }catch(e){clearTimeout(timer);throw e;}
 }
@@ -1204,7 +1176,6 @@ async function fazerLogin(){
     localStorage.setItem('tdoe_edu_token',data.access_token);
     localStorage.setItem('tdoe_edu_nome',data.usuario.nome);
     toast('Bem-vindo, '+data.usuario.nome+'!');
-    verificarVersaoBackend(); // verifica versão em background
     await carregarPainelEducador();
     irPara('educador');
   }catch(e){
@@ -1291,22 +1262,8 @@ function logout(){
   toast('Até logo!','info');
 }
 
-/* ── VERIFICAR VERSÃO DO BACKEND ── */
-async function verificarVersaoBackend(){
-  try{
-    const r=await fetch(API+'/health',{signal:AbortSignal.timeout(5000)});
-    const d=await r.json();
-    if(d.versao&&d.versao!=='1.3.0'){
-      toast('⚠ Backend v'+d.versao+' (esperado 1.3.0 com Supabase) — verifique o deploy no Render','err');
-    }else if(d.db&&d.db!=='supabase'){
-      toast('⚠ Backend sem Supabase — dados não persistem após sleep do Render','err');
-    }
-    return d;
-  }catch(e){return null;}
-}
-
 /* ── PAINEL EDUCADOR ── */
-async function carregarPainelEducador(selecionarId=null){
+async function carregarPainelEducador(){
   let sessoes=[];
   try{ sessoes=await api('GET','/sessao'); }catch(e){ sessoes=[]; }
   if(!sessoes.length){
@@ -1327,46 +1284,19 @@ async function carregarPainelEducador(selecionarId=null){
   }
   sessoes.forEach((s,i)=>{
     const d=document.createElement('div');
-    d.id='sessao-item-'+s.id;
     d.className='eq-item'+(i===0?' on':'');
-    d.style.position='relative';
     d.innerHTML=`<div class="eq-av" style="background:${avatarCor(i)};font-size:9px;">S${i+1}</div>
-      <div style="flex:1;min-width:0;"><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>
-      <button onclick="event.stopPropagation();excluirSessao('${s.id}','${s.titulo.replace(/'/g,"\\'")}',this)" title="Excluir sessão"
-        style="background:none;border:none;cursor:pointer;color:rgba(255,80,80,.5);font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0;"
-        onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='rgba(255,80,80,.5)'">✕</button>`;
+      <div><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>`;
     d.onclick=()=>selecionarSessao(s.id);
     lista.appendChild(d);
   });
-  const idParaSelecionar=selecionarId||sessoes[0]?.id;
-  if(idParaSelecionar) await selecionarSessao(idParaSelecionar);
+  if(sessoes.length>0) await selecionarSessao(sessoes[0].id);
   await carregarNovasFuncoes();
-}
-
-async function excluirSessao(id, titulo, btn){
-  if(!confirm('Excluir a sessão "'+titulo+'"? Esta ação não pode ser desfeita.')) return;
-  try{
-    await api('DELETE','/sessao/'+id);
-    toast('Sessão excluída','ok');
-  }catch(e){
-    // se backend não tem rota DELETE, remove só da UI
-    toast('Sessão removida da lista','ok');
-  }
-  const el=document.getElementById('sessao-item-'+id);
-  if(el) el.remove();
-  // se era a sessão atual, seleciona a primeira disponível
-  if(state.sessaoId===id){
-    const prox=document.querySelector('#lista-sessoes .eq-item');
-    if(prox) prox.click();
-    else { state.sessaoId=null; state.sessaoAtual=null; }
-  }
 }
 
 async function selecionarSessao(id){
   state.sessaoId=id;
-  document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
-  const item=document.getElementById('sessao-item-'+id);
-  if(item) item.classList.add('on');
+  document.querySelectorAll('.eq-item').forEach(el=>el.classList.remove('on'));
   try{
     const s=await api('GET','/sessao/'+id);
     state.sessaoAtual=s;
@@ -1393,15 +1323,12 @@ function atualizarStatusBadge(status){
   const m=mapa[status]||mapa.aguardando;
   badge.style.background=m.bg; badge.style.color=m.cor; badge.style.borderColor=m.bd;
   badge.textContent=m.txt;
-  // atualizar botão ação respeitando idioma atual
-  const t2=I18N[_idiomaAtual]||I18N.pt;
+  // atualizar botão ação
   const btn=document.getElementById('btn-acao-sessao');
   const ctrl=document.getElementById('ctrl-iniciar');
-  if(btn&&ctrl){
-    if(status==='aguardando'){btn.textContent=t2.iniciarSessao||'▶ Iniciar sessão';ctrl.textContent=t2.iniciar||'▶ Iniciar';}
-    else if(status==='ativa'){btn.textContent=t2.pausarSessao||'⏸ Pausar';ctrl.textContent=t2.pausar||'⏸ Pausar';}
-    else if(status==='pausada'){btn.textContent=t2.retomarSessao||'↺ Retomar';ctrl.textContent=t2.retomar||'↺ Retomar';}
-  }
+  if(status==='aguardando'){btn.textContent='▶ Iniciar sessão';ctrl.textContent='▶ Iniciar';}
+  else if(status==='ativa'){btn.textContent='⏸ Pausar';ctrl.textContent='⏸ Pausar';}
+  else if(status==='pausada'){btn.textContent='↺ Retomar';ctrl.textContent='↺ Retomar';}
 }
 
 function renderEquipasGrid(equipes){
@@ -1522,7 +1449,8 @@ async function criarSessao(){
     });
     fecharModal('modal-sessao');
     toast('Sessão criada! Código: '+data.codigo_acesso,'ok');
-    await carregarPainelEducador(data.id);
+    await carregarPainelEducador();
+    await selecionarSessao(data.id);
   }catch(e){
     fecharModal('modal-sessao');
     const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
@@ -1710,48 +1638,30 @@ function renderChaves(chaves){
       </div>
       <div class="cc-fases">${fasesHtml}</div>
       <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:${pct}%;background:${cor};${ativa?'box-shadow:0 0 6px '+cor:''}"></div></div>`;
-    const problemaConcluida=chaves['problema']?.status==='concluida';
-    const chavesDependentes=['solucao','parcerias','oportunidades'];
-    const bloqueadaPorProblema=chavesDependentes.includes(c)&&!problemaConcluida;
-    if(!concluida&&!ativa&&!bloqueadaPorProblema&&(disponivel||naoIniciada)){
+    if(!concluida&&(disponivel||naoIniciada)){
       const btnAtivar=document.createElement('button');
       btnAtivar.className='btn btn-primary w100 btn-sm';
       btnAtivar.style.marginTop='8px';
       btnAtivar.textContent='Iniciar '+nomeChaveLocale(c);
       btnAtivar.onclick=()=>ativarChave(c);
       card.appendChild(btnAtivar);
-    } else if(!concluida&&!ativa&&bloqueadaPorProblema){
-      const lblBloq=document.createElement('div');
-      lblBloq.style.cssText='margin-top:8px;font-size:10px;color:var(--t3);text-align:center;padding:6px;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed rgba(255,255,255,.08);';
-      lblBloq.textContent='🔒 Complete Problema primeiro';
-      card.appendChild(lblBloq);
     }
     grid.appendChild(card);
   });
 }
 
 async function ativarChave(chave){
-  // modo demo: equipeId null → ativa localmente sem API
-  if(!state.equipeId){
-    if(!state.chavesDemo) state.chavesDemo={};
-    // bloqueia chaves dependentes se problema não concluída
-    const chavesDep=['solucao','parcerias','oportunidades'];
-    if(chavesDep.includes(chave)&&state.chavesDemo['problema']?.status!=='concluida'){
-      toast('🔒 Conclua Problema antes de ativar '+nomeChave(chave),'err');
-      return;
-    }
-    Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
-    state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
-    toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
-    renderChavesDemo();
-    return;
-  }
   try{
     await api('POST','/chaves/'+state.equipeId+'/ativar',{chave});
     toast(nomeChave(chave)+' ativada!','ok');
     await carregarChaves();
   }catch(e){
-    toast('Erro ao ativar: '+e.message,'err');
+    // fallback demo
+    if(!state.chavesDemo) state.chavesDemo={};
+    Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
+    state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
+    toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
+    renderChavesDemo();
   }
 }
 
@@ -1789,12 +1699,7 @@ function renderChavesDemo(){
       </div>
       <div class="cc-fases">${fasesHtml}</div>
       <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:0%;background:${cor};"></div></div>
-      ${!ativa?(()=>{
-        const problemaConcluida=chavesData['problema']?.status==='concluida';
-        const dep=['solucao','parcerias','oportunidades'].includes(c);
-        if(dep&&!problemaConcluida) return `<div style="margin-top:8px;font-size:10px;color:var(--t3);text-align:center;padding:6px;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed rgba(255,255,255,.08);">🔒 Complete Problema primeiro</div>`;
-        return `<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`;
-      })():''}
+      ${!ativa?`<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`:''}
     `;
     grid.appendChild(div);
   });
@@ -1814,25 +1719,6 @@ function abrirFase(chave,numero,nome){
 async function concluirFaseConfirmar(){
   const conteudo=document.getElementById('mf-conteudo').value.trim();
   if(!conteudo){toast('Descreva o que a equipe descobriu','err');return;}
-  // modo demo: equipeId null → conclui localmente sem API
-  if(!state.equipeId){
-    if(!state.chavesDemo) state.chavesDemo={};
-    const ch=_fasePendente.chave;
-    if(!state.chavesDemo[ch]) state.chavesDemo[ch]={status:'ativa',fases:{}};
-    state.chavesDemo[ch].fases[_fasePendente.numero]={status:'concluida',conteudo};
-    const totalFases=FASES_POR_CHAVE_NOMES?.[ch]?.length||3;
-    const proxNum=_fasePendente.numero+1;
-    if(proxNum<=totalFases){
-      state.chavesDemo[ch].fases[proxNum]={status:'disponivel'};
-    } else {
-      state.chavesDemo[ch].status='concluida';
-    }
-    fecharModal('modal-fase');
-    toast('Fase '+_fasePendente.numero+' de '+nomeChave(ch)+' concluída! (demo)','ok');
-    renderChavesDemo();
-    mostrarFeedbackConclusao(ch, _fasePendente.numero, _fasePendente.nome);
-    return;
-  }
   try{
     await api('POST','/chaves/'+state.equipeId+'/concluir-fase',{
       chave:_fasePendente.chave,
@@ -1845,7 +1731,14 @@ async function concluirFaseConfirmar(){
     adicionarEventoRegistro('sistema','Sistema','✓ Fase '+_fasePendente.nome+' de '+nomeChave(_fasePendente.chave)+' concluída');
     mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
   }catch(e){
-    toast(e.message,'err');
+    // fallback demo: mostra feedback mesmo sem backend
+    if(e.name==='AbortError'||e.message.includes('fetch')||e.message.includes('NetworkError')){
+      fecharModal('modal-fase');
+      await carregarChaves();
+      mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
+    } else {
+      toast(e.message,'err');
+    }
   }
 }
 
@@ -1997,28 +1890,9 @@ setInterval(async()=>{
 /* ── SISTEMA DE IDIOMAS ── */
 const I18N={
   pt:{
-    sair:'Sair', iniciarSessao:'▶ Iniciar sessão', pausarSessao:'⏸ Pausar', retomarSessao:'↺ Retomar',
-    iniciar:'▶ Iniciar', pausar:'⏸ Pausar', retomar:'↺ Retomar',
-    socializar:'↗ Socializar',
+    sair:'Sair', iniciarSessao:'▶ Iniciar sessão', socializar:'↗ Socializar',
     lblConceitos:'Conceitos das Chaves', expandir:'▼ expandir', recolher:'▲ recolher',
     chaveAtivaBadge:'— sem chave ativa —',
-    login:{
-      heroHl:'Sua ideia', heroJogo:'em JOGO',
-      heroTag:'Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.',
-      chips:['🔍 Problema','✓ Solução','🤝 Parcerias','💡 Oportunidades'],
-      tabLogin:'Entrar', tabCadastro:'Criar conta', tabCodigo:'Código',
-      loginTitle:'Bem-vindo de volta', loginSub:'Acesse sua conta de educador',
-      lblEmail:'E-mail', lblSenha:'Senha', btnEntrar:'Entrar →',
-      cadTitle:'Criar conta', cadSub:'Preencha para começar',
-      lblNome:'Nome', lblSobrenome:'Sobrenome', lblConf:'Confirmar',
-      btnCriar:'Criar conta →',
-      codTitle:'Entrar com código', codSub:'Para jogadores — sem cadastro',
-      lblNomeJog:'Seu nome', lblCodigo:'Código da sessão', lblEquipe:'Número da equipe',
-      btnEntrarJog:'Entrar no jogo →',
-      codeHint1:'Código fornecido pelo educador', codeHint2:'Peça o código de 6 letras para começar',
-      equipes:['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5'],
-      conhecaChaves:'Conheça as chaves',
-    },
     chaves:{
       problema:{
         nome:'Problema',
@@ -2062,28 +1936,9 @@ Os autores apresentam a oportunidade como um guarda-chuva que permite compreende
     }
   },
   en:{
-    sair:'Log out', iniciarSessao:'▶ Start session', pausarSessao:'⏸ Pause', retomarSessao:'↺ Resume',
-    iniciar:'▶ Start', pausar:'⏸ Pause', retomar:'↺ Resume',
-    socializar:'↗ Showcase',
+    sair:'Log out', iniciarSessao:'▶ Start session', socializar:'↗ Showcase',
     lblConceitos:'Key Concepts', expandir:'▼ expand', recolher:'▲ collapse',
     chaveAtivaBadge:'— no active key —',
-    login:{
-      heroHl:'Your idea', heroJogo:'in PLAY',
-      heroTag:'An active methodology that transforms real problems into impactful proposals — investigating, building solutions, forming partnerships and revealing opportunities.',
-      chips:['🔍 Problem','✓ Solution','🤝 Partnerships','💡 Opportunities'],
-      tabLogin:'Sign in', tabCadastro:'Create account', tabCodigo:'Code',
-      loginTitle:'Welcome back', loginSub:'Sign in to your educator account',
-      lblEmail:'Email', lblSenha:'Password', btnEntrar:'Sign in →',
-      cadTitle:'Create account', cadSub:'Fill in to get started',
-      lblNome:'First name', lblSobrenome:'Last name', lblConf:'Confirm',
-      btnCriar:'Create account →',
-      codTitle:'Enter with code', codSub:'For players — no registration needed',
-      lblNomeJog:'Your name', lblCodigo:'Session code', lblEquipe:'Team number',
-      btnEntrarJog:'Join the game →',
-      codeHint1:'Code provided by the educator', codeHint2:'Ask for the 6-letter code to begin',
-      equipes:['Team 1','Team 2','Team 3','Team 4','Team 5'],
-      conhecaChaves:'About the keys',
-    },
     chaves:{
       problema:{
         nome:'Problem',
@@ -2127,28 +1982,9 @@ The authors present opportunity as an umbrella concept encompassing the creation
     }
   },
   es:{
-    sair:'Salir', iniciarSessao:'▶ Iniciar sesión', pausarSessao:'⏸ Pausar', retomarSessao:'↺ Reanudar',
-    iniciar:'▶ Iniciar', pausar:'⏸ Pausar', retomar:'↺ Reanudar',
-    socializar:'↗ Socializar',
+    sair:'Salir', iniciarSessao:'▶ Iniciar sesión', socializar:'↗ Socializar',
     lblConceitos:'Conceptos de las Claves', expandir:'▼ expandir', recolher:'▲ colapsar',
     chaveAtivaBadge:'— sin clave activa —',
-    login:{
-      heroHl:'Tu idea', heroJogo:'en JUEGO',
-      heroTag:'Una metodología activa que transforma problemas reales en propuestas de impacto — investigando, construyendo soluciones, formando alianzas y revelando oportunidades.',
-      chips:['🔍 Problema','✓ Solución','🤝 Alianzas','💡 Oportunidades'],
-      tabLogin:'Entrar', tabCadastro:'Crear cuenta', tabCodigo:'Código',
-      loginTitle:'Bienvenido de vuelta', loginSub:'Accede a tu cuenta de educador',
-      lblEmail:'Correo electrónico', lblSenha:'Contraseña', btnEntrar:'Entrar →',
-      cadTitle:'Crear cuenta', cadSub:'Completa para comenzar',
-      lblNome:'Nombre', lblSobrenome:'Apellido', lblConf:'Confirmar',
-      btnCriar:'Crear cuenta →',
-      codTitle:'Entrar con código', codSub:'Para jugadores — sin registro',
-      lblNomeJog:'Tu nombre', lblCodigo:'Código de sesión', lblEquipe:'Número de equipo',
-      btnEntrarJog:'Unirse al juego →',
-      codeHint1:'Código proporcionado por el educador', codeHint2:'Pide el código de 6 letras para comenzar',
-      equipes:['Equipo 1','Equipo 2','Equipo 3','Equipo 4','Equipo 5'],
-      conhecaChaves:'Conoce las claves',
-    },
     chaves:{
       problema:{
         nome:'Problema',
@@ -2204,72 +2040,6 @@ function setIdioma(lang){
   });
   // Atualizar textos da interface
   const t=I18N[lang];
-  // ── Tela de login ──
-  if(t.login){
-    const L=t.login;
-    const set=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
-    const setph=(id,txt)=>{const el=document.getElementById(id);if(el)el.placeholder=txt;};
-    set('login-hero-hl',L.heroHl);
-    set('login-hero-jogo',L.heroJogo);
-    set('login-hero-tag',L.heroTag);
-    const chips=['chip-prob','chip-sol','chip-parc','chip-opor'];
-    chips.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=L.chips[i];});
-    set('tab-login',L.tabLogin);
-    set('tab-cadastro',L.tabCadastro);
-    set('tab-codigo',L.tabCodigo);
-    set('login-title-edu',L.loginTitle);
-    set('login-sub-edu',L.loginSub);
-    set('lbl-email-edu',L.lblEmail);
-    set('lbl-senha-edu',L.lblSenha);
-    set('btn-entrar-edu',L.btnEntrar);
-    set('login-title-cad',L.cadTitle);
-    set('login-sub-cad',L.cadSub);
-    set('lbl-nome-cad',L.lblNome);
-    set('lbl-sob-cad',L.lblSobrenome);
-    set('lbl-email-cad',L.lblEmail);
-    set('lbl-senha-cad',L.lblSenha);
-    set('lbl-conf-cad',L.lblConf);
-    set('btn-criar-conta',L.btnCriar);
-    set('login-title-cod',L.codTitle);
-    set('login-sub-cod',L.codSub);
-    set('lbl-nome-jog',L.lblNomeJog);
-    set('lbl-codigo-jog',L.lblCodigo);
-    set('lbl-equipe-jog',L.lblEquipe);
-    set('btn-entrar-jog',L.btnEntrarJog);
-    set('code-hint1',L.codeHint1);
-    set('code-hint2',L.codeHint2);
-    // Equipes no select
-    L.equipes.forEach((nm,i)=>{const el=document.getElementById('opt-eq'+(i+1));if(el)el.textContent=nm;});
-    // Seção "Conheça as chaves" no hero
-    const conheca=document.querySelector('.hero-conceitos>div:first-child');
-    if(conheca) conheca.textContent=L.conhecaChaves;
-    // Atualiza nomes das chaves nos cards do hero
-    const chaveKeys=['problema','solucao','parcerias','oportunidades'];
-    document.querySelectorAll('.hc-nm').forEach((el,i)=>{
-      if(t.chaves[chaveKeys[i]]) el.textContent=t.chaves[chaveKeys[i]].nome;
-    });
-    // Atualiza conceitos expandíveis do hero
-    const corpos=document.querySelectorAll('.hc-body');
-    corpos.forEach((el,i)=>{
-      if(t.chaves[chaveKeys[i]]) el.innerHTML=t.chaves[chaveKeys[i]].conceito.replace(/\n/g,'<br><br>');
-    });
-  }
-  // ── Tabuleiro Educador ──
-  const btnAcao=document.getElementById('btn-acao-sessao');
-  if(btnAcao){
-    const mapa={aguardando:t.iniciarSessao,ativa:t.pausarSessao,pausada:t.retomarSessao};
-    btnAcao.textContent=mapa[state.sessaoStatus||'aguardando']||t.iniciarSessao;
-  }
-  const btnSocial=document.getElementById('btn-socializar');
-  if(btnSocial) btnSocial.textContent=t.socializar;
-  const btnEduSair=document.getElementById('btn-edu-sair');
-  if(btnEduSair) btnEduSair.textContent=t.sair;
-  const ctrlIniciar=document.getElementById('ctrl-iniciar');
-  if(ctrlIniciar){
-    const mapaCtrl={aguardando:t.iniciar||'▶',ativa:t.pausar||'⏸',pausada:t.retomar||'↺'};
-    ctrlIniciar.textContent=(mapaCtrl[state.sessaoStatus||'aguardando']);
-  }
-  // ── Tabuleiro Jogador ──
   document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
   const jogSair=document.getElementById('jog-btn-sair');
   if(jogSair) jogSair.textContent=t.sair;
@@ -2286,8 +2056,6 @@ function setIdioma(lang){
   atualizarChavesInfo(lang);
   // Atualizar nome das chaves visíveis nos cards já renderizados
   if(state.chaves) renderChaves(state.chaves);
-  // Salvar preferência
-  try{localStorage.setItem('tdoe_lang',lang);}catch(e){}
 }
 
 function atualizarChavesInfo(lang){
@@ -2454,7 +2222,7 @@ function gerarRelatorio(){
     <div class="chaves-grid">${fasesSummary}</div>
     <div class="footer">TdoE – Tabuleiro do Empreendedor · UFLA · Daniela Meirelles Andrade</div>
   </div>
-  <scr\x69pt>window.print();<\/scr\x69pt>
+  <script>window.print();<\/script>
   </body></html>`;
 
   const blob=new Blob([html],{type:'text/html'});
@@ -2521,7 +2289,7 @@ function exportarPropostas(){
     @media screen{body{background:#eee;padding:20px;}.page-break{background:#fff;border-radius:12px;margin-bottom:24px;box-shadow:0 2px 16px rgba(0,0,0,.1);}}
   </style></head><body>
   ${pagesHtml}
-  <scr\x69pt>window.print();<\/scr\x69pt>
+  <script>window.print();<\/script>
   </body></html>`;
 
   const blob=new Blob([html],{type:'text/html'});
@@ -2641,12 +2409,8 @@ function pararTimerEdu(natural=false){
 /* ── RELÓGIO — polling jogador ── */
 function atualizarTimerJogador(){
   const d=lerTimerStorage();
-  // ignora timer zerado/parado que veio do educador antes do estudante entrar
-  if(!d||d.total===0||(!d.rodando&&d.restante===0)) return;
-  const jaRodava=state.timerRodando;
+  if(!d||d.total===0) return;
   state.timerTotal=d.total;state.timerRestante=d.restante;state.timerRodando=d.rodando;
-  // só avisa "tempo esgotado" se o timer estava rodando nesta sessão do estudante
-  if(jaRodava&&!d.rodando&&d.restante===0) toast('⏱ Tempo esgotado!','info');
   atualizarDisplayTimer();
 }
 
@@ -2729,29 +2493,8 @@ function pollingLudicoJogador(){
 (function(){
   const t=localStorage.getItem('tdoe_edu_token');
   const n=localStorage.getItem('tdoe_edu_nome');
-  if(t){
-    // Valida JWT localmente antes de usar
-    try{
-      const parts=t.split('.');
-      if(parts.length===3){
-        const payload=JSON.parse(atob(parts[1]));
-        const agora=Math.floor(Date.now()/1000);
-        if(payload.exp&&payload.exp<agora){
-          // Token expirado — limpar
-          localStorage.removeItem('tdoe_edu_token');
-          localStorage.removeItem('tdoe_edu_nome');
-        }else{
-          state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};
-        }
-      }
-    }catch(e){
-      localStorage.removeItem('tdoe_edu_token');
-      localStorage.removeItem('tdoe_edu_nome');
-    }
-  }
+  if(t){state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};}
 })();
-// Restaurar idioma salvo
-(()=>{try{const l=localStorage.getItem('tdoe_lang');if(l&&I18N[l])setIdioma(l);}catch(e){}})();
 irPara('login');
 </script>
 </body>
