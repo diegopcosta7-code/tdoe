@@ -1741,7 +1741,7 @@ function renderChaves(chaves){
       const fd=f.status==='concluida'; const fa=f.status==='ativa'||f.status==='disponivel'; const fl=f.status==='bloqueada';
       fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa&&!fl?' active':''}${fl?' locked':''}" 
         style="${fa&&!fl?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
-        onclick="${fl?'':('abrirFase("'+c+'",'+f.numero+',"'+f.nome+'")')}">
+        onclick="${fl?'':("abrirFase('"+c+"',"+f.numero+",'"+f.nome+"')")}">
         <div class="cc-fnum" style="${fd?'background:'+cor+';color:#fff;':fa?'background:'+bg+';color:'+cor+';':'background:rgba(255,255,255,.08);color:var(--t3);'}">${fd?'✓':f.numero}</div>
         <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${f.nome}</div>
         <div class="cc-ftxt">${fd?'✓':(fa?'clique':'🔒')}</div>
