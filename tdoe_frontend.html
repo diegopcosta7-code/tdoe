@@ -1554,16 +1554,8 @@ async function criarSessao(){
     document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
     lista.prepend(d);
     d.onclick=()=>selecionarSessao(data.id);
-    // preenche painel imediatamente com dados do POST (sem novo request)
-    state.sessaoId=data.id;
-    state.sessaoAtual=data;
-    state.sessaoStatus=data.status||'aguardando';
-    document.getElementById('tb-sessao-titulo').textContent=titulo+' · '+data.codigo_acesso;
-    document.getElementById('m-codigo').textContent=data.codigo_acesso;
-    atualizarStatusBadge(data.status||'aguardando');
-    renderEquipasGrid(data.equipes||[]);
-    atualizarMetricas(data.equipes||[]);
-    atualizarBarrasChaves(data.equipes||[]);
+    // seleciona a sessão automaticamente (mostra painel sem precisar clicar)
+    selecionarSessao(data.id);
   }catch(e){
     fecharModal('modal-sessao');
     const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
@@ -1851,8 +1843,15 @@ let _fasePendente={chave:null,numero:null,nome:null};
 function abrirFase(chave,numero,nome){
   _fasePendente={chave,numero,nome};
   document.getElementById('mf-titulo').textContent='Fase '+numero+' — '+nome;
-  document.getElementById('mf-desc').textContent='Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
+  // mostra a pergunta-guia da fase no campo de descrição
+  const info=CHAVES_INFO[chave];
+  const faseInfo=info&&info.fases[numero-1];
+  const descFase=faseInfo?faseInfo.desc:'Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
+  document.getElementById('mf-desc').textContent=descFase;
   document.getElementById('mf-conteudo').value='';
+  // atualiza placeholder do textarea com a pergunta
+  const ta=document.getElementById('mf-conteudo');
+  if(ta) ta.placeholder=faseInfo?'Responda: '+faseInfo.desc:'Descreva o que a equipe descobriu…';
   abrirModal('modal-fase');
 }
 
@@ -2712,13 +2711,15 @@ async function atualizarTimerJogador(){
 }
 
 /* ── CARTA-DESAFIO — lançar (educador) ── */
-function lancarCartaDesafio(chave,icone,titulo,corpo){
+async function lancarCartaDesafio(chave,icone,titulo,corpo){
   const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
   const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
   const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
   const carta={chave,icone,titulo,corpo,cor:corMap[chave]||'var(--gold)',bg:bgMap[chave]||'var(--gold-bg)',bd:bdMap[chave]||'var(--gold-bd)'};
-  try{localStorage.setItem('tdoe_carta_desafio',JSON.stringify({...carta,ts:Date.now()}));}catch(e){}
-  receberCartaDesafio(carta);
+  // salva no backend para sincronizar entre dispositivos
+  if(state.sessaoId){
+    try{ await api('POST','/sessao/'+state.sessaoId+'/carta',{chave,icone,titulo,corpo}); }catch(e){}
+  }
   toast('🃏 Carta enviada: '+titulo,'ok');
 }
 
@@ -2776,16 +2777,24 @@ setInterval(()=>{
     state.timerRestante--;atualizarDisplayTimer();
   }
 },1000);
-function pollingLudicoJogador(){
-  if(state.perfil!=='jogador') return;
+async function pollingLudicoJogador(){
+  if(state.perfil!=='jogador'||!state.sessaoId) return;
   // timer já tem seu próprio interval acima
   atualizarTimerJogador();
-  // carta
+  // carta via API
   try{
-    const raw=localStorage.getItem('tdoe_carta_desafio');
-    if(raw&&!state.cartaDesafioAtiva){
-      const carta=JSON.parse(raw);
-      if(Date.now()-carta.ts<60000) receberCartaDesafio(carta);
+    const d=await api('GET','/sessao/'+state.sessaoId+'/carta');
+    if(d&&d.carta&&!state.cartaDesafioAtiva){
+      const c=d.carta;
+      const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+      const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+      const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+      receberCartaDesafio({...c,cor:corMap[c.chave]||'var(--gold)',bg:bgMap[c.chave]||'var(--gold-bg)',bd:bdMap[c.chave]||'var(--gold-bd)'});
+    } else if(d&&!d.carta){
+      // carta foi removida
+      state.cartaDesafioAtiva=null;
+      const ni=document.getElementById('jog-carta-notif-inline');
+      if(ni) ni.classList.add('hidden');
     }
   }catch(e){}
   // pontuação salva
