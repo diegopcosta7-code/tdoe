@@ -501,7 +501,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <div class="logo-gem">
           <svg width="26" height="26" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg>
         </div>
-        <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE · UFLA</div></div>
+        <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE</div></div>
         <div class="lang-sel" id="lang-sel-login" style="margin-left:auto;">
           <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
           <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
@@ -593,7 +593,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <div id="form-login" class="anim-in">
       <div class="login-title" id="login-title-edu">Bem-vindo de volta</div>
       <div class="login-sub" id="login-sub-edu">Acesse sua conta de educador</div>
-      <div class="field"><label id="lbl-email-edu">E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label id="lbl-email-edu">E-mail</label><input id="login-email" type="email" placeholder="E-mail"/></div>
       <div class="field"><label id="lbl-senha-edu">Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
       <button class="btn btn-primary w100" id="btn-entrar-edu" onclick="fazerLogin()">Entrar →</button>
     </div>
@@ -606,7 +606,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <div class="field"><label id="lbl-nome-cad">Nome</label><input id="cad-nome" placeholder="Nome"/></div>
         <div class="field"><label id="lbl-sob-cad">Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
       </div>
-      <div class="field"><label id="lbl-email-cad">E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field"><label id="lbl-email-cad">E-mail</label><input id="cad-email" type="email" placeholder="E-mail"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="field"><label id="lbl-senha-cad">Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
         <div class="field"><label id="lbl-conf-cad">Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
@@ -635,6 +635,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         </div>
       </div>
     </div>
+  </div>
+  <div style="text-align:center;padding:18px 20px 24px;font-size:11px;color:var(--t3);line-height:1.6;">
+    Plataforma desenvolvida como parte de uma pesquisa de doutorado em Administração<br>da Universidade Federal de Lavras (UFLA)
   </div>
 </div>
 
@@ -1605,6 +1608,8 @@ async function criarSessao(){
     document.getElementById('s-cenario').focus();
     return;
   }
+  const btnCriar=document.querySelector('#modal-sessao .btn-primary');
+  if(btnCriar){btnCriar.disabled=true;btnCriar.textContent='⏳ Criando…';}
   try{
     const data=await api('POST','/sessao',{
       titulo,
@@ -1613,7 +1618,6 @@ async function criarSessao(){
       num_equipes:parseInt(document.getElementById('s-equipes').value),
       integrantes_por_equipe:parseInt(document.getElementById('s-integrantes').value),
     });
-    fecharModal('modal-sessao');
     toast('Sessão criada! Código: '+data.codigo_acesso,'ok');
     // adiciona à lista imediatamente sem esperar reload completo
     const lista=document.getElementById('lista-sessoes');
@@ -1631,9 +1635,11 @@ async function criarSessao(){
     document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
     lista.prepend(d);
     d.onclick=()=>selecionarSessao(data.id);
+    fecharModal('modal-sessao');
     // seleciona a sessão automaticamente (mostra painel sem precisar clicar)
-    selecionarSessao(data.id);
+    await selecionarSessao(data.id);
   }catch(e){
+    if(btnCriar){btnCriar.disabled=false;btnCriar.textContent='Criar sessão →';}
     fecharModal('modal-sessao');
     const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
     const integrantes=parseInt(document.getElementById('s-integrantes').value)||4;
