@@ -405,10 +405,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 /* ═══════════════════════════════════════
    FEEDBACK DE CONCLUSÃO DE FASE
 ═══════════════════════════════════════ */
-#overlay-congrats{
+#overlay-congrats,#overlay-encerramento{
   position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;
   display:flex;align-items:center;justify-content:center;padding:20px;
 }
+.enc-chave-card{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:14px 16px;}
+.enc-chave-titulo{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.enc-fase{margin-bottom:6px;}
+.enc-fase-nome{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:2px;}
+.enc-fase-conteudo{font-size:12px;color:var(--t1);line-height:1.5;background:rgba(255,255,255,.04);border-radius:6px;padding:7px 10px;}
 .congrats-box{
   background:var(--bg2);border-radius:22px;border:.5px solid var(--border2);
   padding:36px 40px;text-align:center;max-width:420px;width:100%;
@@ -723,19 +728,19 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
       <!-- CARTA-DESAFIO — lançador do educador -->
       <div class="panel-title">🃏 Carta-desafio</div>
       <div class="carta-launcher" id="edu-carta-launcher">
-        <button class="carta-launcher-btn" style="border-color:var(--prob-bd);background:var(--prob-bg);" onclick="lancarCartaDesafio('problema','🔍','Desafio Problema','Identifiquem um problema ainda mais específico no contexto investigado e proponham uma nova perspectiva.')">
+        <button class="carta-launcher-btn" style="border-color:var(--prob-bd);background:var(--prob-bg);" onclick="abrirPreviewCarta('problema','🔍','Desafio Problema','Identifiquem um problema ainda mais específico no contexto investigado e proponham uma nova perspectiva.')">
           <div class="carta-launcher-icone" style="background:rgba(34,201,122,.15);">🔍</div>
           <div><div class="carta-launcher-nm">Problema</div><div class="carta-launcher-sub">Aprofundar investigação</div></div>
         </button>
-        <button class="carta-launcher-btn" style="border-color:var(--sol-bd);background:var(--sol-bg);" onclick="lancarCartaDesafio('solucao','✓','Desafio Solução','Revisem a solução proposta considerando novos critérios de viabilidade e impacto.')">
+        <button class="carta-launcher-btn" style="border-color:var(--sol-bd);background:var(--sol-bg);" onclick="abrirPreviewCarta('solucao','✓','Desafio Solução','Revisem a solução proposta considerando novos critérios de viabilidade e impacto.')">
           <div class="carta-launcher-icone" style="background:rgba(15,212,176,.15);">✓</div>
           <div><div class="carta-launcher-nm">Solução</div><div class="carta-launcher-sub">Revisar proposta</div></div>
         </button>
-        <button class="carta-launcher-btn" style="border-color:var(--parc-bd);background:var(--parc-bg);" onclick="lancarCartaDesafio('parcerias','🤝','Desafio Parcerias','Mapeiem pelo menos três novos parceiros estratégicos e justifiquem o papel de cada um.')">
+        <button class="carta-launcher-btn" style="border-color:var(--parc-bd);background:var(--parc-bg);" onclick="abrirPreviewCarta('parcerias','🤝','Desafio Parcerias','Mapeiem pelo menos três novos parceiros estratégicos e justifiquem o papel de cada um.')">
           <div class="carta-launcher-icone" style="background:rgba(46,128,240,.15);">🤝</div>
           <div><div class="carta-launcher-nm">Parcerias</div><div class="carta-launcher-sub">Ampliar alianças</div></div>
         </button>
-        <button class="carta-launcher-btn" style="border-color:var(--opor-bd);background:var(--opor-bg);" onclick="lancarCartaDesafio('oportunidades','💡','Desafio Oportunidades','Identifiquem uma oportunidade de mercado não explorada e descreva como aproveitá-la.')">
+        <button class="carta-launcher-btn" style="border-color:var(--opor-bd);background:var(--opor-bg);" onclick="abrirPreviewCarta('oportunidades','💡','Desafio Oportunidades','Identifiquem uma oportunidade de mercado não explorada e descreva como aproveitá-la.')">
           <div class="carta-launcher-icone" style="background:rgba(160,64,224,.15);">💡</div>
           <div><div class="carta-launcher-nm">Oportunidades</div><div class="carta-launcher-sub">Descobrir novo caminho</div></div>
         </button>
@@ -779,6 +784,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     </div>
     <div style="flex:1;"></div>
     <div id="jog-carta-notif-inline" class="hidden"></div>
+    <button id="btn-ver-resumo" class="hidden" onclick="abrirEncerramento()" style="background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.35);border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🏆 Ver resumo</button>
   </div>
   <!-- FAIXA DO RELÓGIO (só visível quando timer ativo) -->
   <div class="timer-strip hidden" id="jog-timer-strip">
@@ -930,6 +936,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <div class="field"><label>Conteúdo investigado pela equipe</label><textarea id="mf-conteudo" placeholder="Descreva o que a equipe descobriu…"></textarea></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="fecharModal('modal-fase')">Cancelar</button>
+      <button class="btn btn-ghost" id="btn-editar-fase" style="display:none;" onclick="habilitarEdicaoFase()">✏️ Editar</button>
       <button class="btn btn-primary" id="btn-concluir-fase" onclick="concluirFaseConfirmar()">✓ Concluir fase</button>
     </div>
   </div>
@@ -960,6 +967,47 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <div class="congrats-sub" id="congrats-sub">Você avançou na investigação</div>
     <div class="congrats-pts-badge">+<span id="congrats-pts">80</span> pontos de investigação</div>
     <button class="btn btn-primary" style="width:100%;" onclick="fecharCongrats()">Continuar investigando →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL — PREVIEW CARTA-DESAFIO (EDUCADOR)
+════════════════════════════════════ -->
+<div id="modal-preview-carta" class="modal-overlay hidden">
+  <div class="modal" style="max-width:480px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div id="pvc-icone" style="font-size:28px;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🃏</div>
+      <div>
+        <div id="pvc-tipo" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.6;">Carta-Desafio</div>
+        <div id="pvc-titulo" style="font-size:17px;font-weight:800;line-height:1.2;"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Conteúdo da carta <span style="font-size:10px;font-weight:400;opacity:.5;">(editável antes de enviar)</span></label>
+      <textarea id="pvc-corpo" style="height:90px;resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-preview-carta')">Cancelar</button>
+      <button class="btn btn-primary" id="pvc-btn-enviar" onclick="confirmarEnvioCarta()">🃏 Enviar carta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     OVERLAY — ENCERRAMENTO (JOGADOR)
+════════════════════════════════════ -->
+<div id="overlay-encerramento" class="hidden">
+  <div style="background:var(--bg2);border-radius:22px;border:.5px solid var(--border2);padding:28px 28px 24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;animation:fadein .35s ease;position:relative;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:40px;margin-bottom:8px;">🏆</div>
+      <div style="font-size:22px;font-weight:900;letter-spacing:-.5px;" id="enc-titulo">Investigação concluída!</div>
+      <div style="font-size:13px;color:var(--t2);margin-top:4px;" id="enc-sub">Sua equipe completou todas as chaves</div>
+    </div>
+    <div id="enc-resumo" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="fecharEncerramento()">← Revisar</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="enviarEncerramento()">Enviar ✓</button>
+    </div>
   </div>
 </div>
 
@@ -1437,7 +1485,10 @@ function renderEquipasGrid(equipes){
         }).join('')}
       </div>
       <div class="eq-prog-bar"><div class="eq-prog-fill" style="width:${pct}%;background:${chaveAtiva?corChave(chaveAtiva[0]):'var(--t3)'};"></div></div>
-      <div class="badge tiny" style="background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border);">${concluidas}/4 chaves</div>`;
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="badge tiny" style="background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border);">${concluidas}/4 chaves</div>
+        ${eq.investigacao_enviada?'<div class="badge tiny" style="background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.3);">✓ Enviou</div>':''}
+      </div>`;
     grid.appendChild(div);
   });
 }
@@ -1766,6 +1817,10 @@ function renderChaves(chaves){
     }
     grid.appendChild(card);
   });
+  // mostrar botão "Ver resumo" se todas as 4 chaves concluídas
+  const todasConcluidas=Object.values(chaves).length===4&&Object.values(chaves).every(v=>v.status==='concluida');
+  const btnResumo=document.getElementById('btn-ver-resumo');
+  if(btnResumo) btnResumo.classList.toggle('hidden',!todasConcluidas);
 }
 
 async function ativarChave(chave){
@@ -1855,12 +1910,23 @@ function abrirFase(chave,numero,nome){
     ta.value=conteudoSalvo;
     ta.placeholder=faseInfo?'Responda: '+faseInfo.desc:'Descreva o que a equipe descobriu…';
     ta.readOnly=!!conteudoSalvo; // somente leitura se já preenchida
-    ta.style.opacity=conteudoSalvo?'0.7':'1';
+    ta.style.opacity=conteudoSalvo?'0.8':'1';
   }
-  // botão concluir: oculta se já concluída
+  // botões: concluir oculto se já preenchida; editar visível se já preenchida
   const btnConcluir=document.getElementById('btn-concluir-fase');
+  const btnEditar=document.getElementById('btn-editar-fase');
   if(btnConcluir) btnConcluir.style.display=conteudoSalvo?'none':'';
+  if(btnEditar) btnEditar.style.display=conteudoSalvo?'':'none';
   abrirModal('modal-fase');
+}
+
+function habilitarEdicaoFase(){
+  const ta=document.getElementById('mf-conteudo');
+  if(ta){ta.readOnly=false;ta.style.opacity='1';ta.focus();}
+  const btnEditar=document.getElementById('btn-editar-fase');
+  const btnConcluir=document.getElementById('btn-concluir-fase');
+  if(btnEditar) btnEditar.style.display='none';
+  if(btnConcluir){btnConcluir.style.display='';btnConcluir.textContent='✓ Salvar edição';}
 }
 
 async function concluirFaseConfirmar(){
@@ -2627,10 +2693,71 @@ function mostrarFeedbackConclusao(chave,numeroFase,nomeFase){
   if(badge) badge.style.color=cor;
   const ov=document.getElementById('overlay-congrats');
   if(ov) ov.classList.remove('hidden');
+  // verificar se TODAS as 4 chaves estão concluídas → abrir encerramento após fechar congrats
+  if(chaveConcluida){
+    // pequeno delay para garantir que state.chaves já foi atualizado pelo carregarChaves()
+    setTimeout(()=>{
+      const todasChaves=['problema','solucao','parcerias','oportunidades'];
+      const todasConcluidas=todasChaves.every(c=>state.chaves?.[c]?.status==='concluida');
+      if(todasConcluidas){
+        setTimeout(()=>{
+          fecharCongrats();
+          abrirEncerramento();
+        },2000);
+      }
+    },200);
+  }
 }
 function fecharCongrats(){
   const ov=document.getElementById('overlay-congrats');
   if(ov) ov.classList.add('hidden');
+}
+
+/* ── ENCERRAMENTO — tela de resumo final ── */
+function abrirEncerramento(){
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+  const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+  const resumo=document.getElementById('enc-resumo');
+  resumo.innerHTML='';
+  const dadosChaves=state.chaves||{};
+  chaves.forEach(c=>{
+    const dados=dadosChaves[c];
+    if(!dados) return;
+    const card=document.createElement('div');
+    card.className='enc-chave-card';
+    card.style.borderColor=bdMap[c];
+    let fasesHtml='';
+    (dados.fases||[]).forEach(f=>{
+      if(f.conteudo){
+        fasesHtml+=`<div class="enc-fase">
+          <div class="enc-fase-nome" style="color:${corMap[c]};">${f.nome}</div>
+          <div class="enc-fase-conteudo">${f.conteudo}</div>
+        </div>`;
+      }
+    });
+    card.innerHTML=`<div class="enc-chave-titulo" style="color:${corMap[c]};border-bottom:1px solid ${bdMap[c]};padding-bottom:8px;margin-bottom:10px;">${iconChave(c)} ${nomeChaveLocale(c)}</div>${fasesHtml||'<div style="font-size:11px;color:var(--t3);">Nenhuma fase registrada</div>'}`;
+    resumo.appendChild(card);
+  });
+  // pontuação total
+  const sub=document.getElementById('enc-sub');
+  if(sub) sub.textContent='Equipe: '+(state.equipeNome||'sua equipe')+' · '+state.pontuacao+' pts';
+  document.getElementById('overlay-encerramento').classList.remove('hidden');
+}
+function fecharEncerramento(){
+  document.getElementById('overlay-encerramento').classList.add('hidden');
+}
+async function enviarEncerramento(){
+  // marca equipe como investigação enviada no backend
+  if(state.equipeId){
+    try{
+      await api('PATCH','/equipe/'+state.equipeId+'/encerrar',{});
+    }catch(e){console.warn('encerrar:',e);}
+  }
+  toast('📤 Investigação enviada com sucesso! O educador já pode ver.','ok');
+  fecharEncerramento();
+  adicionarEventoRegistro('sistema','Sistema','✓ Investigação final enviada ao educador');
 }
 
 /* ── RELÓGIO — helpers ── */
@@ -2716,6 +2843,35 @@ async function atualizarTimerJogador(){
     const d=await api('GET','/sessao/'+state.sessaoId+'/timer');
     if(d&&d.timer) aplicarTimerDaAPI(d.timer);
   }catch(e){}
+}
+
+/* ── CARTA-DESAFIO — preview antes de enviar (educador) ── */
+let _cartaPendente=null;
+function abrirPreviewCarta(chave,icone,titulo,corpo){
+  _cartaPendente={chave,icone,titulo,corpo};
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'rgba(34,201,122,.15)',solucao:'rgba(15,212,176,.15)',parcerias:'rgba(46,128,240,.15)',oportunidades:'rgba(160,64,224,.15)'};
+  const cor=corMap[chave]||'var(--gold)';
+  const bg=bgMap[chave]||'rgba(255,215,0,.15)';
+  const iEl=document.getElementById('pvc-icone');
+  const tipoEl=document.getElementById('pvc-tipo');
+  const titEl=document.getElementById('pvc-titulo');
+  const taEl=document.getElementById('pvc-corpo');
+  const btnEl=document.getElementById('pvc-btn-enviar');
+  if(iEl){iEl.textContent=icone;iEl.style.background=bg;iEl.style.color=cor;}
+  if(tipoEl){tipoEl.textContent='Carta-Desafio · '+nomeChave(chave);tipoEl.style.color=cor;}
+  if(titEl) titEl.textContent=titulo;
+  if(taEl) taEl.value=corpo;
+  if(btnEl) btnEl.style.background=cor;
+  abrirModal('modal-preview-carta');
+}
+async function confirmarEnvioCarta(){
+  if(!_cartaPendente) return;
+  const corpo=document.getElementById('pvc-corpo').value.trim();
+  if(!corpo){toast('O conteúdo da carta não pode estar vazio','err');return;}
+  await lancarCartaDesafio(_cartaPendente.chave,_cartaPendente.icone,_cartaPendente.titulo,corpo);
+  fecharModal('modal-preview-carta');
+  _cartaPendente=null;
 }
 
 /* ── CARTA-DESAFIO — lançar (educador) ── */
