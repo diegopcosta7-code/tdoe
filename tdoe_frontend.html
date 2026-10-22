@@ -971,6 +971,21 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 </div>
 
 <!-- ════════════════════════════════════
+     MODAL — CONFIRMAÇÃO GENÉRICA
+════════════════════════════════════ -->
+<div id="modal-confirm" class="modal-overlay hidden">
+  <div class="modal" style="max-width:380px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:10px;" id="mc-icon">⚠️</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:8px;" id="mc-titulo">Confirmar</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.5;" id="mc-msg"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="fecharModal('modal-confirm');_confirmCallback=null;">Cancelar</button>
+      <button class="btn" id="mc-btn-ok" style="flex:1;background:#ef4444;color:#fff;" onclick="if(_confirmCallback){_confirmCallback();}_confirmCallback=null;fecharModal('modal-confirm');">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
      MODAL — PREVIEW CARTA-DESAFIO (EDUCADOR)
 ════════════════════════════════════ -->
 <div id="modal-preview-carta" class="modal-overlay hidden">
@@ -1402,21 +1417,32 @@ async function carregarPainelEducador(selecionarId=null){
   await carregarNovasFuncoes();
 }
 
+let _confirmCallback=null;
+function confirmar(msg,cb,{icone='⚠️',titulo='Confirmar',labelOk='Confirmar'}={}){
+  document.getElementById('mc-msg').textContent=msg;
+  document.getElementById('mc-titulo').textContent=titulo;
+  document.getElementById('mc-icon').textContent=icone;
+  document.getElementById('mc-btn-ok').textContent=labelOk;
+  _confirmCallback=cb;
+  abrirModal('modal-confirm');
+}
+
 async function excluirSessao(id, titulo, btn){
-  if(!confirm('Excluir a sessão "'+titulo+'"? Esta ação não pode ser desfeita.')) return;
-  try{
-    await api('DELETE','/sessao/'+id);
-    toast('Sessão excluída','ok');
-    const el=document.getElementById('sessao-item-'+id);
-    if(el) el.remove();
-    if(state.sessaoId===id){
-      const prox=document.querySelector('#lista-sessoes .eq-item');
-      if(prox) prox.click();
-      else { state.sessaoId=null; state.sessaoAtual=null; }
+  confirmar('Excluir a sessão "'+titulo+'"? Esta ação não pode ser desfeita.',async()=>{
+    try{
+      await api('DELETE','/sessao/'+id);
+      toast('Sessão excluída','ok');
+      const el=document.getElementById('sessao-item-'+id);
+      if(el) el.remove();
+      if(state.sessaoId===id){
+        const prox=document.querySelector('#lista-sessoes .eq-item');
+        if(prox) prox.click();
+        else { state.sessaoId=null; state.sessaoAtual=null; }
+      }
+    }catch(e){
+      toast('Erro ao excluir: '+e.message,'err');
     }
-  }catch(e){
-    toast('Erro ao excluir: '+e.message,'err');
-  }
+  },{icone:'🗑️',titulo:'Excluir sessão',labelOk:'Excluir'});
 }
 
 async function selecionarSessao(id){
