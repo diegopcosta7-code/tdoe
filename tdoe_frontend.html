@@ -1848,10 +1848,18 @@ function abrirFase(chave,numero,nome){
   const faseInfo=info&&info.fases[numero-1];
   const descFase=faseInfo?faseInfo.desc:'Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
   document.getElementById('mf-desc').textContent=descFase;
-  document.getElementById('mf-conteudo').value='';
-  // atualiza placeholder do textarea com a pergunta
+  // carrega conteúdo já salvo (se fase foi concluída)
   const ta=document.getElementById('mf-conteudo');
-  if(ta) ta.placeholder=faseInfo?'Responda: '+faseInfo.desc:'Descreva o que a equipe descobriu…';
+  const conteudoSalvo=state.chaves?.[chave]?.fases?.find(f=>f.numero===numero)?.conteudo||'';
+  if(ta){
+    ta.value=conteudoSalvo;
+    ta.placeholder=faseInfo?'Responda: '+faseInfo.desc:'Descreva o que a equipe descobriu…';
+    ta.readOnly=!!conteudoSalvo; // somente leitura se já preenchida
+    ta.style.opacity=conteudoSalvo?'0.7':'1';
+  }
+  // botão concluir: oculta se já concluída
+  const btnConcluir=document.getElementById('btn-concluir-fase');
+  if(btnConcluir) btnConcluir.style.display=conteudoSalvo?'none':'';
   abrirModal('modal-fase');
 }
 
