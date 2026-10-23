@@ -1664,15 +1664,14 @@ async function criarSessao(){
 async function carregarNovasFuncoes(){
   try{
     const data=await api('GET','/novas-funcoes');
-    const lista=document.getElementById('novas-funcoes-lista');
     const mLista=document.getElementById('modal-novas-lista');
-    lista.innerHTML=''; mLista.innerHTML='';
+    if(mLista) mLista.innerHTML='';
     data.funcionalidades.forEach(f=>{
       const html=`<div style="background:var(--gold-bg);border:1px solid var(--gold-bd);border-radius:9px;padding:9px 11px;">
         <div style="font-size:11px;font-weight:700;color:var(--gold);">${f.icone} ${f.nome}</div>
         <div style="font-size:10px;color:var(--t3);margin-top:3px;">${f.descricao}</div>
         <div style="font-size:8px;color:rgba(240,188,64,.5);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;">Em breve</div></div>`;
-      lista.innerHTML+=html; mLista.innerHTML+=html;
+      if(mLista) mLista.innerHTML+=html;
     });
   }catch(e){}
 }
