@@ -659,7 +659,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
         <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
       </div>
-      <button class="btn btn-gold btn-sm" onclick="abrirModalNovasSessoes()">☕ Novas funções</button>
+      <button class="btn btn-gold btn-sm" onclick="abrirModalNovasSessoes()">☕ Extensões</button>
       <button class="btn btn-sm" id="btn-acao-sessao" style="background:var(--parc-bg);color:var(--parc);border:1.5px solid var(--parc-bd);" onclick="acaoSessao()">▶ Iniciar sessão</button>
       <button class="btn btn-sm" id="btn-socializar" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
       <button class="btn btn-ghost btn-sm" id="btn-edu-sair" onclick="logout()">Sair</button>
@@ -748,9 +748,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
           <div><div class="carta-launcher-nm">Oportunidades</div><div class="carta-launcher-sub">Descobrir novo caminho</div></div>
         </button>
       </div>
-      <div class="sidebar-divider"></div>
-      <div class="panel-title">☕ Novas funções</div>
-      <div id="novas-funcoes-lista" style="display:flex;flex-direction:column;gap:6px;"></div>
     </div>
   </div>
 </div>
@@ -947,7 +944,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 
 <div id="modal-novas" class="modal-overlay hidden">
   <div class="modal">
-    <h3>☕ Novas funções</h3>
+    <h3>☕ Extensões</h3>
     <p>Funcionalidades planejadas para as próximas versões do TdoE</p>
     <div id="modal-novas-lista" style="display:flex;flex-direction:column;gap:10px;"></div>
     <div style="margin-top:20px;">
@@ -1338,6 +1335,7 @@ async function entrarComCodigo(){
     toast('Entrando em '+data.equipe_nome+'!');
     await carregarPainelJogadores();
     irPara('jogadores');
+    setTimeout(pollingLudicoJogador,2000); // verifica carta logo ao entrar
   }catch(e){
     state.perfil='jogador';
     state.participanteNome=nome;
@@ -1683,12 +1681,19 @@ function abrirModalNovasSessoes(){abrirModal('modal-novas');}
 
 async function irParaSocializacao(){
   if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  // Se já está na tela de socialização, apenas atualiza os dados
+  const btnSoc=document.getElementById('btn-socializar');
+  if(btnSoc){btnSoc.disabled=true;btnSoc.textContent='⏳ Carregando…';}
   try{
     const data=await api('GET','/pitch/'+state.sessaoId);
     document.getElementById('soc-titulo').textContent=data.titulo;
     renderPitch(data);
     irPara('socializacao');
-  }catch(e){toast(e.message,'err');}
+  }catch(e){
+    toast('Erro ao carregar socialização. Tente novamente.','err');
+  }finally{
+    if(btnSoc){btnSoc.disabled=false;btnSoc.textContent='↗ Socializar';}
+  }
 }
 
 function renderPitch(data){
@@ -2614,10 +2619,16 @@ function gerarRelatorio(){
 }
 
 /* ── EXPORTAR PROPOSTAS (MODELO DE NEGÓCIO) ── */
-function exportarPropostas(){
+async function exportarPropostas(){
   const sessao=state.sessaoAtual;
   if(!sessao){toast('Nenhuma sessão selecionada','err');return;}
-  const equipes=sessao.equipes||[];
+  // Busca dados frescos da API para garantir conteúdo atualizado
+  let equipes=sessao.equipes||[];
+  try{
+    const fresh=await api('GET','/sessao/'+state.sessaoId);
+    if(fresh&&fresh.equipes) equipes=fresh.equipes;
+  }catch(e){}
+  if(!equipes.length){toast('Nenhuma equipe nesta sessão','err');return;}
   const chaves=['problema','solucao','parcerias','oportunidades'];
   const corMap={problema:'#22C97A',solucao:'#0FD4B0',parcerias:'#2E80F0',oportunidades:'#A040E0'};
   const nmMap={problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'};
@@ -2636,7 +2647,10 @@ function exportarPropostas(){
       const concluida=status==='concluida';
       const cor=corMap[c];
       const fasesInfo=CHAVES_INFO[c]?.fases||[];
-      const fasesText=fasesInfo.map(f=>`<div style="margin-bottom:6px;"><span style="font-size:10px;font-weight:700;color:${cor};">${f.nm}</span><div style="font-size:11px;color:#555;margin-top:2px;">${concluida?'Investigado pela equipe.':'(a ser preenchido)'}</div></div>`).join('');
+      const fasesText=fasesInfo.map(f=>{
+        const conteudo=eq.chaves?.[c]?.conteudo?.[f.id]||'';
+        return `<div style="margin-bottom:8px;"><span style="font-size:10px;font-weight:700;color:${cor};">${f.nm}</span><div style="font-size:11px;color:#444;margin-top:3px;line-height:1.5;white-space:pre-wrap;">${conteudo||'(não preenchido)'}</div></div>`;
+      }).join('');
       return `<div style="border:2px solid ${cor}${concluida?'':'44'};border-radius:10px;padding:14px;background:${cor}${concluida?'0D':'05'};">
         <div style="font-weight:800;font-size:13px;color:${cor};margin-bottom:8px;">${icnMap[c]} ${nmMap[c]}</div>
         ${fasesText}
@@ -2657,7 +2671,7 @@ function exportarPropostas(){
         ${quadrantes.join('')}
       </div>
       <div style="margin-top:14px;padding:10px 14px;background:#f5f5f5;border-radius:8px;font-size:10px;color:#888;text-align:center;">
-        TdoE – Tabuleiro do Empreendedor · UFLA · Modelo de Negócio da Equipe
+        TdoE – Tabuleiro do Empreendedor · Modelo de Negócio da Equipe
       </div>
     </div>`;
   }).join('');
@@ -2968,6 +2982,10 @@ function aceitarCarta(){
 setInterval(()=>{
   if(state.perfil==='jogador'&&state.sessaoId) atualizarTimerJogador();
 },5000);
+// Carta-desafio: verifica via API a cada 8s
+setInterval(()=>{
+  if(state.perfil==='jogador'&&state.sessaoId) pollingLudicoJogador();
+},8000);
 setInterval(()=>{
   if(state.perfil==='jogador'&&state.timerRodando&&state.timerRestante>0){
     state.timerRestante--;atualizarDisplayTimer();
