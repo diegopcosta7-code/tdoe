@@ -108,8 +108,19 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .login-hero{
   background:var(--bg);padding:56px 58px;
   display:flex;flex-direction:column;justify-content:space-between;
-  position:relative;overflow:hidden;border-right:.5px solid var(--border);
+  position:relative;overflow-y:auto;overflow-x:hidden;border-right:.5px solid var(--border);
 }
+
+/* ACORDEÕES DE CONCEITO NA HERO */
+.hero-conceitos{margin-top:28px;display:flex;flex-direction:column;gap:6px;}
+.hc-card{border-radius:10px;border:1px solid;overflow:hidden;transition:border-color .2s;}
+.hc-head{display:flex;align-items:center;gap:9px;padding:10px 13px;cursor:pointer;user-select:none;}
+.hc-icn{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.hc-nm{font-size:12px;font-weight:800;flex:1;}
+.hc-chev{font-size:11px;color:rgba(255,255,255,.3);transition:transform .2s;}
+.hc-card.open .hc-chev{transform:rotate(90deg);}
+.hc-body{display:none;padding:0 13px 12px;font-size:11px;color:var(--t2);line-height:1.7;}
+.hc-card.open .hc-body{display:block;}
 .glow-prob{position:absolute;bottom:-80px;left:-80px;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(34,201,122,.25) 0%,transparent 65%);pointer-events:none;}
 .glow-parc{position:absolute;top:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(46,128,240,.2) 0%,transparent 65%);pointer-events:none;}
 .glow-opor{position:absolute;bottom:-60px;right:10%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(160,64,224,.18) 0%,transparent 65%);pointer-events:none;}
@@ -245,6 +256,33 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .cc-prog-bar{height:3px;border-radius:2px;margin-top:8px;background:rgba(255,255,255,.07);overflow:hidden;}
 .cc-prog-fill{height:3px;border-radius:2px;}
 
+/* SELETOR DE IDIOMA */
+.lang-sel{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:9px;padding:3px;}
+.lang-btn{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--t3);font-family:inherit;transition:all .15s;}
+.lang-btn.on{background:var(--parc-bg);color:var(--parc);}
+.lang-btn:hover:not(.on){background:rgba(255,255,255,.08);color:var(--t2);}
+
+/* CONCEITOS DAS CHAVES */
+.conceitos-sec{display:flex;flex-direction:column;gap:6px;}
+.conceito-card{border-radius:11px;border:1.5px solid;overflow:hidden;cursor:pointer;transition:all .2s;}
+.conceito-head{display:flex;align-items:center;gap:8px;padding:10px 12px;}
+.conceito-icn{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.conceito-nm{font-size:12px;font-weight:800;flex:1;}
+.conceito-chev{font-size:10px;color:var(--t3);transition:transform .2s;}
+.conceito-card.open .conceito-chev{transform:rotate(90deg);}
+.conceito-body{display:none;padding:0 12px 12px;font-size:11px;color:var(--t2);line-height:1.65;}
+.conceito-card.open .conceito-body{display:block;}
+
+/* TOOLTIP CHAVE */
+.key-help{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;font-size:9px;font-weight:900;cursor:pointer;flex-shrink:0;opacity:.7;transition:opacity .15s;position:relative;background:transparent;line-height:1;vertical-align:middle;}
+.key-help:hover,.key-help:focus{opacity:1;outline:none;}
+.key-tooltip{position:absolute;z-index:9999;top:calc(100% + 6px);left:50%;transform:translateX(-50%);min-width:220px;max-width:260px;background:#1a1f2e;border:1px solid rgba(255,255,255,.15);border-radius:11px;padding:11px 13px;box-shadow:0 8px 32px rgba(0,0,0,.55);pointer-events:none;opacity:0;transition:opacity .15s;}
+.key-help:hover .key-tooltip,.key-help:focus .key-tooltip,.key-tooltip.vis{opacity:1;pointer-events:auto;}
+.kt-title{font-size:10px;font-weight:800;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em;}
+.kt-fase{margin-bottom:5px;}
+.kt-fase-nm{font-size:9px;font-weight:700;color:var(--t2);}
+.kt-fase-desc{font-size:9px;color:var(--t3);margin-top:1px;line-height:1.4;}
+
 /* COMUNICAÇÃO */
 .comm-panel{display:flex;flex-direction:column;gap:12px;}
 .comm-tabs{display:flex;border-bottom:.5px solid var(--border);}
@@ -320,6 +358,121 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 ═══════════════════════════════════════ */
 #modal-fase .modal{max-width:560px;}
 #modal-fase textarea{height:100px;resize:vertical;}
+
+/* ═══════════════════════════════════════
+   PONTUAÇÃO POR FASE — faixa do jogador
+═══════════════════════════════════════ */
+.score-strip{
+  background:#0D0D18;border-bottom:.5px solid #1A1A2A;
+  padding:6px 20px;display:flex;align-items:center;gap:12px;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.score-label{color:var(--t3);font-size:10px;text-transform:uppercase;letter-spacing:.06em;}
+.score-val{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:-.5px;line-height:1;}
+.score-pts{font-size:9px;color:var(--t3);margin-top:1px;}
+@keyframes scoreUp{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-24px);opacity:0}}
+.score-bump{animation:scoreUp .8s ease forwards;color:var(--prob);font-size:14px;font-weight:900;position:absolute;pointer-events:none;}
+
+/* ═══════════════════════════════════════
+   RELÓGIO VISÍVEL
+═══════════════════════════════════════ */
+.timer-strip{
+  background:#0D0D18;border-bottom:.5px solid #1A1A2A;
+  padding:5px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.timer-ring-wrap{position:relative;width:36px;height:36px;flex-shrink:0;}
+.timer-ring-wrap svg{transform:rotate(-90deg);}
+.timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:3;}
+.timer-prog{fill:none;stroke:var(--sol);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .9s linear;stroke-dasharray:100.5;stroke-dashoffset:0;}
+.timer-prog.urgent{stroke:var(--opor);}
+.timer-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--t1);}
+.timer-display{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--t1);font-variant-numeric:tabular-nums;}
+.timer-display.urgent{color:var(--opor);}
+.timer-lbl{font-size:10px;color:var(--t3);}
+/* controles do educador */
+.timer-edu-block{display:flex;flex-direction:column;gap:6px;padding:10px 0;}
+.timer-presets{display:flex;gap:4px;flex-wrap:wrap;}
+.timer-preset-btn{padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--t2);font-family:inherit;}
+.timer-preset-btn:hover{background:rgba(255,255,255,.06);}
+.timer-preset-btn.sel{background:var(--sol-bg);border-color:var(--sol-bd);color:var(--sol);}
+.timer-ctrl-row{display:flex;gap:5px;}
+.timer-ctrl-btn{flex:1;padding:8px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit;text-align:center;}
+.timer-start{background:var(--prob-bg);color:var(--prob);border:1.5px solid var(--prob-bd);}
+.timer-stop{background:rgba(255,80,80,.1);color:#ff6b6b;border:1.5px solid rgba(255,80,80,.3);}
+.timer-custom-row{display:flex;gap:5px;align-items:center;}
+.timer-custom-input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--t1);font-family:inherit;text-align:center;}
+
+/* ═══════════════════════════════════════
+   FEEDBACK DE CONCLUSÃO DE FASE
+═══════════════════════════════════════ */
+#overlay-congrats,#overlay-encerramento{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.enc-chave-card{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:14px 16px;}
+.enc-chave-titulo{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.enc-fase{margin-bottom:6px;}
+.enc-fase-nome{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:2px;}
+.enc-fase-conteudo{font-size:12px;color:var(--t1);line-height:1.5;background:rgba(255,255,255,.04);border-radius:6px;padding:7px 10px;}
+.congrats-box{
+  background:var(--bg2);border-radius:22px;border:.5px solid var(--border2);
+  padding:36px 40px;text-align:center;max-width:420px;width:100%;
+  animation:fadein .35s ease;position:relative;overflow:hidden;
+}
+.congrats-stars{font-size:40px;margin-bottom:12px;display:flex;justify-content:center;gap:6px;}
+@keyframes starPop{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.25) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.congrats-star{display:inline-block;animation:starPop .5s ease both;}
+.congrats-star:nth-child(1){animation-delay:.05s;}
+.congrats-star:nth-child(2){animation-delay:.18s;}
+.congrats-star:nth-child(3){animation-delay:.31s;}
+.congrats-title{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;}
+.congrats-sub{font-size:13px;color:var(--t2);margin-bottom:18px;}
+.congrats-pts-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 22px;border-radius:30px;
+  background:var(--gold-bg);border:1.5px solid var(--gold-bd);
+  color:var(--gold);font-size:22px;font-weight:900;letter-spacing:-.3px;
+  margin-bottom:22px;
+}
+@keyframes ptsCount{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.congrats-pts-badge{animation:ptsCount .4s .45s ease both;}
+
+/* ═══════════════════════════════════════
+   CARTA-DESAFIO
+═══════════════════════════════════════ */
+/* notificação para jogadores */
+.carta-notif{
+  margin:8px 16px 0;border-radius:11px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  border:1.5px solid;animation:fadein .3s ease;
+}
+/* overlay da carta para jogadores */
+#overlay-carta{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.carta-box{
+  background:var(--bg2);border-radius:22px;border:1.5px solid;
+  padding:32px 36px;max-width:440px;width:100%;
+  animation:fadein .35s ease;
+}
+.carta-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.carta-icone{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.carta-tipo{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:2px;}
+.carta-titulo{font-size:20px;font-weight:900;letter-spacing:-.3px;}
+.carta-corpo{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:22px;}
+/* painel do educador — lançador de cartas */
+.carta-launcher{display:flex;flex-direction:column;gap:5px;}
+.carta-launcher-btn{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;
+  border-radius:10px;cursor:pointer;border:1.5px solid;
+  background:transparent;font-family:inherit;text-align:left;
+  transition:all .15s;
+}
+.carta-launcher-btn:hover{filter:brightness(1.15);}
+.carta-launcher-icone{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.carta-launcher-nm{font-size:11px;font-weight:700;color:var(--t1);}
+.carta-launcher-sub{font-size:9px;color:var(--t3);margin-top:1px;}
 </style>
 </head>
 <body>
@@ -348,17 +501,80 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <div class="logo-gem">
           <svg width="26" height="26" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg>
         </div>
-        <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE · UFLA</div></div>
+        <div><div class="logo-nm">Tabuleiro do Empreendedor</div><div class="logo-sb">TdoE</div></div>
+        <div class="lang-sel" id="lang-sel-login" style="margin-left:auto;">
+          <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
+          <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
+          <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
+        </div>
       </div>
       <div>
-        <div class="hero-hl">Sua ideia</div>
-        <div class="hero-jogo grad">em JOGO</div>
-        <div class="hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
+        <div class="hero-hl" id="login-hero-hl">Sua ideia</div>
+        <div class="hero-jogo grad" id="login-hero-jogo">em JOGO</div>
+        <div class="hero-tag" id="login-hero-tag">Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.</div>
         <div class="hero-chips">
-          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">🔍 Problema</div>
-          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);">✓ Solução</div>
-          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);">🤝 Parcerias</div>
-          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);">💡 Oportunidades</div>
+          <div class="badge" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);" id="chip-prob">🔍 Problema</div>
+          <div class="badge" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);" id="chip-sol">✓ Solução</div>
+          <div class="badge" style="background:var(--parc-bg);color:var(--parc);border-color:var(--parc-bd);" id="chip-parc">🤝 Parcerias</div>
+          <div class="badge" style="background:var(--opor-bg);color:var(--opor);border-color:var(--opor-bd);" id="chip-opor">💡 Oportunidades</div>
+        </div>
+        <!-- CONCEITOS DAS CHAVES — HERO -->
+        <div class="hero-conceitos">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:4px;">Conheça as chaves</div>
+
+          <!-- PROBLEMA -->
+          <div class="hc-card" style="background:var(--prob-bg);border-color:var(--prob-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(34,201,122,.15);">🔍</div>
+              <div class="hc-nm" style="color:var(--prob);">Problema</div>
+              <span class="hc-chev" style="color:var(--prob);">›</span>
+            </div>
+            <div class="hc-body">
+              A chave Problema representa o início da dinâmica, uma vez que sua identificação é resultado da interação dos jogadores que, ao compartilhar suas experiências, refletem sobre o contexto investigado (Landry, 1995; Bianchi; Verganti, 2021), delimitando-o e caracterizando-o a partir de vivências estabelecidas com o meio. Nesse processo, a motivação para solucionar o problema torna-se um aspecto compartilhado entre a equipe (Hevner et al., 2004; Bianchi; Verganti, 2021).
+              <br><br>
+              O problema pode ser compreendido a partir de sua identificação no contexto, sendo: ocorrência negativa, avaliação de uma intervenção, utilização de recursos sem planejamento e situações de incerteza (Landry, 1995). Bianchi e Verganti (2021) destacam que a identificação de problemas envolve componentes que não se limitam a processos analíticos, mas na construção interpretativa dos participantes, decorrente de transformações sociais, culturais e tecnológicas.
+            </div>
+          </div>
+
+          <!-- SOLUÇÃO -->
+          <div class="hc-card" style="background:var(--sol-bg);border-color:var(--sol-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(15,212,176,.15);">✓</div>
+              <div class="hc-nm" style="color:var(--sol);">Solução</div>
+              <span class="hc-chev" style="color:var(--sol);">›</span>
+            </div>
+            <div class="hc-body">
+              A chave Solução corresponde à trilha de investigação em que os participantes constroem uma solução aplicável ao contexto, estabelecendo respostas ou alternativas para o problema identificado. Nessa etapa, os participantes exercitam a criatividade e a tomada de decisão diante de proposições viáveis e geradoras de valor (Kujala et al., 2010; Zimmer; Salonen; Wangenheim, 2020; Vogel et al., 2025).
+              <br><br>
+              Diante disso, o comportamento dos jogadores influencia nas possibilidades de criação de novos negócios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).
+            </div>
+          </div>
+
+          <!-- PARCERIAS -->
+          <div class="hc-card" style="background:var(--parc-bg);border-color:var(--parc-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(46,128,240,.15);">🤝</div>
+              <div class="hc-nm" style="color:var(--parc);">Parcerias</div>
+              <span class="hc-chev" style="color:var(--parc);">›</span>
+            </div>
+            <div class="hc-body">
+              Estimula os participantes a analisar o contexto e definir alianças estratégicas para a implementação da proposta empreendedora. Para isso, a combinação dos conhecimentos de diferentes atores, que se organizam em torno de um objetivo comum (Crowley; Karim, 1995; Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021), contribui para o desenvolvimento de projetos, com definição de prazos, responsabilidades (Reed; Reed, 2009), recursos e condições de atuação (Seo, 2020; Zahoor; Gabriel Pepple; Choudrie, 2021).
+            </div>
+          </div>
+
+          <!-- OPORTUNIDADES -->
+          <div class="hc-card" style="background:var(--opor-bg);border-color:var(--opor-bd);" onclick="this.classList.toggle('open')">
+            <div class="hc-head">
+              <div class="hc-icn" style="background:rgba(160,64,224,.15);">💡</div>
+              <div class="hc-nm" style="color:var(--opor);">Oportunidades</div>
+              <span class="hc-chev" style="color:var(--opor);">›</span>
+            </div>
+            <div class="hc-body">
+              A chave Oportunidades representa uma possibilidade identificada pelos participantes por meio da contextualização do problema e de soluções construídas durante a investigação. Dessa forma, a oportunidade torna-se um processo de criação de valor (George et al., 2016), tanto pelo comportamento do empreendedor, na qual utiliza das competências empreendedoras, quanto pelas possíveis transformações no contexto investigado (Wood e Mickinley, 2020).
+              <br><br>
+              Nesse sentido, os autores apresentam a oportunidade como um guarda-chuva que permite compreender processos de criação de novos negócios (Wood; Mickinley, 2020) e o desenvolvimento de ideias (Matzembacher et al., 2019), a partir da descoberta, avaliação e exploração (Shane; Venkataraman, 2000; Wood; Mickinley, 2020).
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -368,58 +584,60 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 
   <div class="login-panel">
     <div class="login-tabs">
-      <div class="login-tab on" onclick="setLoginTab('login')">Entrar</div>
-      <div class="login-tab" onclick="setLoginTab('cadastro')">Criar conta</div>
-      <div class="login-tab" onclick="setLoginTab('codigo')">Código</div>
+      <div class="login-tab on" id="tab-login" onclick="setLoginTab('login')">Entrar</div>
+      <div class="login-tab" id="tab-cadastro" onclick="setLoginTab('cadastro')">Criar conta</div>
+      <div class="login-tab" id="tab-codigo" onclick="setLoginTab('codigo')">Código</div>
     </div>
 
     <!-- LOGIN -->
     <div id="form-login" class="anim-in">
-      <div class="login-title">Bem-vindo de volta</div>
-      <div class="login-sub">Acesse sua conta de educador</div>
-      <div class="field"><label>E-mail</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
-      <div class="field"><label>Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
-      <button class="btn btn-primary w100" onclick="fazerLogin()">Entrar →</button>
+      <div class="login-title" id="login-title-edu">Bem-vindo de volta</div>
+      <div class="login-sub" id="login-sub-edu">Acesse sua conta de educador</div>
+      <div class="field"><label id="lbl-email-edu">E-mail</label><input id="login-email" type="email" placeholder="E-mail"/></div>
+      <div class="field"><label id="lbl-senha-edu">Senha</label><input id="login-senha" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-primary w100" id="btn-entrar-edu" onclick="fazerLogin()">Entrar →</button>
     </div>
 
     <!-- CADASTRO -->
     <div id="form-cadastro" class="hidden anim-in">
-      <div class="login-title">Criar conta</div>
-      <div class="login-sub">Preencha para começar</div>
+      <div class="login-title" id="login-title-cad">Criar conta</div>
+      <div class="login-sub" id="login-sub-cad">Preencha para começar</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field"><label>Nome</label><input id="cad-nome" placeholder="Nome"/></div>
-        <div class="field"><label>Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
+        <div class="field"><label id="lbl-nome-cad">Nome</label><input id="cad-nome" placeholder="Nome"/></div>
+        <div class="field"><label id="lbl-sob-cad">Sobrenome</label><input id="cad-sobrenome" placeholder="Sobrenome"/></div>
       </div>
-      <div class="field"><label>E-mail</label><input id="cad-email" type="email" placeholder="seu@email.com"/></div>
-      <div class="field"><label>Instituição</label><input id="cad-inst" placeholder="UFLA, escola..."/></div>
+      <div class="field"><label id="lbl-email-cad">E-mail</label><input id="cad-email" type="email" placeholder="E-mail"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field"><label>Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
-        <div class="field"><label>Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label id="lbl-senha-cad">Senha</label><input id="cad-senha" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label id="lbl-conf-cad">Confirmar</label><input id="cad-conf" type="password" placeholder="••••••••"/></div>
       </div>
-      <button class="btn btn-primary w100" onclick="fazerCadastro()">Criar conta →</button>
+      <button class="btn btn-primary w100" id="btn-criar-conta" onclick="fazerCadastro()">Criar conta →</button>
     </div>
 
     <!-- CÓDIGO JOGADOR -->
     <div id="form-codigo" class="hidden anim-in">
-      <div class="login-title">Entrar com código</div>
-      <div class="login-sub">Para jogadores — sem cadastro</div>
-      <div class="field"><label>Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
-      <div class="field"><label>Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
+      <div class="login-title" id="login-title-cod">Entrar com código</div>
+      <div class="login-sub" id="login-sub-cod">Para jogadores — sem cadastro</div>
+      <div class="field"><label id="lbl-nome-jog">Seu nome</label><input id="jog-nome" placeholder="Como quer ser chamado"/></div>
+      <div class="field"><label id="lbl-codigo-jog">Código da sessão</label><input id="jog-codigo" placeholder="Ex: A7X3K2" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;"/></div>
       <div class="field">
-        <label>Número da equipe</label>
+        <label id="lbl-equipe-jog">Número da equipe</label>
         <select id="jog-equipe">
-          <option value="1">Equipe 1</option><option value="2">Equipe 2</option>
-          <option value="3">Equipe 3</option><option value="4">Equipe 4</option><option value="5">Equipe 5</option>
+          <option value="1" id="opt-eq1">Equipe 1</option><option value="2" id="opt-eq2">Equipe 2</option>
+          <option value="3" id="opt-eq3">Equipe 3</option><option value="4" id="opt-eq4">Equipe 4</option><option value="5" id="opt-eq5">Equipe 5</option>
         </select>
       </div>
-      <button class="btn btn-primary w100" onclick="entrarComCodigo()">Entrar no jogo →</button>
+      <button class="btn btn-primary w100" id="btn-entrar-jog" onclick="entrarComCodigo()">Entrar no jogo →</button>
       <div style="margin-top:12px;">
         <div class="code-blk">
           <div class="code-gem"><svg width="20" height="20" viewBox="0 0 100 100"><path d="M50,4 L53,44 L50,50 L47,44 Z M50,96 L53,56 L50,50 L47,56 Z M4,50 L44,47 L50,50 L44,53 Z M96,50 L56,47 L50,50 L56,53 Z M18,18 L44,44 L50,50 L44,44 Z M82,18 L56,44 L50,50 L56,44 Z M18,82 L44,56 L50,50 L44,56 Z M82,82 L56,56 L50,50 L56,56 Z" fill="#F0BC40"/><circle cx="50" cy="50" r="4" fill="#F0BC40"/></svg></div>
-          <div><div style="font-size:12px;font-weight:700;">Código fornecido pelo educador</div><div class="small muted" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
+          <div><div class="small muted" id="code-hint1" style="font-size:12px;font-weight:700;color:var(--t2);">Código fornecido pelo educador</div><div class="small muted" id="code-hint2" style="margin-top:2px;">Peça o código de 6 letras para começar</div></div>
         </div>
       </div>
     </div>
+  </div>
+  <div style="text-align:center;padding:18px 20px 24px;font-size:11px;color:var(--t3);line-height:1.6;">
+    Plataforma desenvolvida como parte de uma pesquisa de doutorado em Administração<br>da Universidade Federal de Lavras (UFLA)
   </div>
 </div>
 
@@ -436,10 +654,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <span class="tb-sub" id="tb-sessao-titulo">Painel do educador</span>
     <div class="tb-right">
       <div class="badge" id="tb-status" style="background:var(--prob-bg);color:var(--prob);border-color:var(--prob-bd);">⬤ Aguardando</div>
+      <div class="lang-sel" id="lang-sel-edu">
+        <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
+        <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
+        <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
+      </div>
       <button class="btn btn-gold btn-sm" onclick="abrirModalNovasSessoes()">☕ Extensões</button>
       <button class="btn btn-sm" id="btn-acao-sessao" style="background:var(--parc-bg);color:var(--parc);border:1.5px solid var(--parc-bd);" onclick="acaoSessao()">▶ Iniciar sessão</button>
-      <button class="btn btn-sm" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+      <button class="btn btn-sm" id="btn-socializar" style="background:linear-gradient(135deg,var(--parc),#5B6CF0);color:#fff;" onclick="irParaSocializacao()">↗ Socializar</button>
+      <button class="btn btn-ghost btn-sm" id="btn-edu-sair" onclick="logout()">Sair</button>
     </div>
   </div>
   <div class="edu-layout">
@@ -451,6 +674,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
       <div class="sidebar-action" onclick="abrirModalCriarSessao()">＋ Nova sessão</div>
       <div class="sidebar-action" onclick="verificarAlertas()">🔔 Verificar alertas</div>
       <div class="sidebar-action" onclick="irParaSocializacao()">↗ Socializar</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-sec">Exportar</div>
+      <div class="sidebar-action" onclick="gerarRelatorio()">📋 Relatório de interação</div>
+      <div class="sidebar-action" onclick="exportarPropostas()">📄 Exportar propostas</div>
       <div class="sidebar-action" onclick="logout()">← Sair</div>
     </div>
     <div class="edu-main">
@@ -480,8 +707,47 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <div class="ctrl-btn" onclick="verificarAlertas()">🔔 Alertas</div>
       </div>
       <div class="sidebar-divider"></div>
-      <div class="panel-title">☕ Extensões</div>
-      <div id="novas-funcoes-lista" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <!-- RELÓGIO — controle do educador -->
+      <div class="panel-title">⏱ Relógio da fase</div>
+      <div class="timer-edu-block">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:4px;">Duração</div>
+        <div class="timer-presets">
+          <button class="timer-preset-btn" onclick="setTimerPreset(5)">5 min</button>
+          <button class="timer-preset-btn" onclick="setTimerPreset(15)">15 min</button>
+          <button class="timer-preset-btn" onclick="setTimerPreset(20)">20 min</button>
+          <button class="timer-preset-btn" onclick="setTimerPreset(30)">30 min</button>
+        </div>
+        <div class="timer-custom-row" style="margin-top:4px;">
+          <input class="timer-custom-input" id="edu-timer-min" type="number" min="1" max="120" placeholder="min" style="width:64px;"/>
+          <button class="timer-preset-btn" onclick="setTimerCustom()">Definir</button>
+        </div>
+        <div style="font-size:26px;font-weight:900;color:var(--t1);letter-spacing:-.5px;text-align:center;margin:6px 0 4px;font-variant-numeric:tabular-nums;" id="edu-timer-display">—</div>
+        <div class="timer-ctrl-row">
+          <button class="timer-ctrl-btn timer-start" onclick="iniciarTimerEdu()">▶ Iniciar</button>
+          <button class="timer-ctrl-btn timer-stop" onclick="pararTimerEdu()">⏹ Parar</button>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <!-- CARTA-DESAFIO — lançador do educador -->
+      <div class="panel-title">🃏 Carta-desafio</div>
+      <div class="carta-launcher" id="edu-carta-launcher">
+        <button class="carta-launcher-btn" style="border-color:var(--prob-bd);background:var(--prob-bg);" onclick="abrirPreviewCarta('problema','🔍','Desafio Problema','Identifiquem um problema ainda mais específico no contexto investigado e proponham uma nova perspectiva.')">
+          <div class="carta-launcher-icone" style="background:rgba(34,201,122,.15);">🔍</div>
+          <div><div class="carta-launcher-nm">Problema</div><div class="carta-launcher-sub">Aprofundar investigação</div></div>
+        </button>
+        <button class="carta-launcher-btn" style="border-color:var(--sol-bd);background:var(--sol-bg);" onclick="abrirPreviewCarta('solucao','✓','Desafio Solução','Revisem a solução proposta considerando novos critérios de viabilidade e impacto.')">
+          <div class="carta-launcher-icone" style="background:rgba(15,212,176,.15);">✓</div>
+          <div><div class="carta-launcher-nm">Solução</div><div class="carta-launcher-sub">Revisar proposta</div></div>
+        </button>
+        <button class="carta-launcher-btn" style="border-color:var(--parc-bd);background:var(--parc-bg);" onclick="abrirPreviewCarta('parcerias','🤝','Desafio Parcerias','Mapeiem pelo menos três novos parceiros estratégicos e justifiquem o papel de cada um.')">
+          <div class="carta-launcher-icone" style="background:rgba(46,128,240,.15);">🤝</div>
+          <div><div class="carta-launcher-nm">Parcerias</div><div class="carta-launcher-sub">Ampliar alianças</div></div>
+        </button>
+        <button class="carta-launcher-btn" style="border-color:var(--opor-bd);background:var(--opor-bg);" onclick="abrirPreviewCarta('oportunidades','💡','Desafio Oportunidades','Identifiquem uma oportunidade de mercado não explorada e descreva como aproveitá-la.')">
+          <div class="carta-launcher-icone" style="background:rgba(160,64,224,.15);">💡</div>
+          <div><div class="carta-launcher-nm">Oportunidades</div><div class="carta-launcher-sub">Descobrir novo caminho</div></div>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -499,8 +765,44 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <span class="tb-sub" id="jog-topbar-sessao">—</span>
     <div class="tb-right">
       <div class="badge" id="jog-chave-ativa" style="background:var(--sol-bg);color:var(--sol);border-color:var(--sol-bd);">— sem chave ativa —</div>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+      <div class="lang-sel" id="lang-sel-jog">
+        <button class="lang-btn on" onclick="setIdioma('pt')">🇧🇷 PT</button>
+        <button class="lang-btn" onclick="setIdioma('en')">🇺🇸 EN</button>
+        <button class="lang-btn" onclick="setIdioma('es')">🇪🇸 ES</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="jog-btn-sair" onclick="logout()">Sair</button>
     </div>
+  </div>
+  <!-- FAIXA DE PONTUAÇÃO -->
+  <div class="score-strip" id="jog-score-strip">
+    <div>
+      <div class="score-label">Pontos de investigação</div>
+      <div style="display:flex;align-items:baseline;gap:5px;position:relative;">
+        <div class="score-val" id="jog-score-val">0</div>
+        <div class="score-pts">pts</div>
+      </div>
+    </div>
+    <div style="flex:1;"></div>
+    <div id="jog-carta-notif-inline" class="hidden"></div>
+    <button id="btn-ver-resumo" class="hidden" onclick="abrirEncerramento()" style="background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.35);border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🏆 Ver resumo</button>
+  </div>
+  <!-- FAIXA DO RELÓGIO (só visível quando timer ativo) -->
+  <div class="timer-strip hidden" id="jog-timer-strip">
+    <div class="timer-ring-wrap">
+      <svg width="36" height="36" viewBox="0 0 36 36">
+        <circle class="timer-track" cx="18" cy="18" r="16"/>
+        <circle class="timer-prog" id="jog-timer-ring" cx="18" cy="18" r="16"/>
+      </svg>
+      <div class="timer-center" id="jog-timer-pct">100%</div>
+    </div>
+    <div>
+      <div class="timer-display" id="jog-timer-display">00:00</div>
+      <div class="timer-lbl">Tempo da fase</div>
+    </div>
+    <div style="flex:1;"></div>
+  </div>
+  <!-- NOTIF CARTA-DESAFIO (banner clicável) -->
+  <div id="jog-carta-notif" class="hidden">
   </div>
   <div class="jog-layout">
     <!-- COLUNA ESQUERDA -->
@@ -591,22 +893,34 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <p>Configure a sessão de investigação empreendedora</p>
     <div class="field"><label>Título da sessão</label><input id="s-titulo" placeholder="Ex: Bairro Novo Horizonte — EJA"/></div>
     <div class="field">
-      <label>Contexto</label>
-      <select id="s-contexto">
-        <option value="escolar">🌱 Contexto escolar — EJA, ensino médio</option>
-        <option value="superior">🎓 Ensino superior — graduação, pós</option>
-        <option value="gestao">🏢 Gestão — cooperativas, empresas</option>
-        <option value="personalizado">✏️ Personalizado</option>
+      <label>Modo de investigação</label>
+      <select id="s-contexto" onchange="toggleCenario(this.value)">
+        <option value="escolar">🌱 Escolar — as equipes definem o problema</option>
+        <option value="personalizado">✏️ Personalizado — educador define o contexto</option>
       </select>
     </div>
-    <div class="field"><label>Cenário (opcional)</label><input id="s-cenario" placeholder="Ex: Vocês são agentes de transformação do bairro…"/></div>
-    <div class="field">
-      <label>Número de equipes</label>
-      <select id="s-equipes">
-        <option value="2">2 equipes</option><option value="3">3 equipes</option>
-        <option value="4">4 equipes</option><option value="5" selected>5 equipes</option>
-        <option value="6">6 equipes</option><option value="8">8 equipes</option><option value="10">10 equipes</option>
-      </select>
+    <div class="field hidden" id="campo-cenario">
+      <label>Contexto de investigação</label>
+      <input id="s-cenario" placeholder="Ex: Vocês são agentes de transformação do bairro Novo Horizonte…"/>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px;">Este texto será exibido para as equipes ao iniciar a sessão.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>Número de equipes</label>
+        <select id="s-equipes">
+          <option value="2">2 equipes</option><option value="3">3 equipes</option>
+          <option value="4">4 equipes</option><option value="5" selected>5 equipes</option>
+          <option value="6">6 equipes</option><option value="8">8 equipes</option><option value="10">10 equipes</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Integrantes por equipe</label>
+        <select id="s-integrantes">
+          <option value="4" selected>4 integrantes</option>
+          <option value="5">5 integrantes</option>
+          <option value="6">6 integrantes</option>
+        </select>
+      </div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="fecharModal('modal-sessao')">Cancelar</button>
@@ -622,6 +936,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <div class="field"><label>Conteúdo investigado pela equipe</label><textarea id="mf-conteudo" placeholder="Descreva o que a equipe descobriu…"></textarea></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="fecharModal('modal-fase')">Cancelar</button>
+      <button class="btn btn-ghost" id="btn-editar-fase" style="display:none;" onclick="habilitarEdicaoFase()">✏️ Editar</button>
       <button class="btn btn-primary" id="btn-concluir-fase" onclick="concluirFaseConfirmar()">✓ Concluir fase</button>
     </div>
   </div>
@@ -639,11 +954,114 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 </div>
 
 <!-- ════════════════════════════════════
+     OVERLAY — FEEDBACK DE CONCLUSÃO
+════════════════════════════════════ -->
+<div id="overlay-congrats" class="hidden">
+  <div class="congrats-box">
+    <div class="congrats-stars">
+      <span class="congrats-star">⭐</span>
+      <span class="congrats-star">🌟</span>
+      <span class="congrats-star">⭐</span>
+    </div>
+    <div class="congrats-title" id="congrats-titulo">Fase concluída!</div>
+    <div class="congrats-sub" id="congrats-sub">Você avançou na investigação</div>
+    <div class="congrats-pts-badge">+<span id="congrats-pts">80</span> pontos de investigação</div>
+    <button class="btn btn-primary" style="width:100%;" onclick="fecharCongrats()">Continuar investigando →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL — CONFIRMAÇÃO GENÉRICA
+════════════════════════════════════ -->
+<div id="modal-confirm" class="modal-overlay hidden">
+  <div class="modal" style="max-width:380px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:10px;" id="mc-icon">⚠️</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:8px;" id="mc-titulo">Confirmar</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.5;" id="mc-msg"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="fecharModal('modal-confirm');_confirmCallback=null;">Cancelar</button>
+      <button class="btn" id="mc-btn-ok" style="flex:1;background:#ef4444;color:#fff;" onclick="if(_confirmCallback){_confirmCallback();}_confirmCallback=null;fecharModal('modal-confirm');">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MODAL — PREVIEW CARTA-DESAFIO (EDUCADOR)
+════════════════════════════════════ -->
+<div id="modal-preview-carta" class="modal-overlay hidden">
+  <div class="modal" style="max-width:480px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div id="pvc-icone" style="font-size:28px;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🃏</div>
+      <div>
+        <div id="pvc-tipo" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.6;">Carta-Desafio</div>
+        <div id="pvc-titulo" style="font-size:17px;font-weight:800;line-height:1.2;"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Conteúdo da carta <span style="font-size:10px;font-weight:400;opacity:.5;">(editável antes de enviar)</span></label>
+      <textarea id="pvc-corpo" style="height:90px;resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-preview-carta')">Cancelar</button>
+      <button class="btn btn-primary" id="pvc-btn-enviar" onclick="confirmarEnvioCarta()">🃏 Enviar carta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     OVERLAY — ENCERRAMENTO (JOGADOR)
+════════════════════════════════════ -->
+<div id="overlay-encerramento" class="hidden">
+  <div style="background:var(--bg2);border-radius:22px;border:.5px solid var(--border2);padding:28px 28px 24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;animation:fadein .35s ease;position:relative;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:40px;margin-bottom:8px;">🏆</div>
+      <div style="font-size:22px;font-weight:900;letter-spacing:-.5px;" id="enc-titulo">Investigação concluída!</div>
+      <div style="font-size:13px;color:var(--t2);margin-top:4px;" id="enc-sub">Sua equipe completou todas as chaves</div>
+    </div>
+    <div id="enc-resumo" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="fecharEncerramento()">← Revisar</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="enviarEncerramento()">Enviar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     OVERLAY — CARTA-DESAFIO (JOGADOR)
+════════════════════════════════════ -->
+<div id="overlay-carta" class="hidden">
+  <div class="carta-box" id="carta-box-inner">
+    <div class="carta-header">
+      <div class="carta-icone" id="carta-icone-el">🎯</div>
+      <div>
+        <div class="carta-tipo" id="carta-tipo-el">Carta-Desafio</div>
+        <div class="carta-titulo" id="carta-titulo-el">Novo desafio!</div>
+      </div>
+    </div>
+    <div class="carta-corpo" id="carta-corpo-el">O educador lançou um desafio especial para sua equipe.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="fecharCartaOverlay()">Fechar</button>
+      <button class="btn btn-primary" style="flex:1;" id="carta-aceitar-btn" onclick="aceitarCarta()">Aceitar desafio ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
      JAVASCRIPT
 ════════════════════════════════════ -->
 <script>
 /* ── CONFIG ── */
-const API = 'http://localhost:8000';
+// URL do backend: prioridade para variável global (injetada no deploy),
+// depois variável de ambiente via meta tag, depois localhost para desenvolvimento local.
+const API = (()=>{
+  // Permite sobrescrever via: window.TDOE_API_URL='https://...' (definir antes deste arquivo)
+  if(window.TDOE_API_URL) return window.TDOE_API_URL.replace(/\/$/,'');
+  // Detecta automaticamente: se abrindo de file:// ou localhost, usa localhost
+  const h = location.hostname;
+  if(!h || h==='localhost' || h==='127.0.0.1') return 'http://localhost:8000';
+  // Em produção (GitHub Pages), usa a URL do Render configurada aqui:
+  return 'https://tdoe.onrender.com'; // URL do backend Render
+})();
 
 /* ── ESTADO GLOBAL ── */
 let state = {
@@ -659,9 +1077,28 @@ let state = {
   chaves: {},
   sessaoAtual: null,
   sussurroDestinatario: null,
+  // elementos lúdicos
+  pontuacao: 0,
+  timerTotal: 0,
+  timerRestante: 0,
+  timerRodando: false,
+  timerInterval: null,
+  cartaDesafioAtiva: null,
 };
 
 /* ── UTILIDADES ── */
+function toggleCenario(valor){
+  const campo=document.getElementById('campo-cenario');
+  if(valor==='personalizado'){
+    campo.classList.remove('hidden');
+    document.getElementById('s-cenario').required=true;
+  } else {
+    campo.classList.add('hidden');
+    document.getElementById('s-cenario').required=false;
+    document.getElementById('s-cenario').value='';
+  }
+}
+
 function toast(msg, tipo='ok'){
   const t=document.createElement('div');
   t.className=`toast-item toast-${tipo}`;
@@ -672,15 +1109,42 @@ function toast(msg, tipo='ok'){
 
 async function api(method, path, body=null){
   const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),5000);
+  // DELETE e POST de ação demoram mais (Render pode estar dormindo)
+  const longRoutes=['/ativar','/acao','/concluir','/entrar','/auth/login','/chaves/','/sessao/'];
+  const isLong=method==='DELETE'||longRoutes.some(r=>path.includes(r));
+  const timeout=isLong?35000:8000;
+  const timer=setTimeout(()=>ctrl.abort(),timeout);
   try{
+    // Garante que o token está sempre atualizado do localStorage
+    if(!state.token){
+      const t=localStorage.getItem('tdoe_edu_token');
+      if(t) state.token=t;
+    }
     const opts={method,signal:ctrl.signal,headers:{'Content-Type':'application/json'}};
     if(state.token) opts.headers['Authorization']=`Bearer ${state.token}`;
     if(body) opts.body=JSON.stringify(body);
     const r=await fetch(API+path,opts);
     clearTimeout(timer);
     const data=await r.json();
-    if(!r.ok) throw new Error(data.detail||JSON.stringify(data));
+    if(!r.ok){
+      // Token inválido/expirado — limpar sessão e pedir novo login
+      if(r.status===401){
+        const msg=data.detail||'Sessão expirada';
+        if(msg.includes('Token não informado')||msg.includes('Token inválido')||msg.includes('expirado')){
+          localStorage.removeItem('tdoe_edu_token');
+          localStorage.removeItem('tdoe_edu_nome');
+          state.token=null;
+          // Redireciona para login apenas se for educador na tela errada
+          if(state.perfil==='educador'){
+            setTimeout(()=>{
+              toast('Sessão expirada — faça login novamente','err');
+              logout();
+            },100);
+          }
+        }
+      }
+      throw new Error(data.detail||JSON.stringify(data));
+    }
     return data;
   }catch(e){clearTimeout(timer);throw e;}
 }
@@ -719,6 +1183,63 @@ function iconChave(c){
 function nomeChave(c){
   return {problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'}[c]||c;
 }
+
+const CHAVES_INFO={
+  problema:{
+    fases:[
+      {nm:'Contexto',desc:'Onde o problema acontece?'},
+      {nm:'Características',desc:'Como o problema afeta o contexto?'},
+      {nm:'Motivação',desc:'Por que vale a pena investigar esse problema?'},
+    ]
+  },
+  solucao:{
+    fases:[
+      {nm:'Características',desc:'Como será a solução?'},
+      {nm:'Custos',desc:'Quais são as despesas envolvidas para implementar a solução?'},
+      {nm:'Riscos',desc:'Quais barreiras que podem dificultar ou inviabilizar a implementação da solução?'},
+    ]
+  },
+  parcerias:{
+    fases:[
+      {nm:'Recursos',desc:'Quem pode oferecer os serviços ou os produtos na localidade?'},
+      {nm:'Características',desc:'Qual será a responsabilidade de cada parceiro?'},
+      {nm:'Tempo',desc:'Quanto tempo entre a formalização e a execução?'},
+    ]
+  },
+  oportunidades:{
+    fases:[
+      {nm:'Características',desc:'O que é e como a oportunidade foi identificada?'},
+      {nm:'Diferenciação',desc:'Como a ideia é inovadora em relação às atividades existentes?'},
+      {nm:'Aplicabilidade',desc:'Como essa oportunidade pode ser desenvolvida no contexto investigado?'},
+    ]
+  },
+};
+
+function helpChaveHtml(c){
+  const info=CHAVES_INFO[c]; if(!info) return '';
+  const cor=corChave(c);
+  const fasesHtml=info.fases.map(f=>`
+    <div class="kt-fase">
+      <div class="kt-fase-nm" style="color:${cor};">${f.nm}</div>
+      <div class="kt-fase-desc">${f.desc}</div>
+    </div>`).join('');
+  return `<button class="key-help" style="color:${cor};border-color:${cor};" onclick="toggleTooltip(event,this)" title="O que é ${nomeChave(c)}?">?
+    <div class="key-tooltip">
+      <div class="kt-title" style="color:${cor};">${nomeChave(c)}</div>
+      ${fasesHtml}
+    </div>
+  </button>`;
+}
+
+function toggleTooltip(e,btn){
+  e.stopPropagation();
+  const tt=btn.querySelector('.key-tooltip');
+  const isVis=tt.classList.contains('vis');
+  document.querySelectorAll('.key-tooltip.vis').forEach(t=>t.classList.remove('vis'));
+  if(!isVis) tt.classList.add('vis');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.key-tooltip.vis').forEach(t=>t.classList.remove('vis')));
+
 function avatarCor(i){
   const cores=['linear-gradient(135deg,#1A9055,#0F5E38)','linear-gradient(135deg,#1A4E9E,#0F3370)',
     'linear-gradient(135deg,#6A28A0,#441870)','linear-gradient(135deg,#E8A830,#C4891A)',
@@ -747,9 +1268,10 @@ async function fazerLogin(){
     state.token=data.access_token;
     state.perfil='educador';
     state.usuario=data.usuario;
-    localStorage.setItem('tdoe_edu_token', data.access_token);
-    localStorage.setItem('tdoe_edu_nome', data.usuario.nome);
+    localStorage.setItem('tdoe_edu_token',data.access_token);
+    localStorage.setItem('tdoe_edu_nome',data.usuario.nome);
     toast('Bem-vindo, '+data.usuario.nome+'!');
+    verificarVersaoBackend(); // verifica versão em background
     await carregarPainelEducador();
     irPara('educador');
   }catch(e){
@@ -773,14 +1295,14 @@ async function fazerCadastro(){
       nome,
       sobrenome:document.getElementById('cad-sobrenome').value,
       email:document.getElementById('cad-email').value,
-      instituicao:document.getElementById('cad-inst').value,
+      instituicao:'',
       senha:s,
     });
     state.token=data.access_token;
     state.perfil='educador';
     state.usuario=data.usuario;
-    localStorage.setItem('tdoe_edu_token', data.access_token);
-    localStorage.setItem('tdoe_edu_nome', data.usuario.nome);
+    localStorage.setItem('tdoe_edu_token',data.access_token);
+    localStorage.setItem('tdoe_edu_nome',data.usuario.nome);
     toast('Conta criada! Bem-vindo, '+data.usuario.nome+'!');
     await carregarPainelEducador();
     irPara('educador');
@@ -813,6 +1335,7 @@ async function entrarComCodigo(){
     toast('Entrando em '+data.equipe_nome+'!');
     await carregarPainelJogadores();
     irPara('jogadores');
+    setTimeout(pollingLudicoJogador,2000); // verifica carta logo ao entrar
   }catch(e){
     state.perfil='jogador';
     state.participanteNome=nome;
@@ -830,28 +1353,45 @@ function logout(){
     chaves:{},sessaoAtual:null,sussurroDestinatario:null};
   localStorage.removeItem('tdoe_edu_token');
   localStorage.removeItem('tdoe_edu_nome');
+  const b=document.getElementById('banner-demo');
+  if(b){b.remove();document.body.style.paddingTop='';}
   irPara('login');
   toast('Até logo!','info');
 }
 
+/* ── VERIFICAR VERSÃO DO BACKEND ── */
+async function verificarVersaoBackend(){
+  try{
+    const r=await fetch(API+'/health',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    if(d.versao&&d.versao!=='1.3.0'){
+      toast('⚠ Backend v'+d.versao+' (esperado 1.3.0 com Supabase) — verifique o deploy no Render','err');
+    }else if(d.db&&d.db!=='supabase'){
+      toast('⚠ Backend sem Supabase — dados não persistem após sleep do Render','err');
+    }
+    return d;
+  }catch(e){return null;}
+}
+
 /* ── PAINEL EDUCADOR ── */
-async function carregarPainelEducador(){
+async function carregarPainelEducador(selecionarId=null){
   let sessoes=[];
-  try{ sessoes=await api('GET','/sessao'); }catch(e){ sessoes=[]; }
-  if(!sessoes.length){
-    sessoes=[{id:'demo-1',titulo:'Sessão Demo — Bairro Novo Horizonte',
+  let backendOnline=false;
+  try{ sessoes=await api('GET','/sessao'); backendOnline=true; }catch(e){
+    // backend online se o erro veio de HTTP (não de rede/timeout)
+    // TypeError = rede; AbortError = timeout; outros = resposta HTTP (401, 500…)
+    if(e.name!=='TypeError' && e.name!=='AbortError') backendOnline=true;
+    sessoes=[];
+  }
+  // só injeta sessão demo se o backend estiver offline (erro de rede/timeout)
+  if(!backendOnline && !sessoes.length){
+    sessoes=[{id:'demo-1',titulo:'Sessão Demo',
       contexto:'escolar',codigo_acesso:'DEMO01',status:'ativa',
       criada_em:new Date().toISOString(),alertas:[],
       equipes:[
-        {id:'eq1',nome:'Equipe 1',numero:1,chaves_concluidas:1,
-          chaves:{problema:{status:'concluida'},solucao:{status:'ativa'},
-                  parcerias:{status:'disponivel'},oportunidades:{status:'disponivel'}}},
-        {id:'eq2',nome:'Equipe 2',numero:2,chaves_concluidas:0,
-          chaves:{problema:{status:'ativa'},solucao:{status:'nao_iniciada'},
-                  parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
-        {id:'eq3',nome:'Equipe 3',numero:3,chaves_concluidas:0,
-          chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},
-                  parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
+        {id:'eq1',nome:'Equipe 1',numero:1,chaves_concluidas:1,chaves:{problema:{status:'concluida'},solucao:{status:'ativa'},parcerias:{status:'disponivel'},oportunidades:{status:'disponivel'}}},
+        {id:'eq2',nome:'Equipe 2',numero:2,chaves_concluidas:0,chaves:{problema:{status:'ativa'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
+        {id:'eq3',nome:'Equipe 3',numero:3,chaves_concluidas:0,chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
       ]}];
   }
   const lista=document.getElementById('lista-sessoes');
@@ -862,19 +1402,55 @@ async function carregarPainelEducador(){
   }
   sessoes.forEach((s,i)=>{
     const d=document.createElement('div');
+    d.id='sessao-item-'+s.id;
     d.className='eq-item'+(i===0?' on':'');
+    d.style.position='relative';
     d.innerHTML=`<div class="eq-av" style="background:${avatarCor(i)};font-size:9px;">S${i+1}</div>
-      <div><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>`;
+      <div style="flex:1;min-width:0;"><div class="eq-nm">${s.titulo}</div><div class="eq-st">${s.status} · ${s.codigo_acesso}</div></div>
+      <button onclick="event.stopPropagation();excluirSessao('${s.id}','${s.titulo.replace(/'/g,"\\'")}',this)" title="Excluir sessão"
+        style="background:none;border:none;cursor:pointer;color:rgba(255,80,80,.5);font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0;"
+        onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='rgba(255,80,80,.5)'">✕</button>`;
     d.onclick=()=>selecionarSessao(s.id);
     lista.appendChild(d);
   });
-  if(sessoes.length>0) await selecionarSessao(sessoes[0].id);
+  const idParaSelecionar=selecionarId||sessoes[0]?.id;
+  if(idParaSelecionar) await selecionarSessao(idParaSelecionar);
   await carregarNovasFuncoes();
+}
+
+let _confirmCallback=null;
+function confirmar(msg,cb,{icone='⚠️',titulo='Confirmar',labelOk='Confirmar'}={}){
+  document.getElementById('mc-msg').textContent=msg;
+  document.getElementById('mc-titulo').textContent=titulo;
+  document.getElementById('mc-icon').textContent=icone;
+  document.getElementById('mc-btn-ok').textContent=labelOk;
+  _confirmCallback=cb;
+  abrirModal('modal-confirm');
+}
+
+async function excluirSessao(id, titulo, btn){
+  confirmar('Excluir a sessão "'+titulo+'"? Esta ação não pode ser desfeita.',async()=>{
+    try{
+      await api('DELETE','/sessao/'+id);
+      toast('Sessão excluída','ok');
+      const el=document.getElementById('sessao-item-'+id);
+      if(el) el.remove();
+      if(state.sessaoId===id){
+        const prox=document.querySelector('#lista-sessoes .eq-item');
+        if(prox) prox.click();
+        else { state.sessaoId=null; state.sessaoAtual=null; }
+      }
+    }catch(e){
+      toast('Erro ao excluir: '+e.message,'err');
+    }
+  },{icone:'🗑️',titulo:'Excluir sessão',labelOk:'Excluir'});
 }
 
 async function selecionarSessao(id){
   state.sessaoId=id;
-  document.querySelectorAll('.eq-item').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
+  const item=document.getElementById('sessao-item-'+id);
+  if(item) item.classList.add('on');
   try{
     const s=await api('GET','/sessao/'+id);
     state.sessaoAtual=s;
@@ -886,13 +1462,7 @@ async function selecionarSessao(id){
     atualizarMetricas(s.equipes);
     atualizarBarrasChaves(s.equipes);
     if(s.alertas&&s.alertas.length>0) renderAlertas(s.alertas);
-  }catch(e){
-    if(state.sessaoAtual){
-      renderEquipasGrid(state.sessaoAtual.equipes||[]);
-      atualizarMetricas(state.sessaoAtual.equipes||[]);
-      atualizarBarrasChaves(state.sessaoAtual.equipes||[]);
-    }
-  }
+  }catch(e){toast(e.message,'err');}
 }
 
 function atualizarStatusBadge(status){
@@ -907,12 +1477,15 @@ function atualizarStatusBadge(status){
   const m=mapa[status]||mapa.aguardando;
   badge.style.background=m.bg; badge.style.color=m.cor; badge.style.borderColor=m.bd;
   badge.textContent=m.txt;
-  // atualizar botão ação
+  // atualizar botão ação respeitando idioma atual
+  const t2=I18N[_idiomaAtual]||I18N.pt;
   const btn=document.getElementById('btn-acao-sessao');
   const ctrl=document.getElementById('ctrl-iniciar');
-  if(status==='aguardando'){btn.textContent='▶ Iniciar sessão';ctrl.textContent='▶ Iniciar';}
-  else if(status==='ativa'){btn.textContent='⏸ Pausar';ctrl.textContent='⏸ Pausar';}
-  else if(status==='pausada'){btn.textContent='↺ Retomar';ctrl.textContent='↺ Retomar';}
+  if(btn&&ctrl){
+    if(status==='aguardando'){btn.textContent=t2.iniciarSessao||'▶ Iniciar sessão';ctrl.textContent=t2.iniciar||'▶ Iniciar';}
+    else if(status==='ativa'){btn.textContent=t2.pausarSessao||'⏸ Pausar';ctrl.textContent=t2.pausar||'⏸ Pausar';}
+    else if(status==='pausada'){btn.textContent=t2.retomarSessao||'↺ Retomar';ctrl.textContent=t2.retomar||'↺ Retomar';}
+  }
 }
 
 function renderEquipasGrid(equipes){
@@ -939,7 +1512,10 @@ function renderEquipasGrid(equipes){
         }).join('')}
       </div>
       <div class="eq-prog-bar"><div class="eq-prog-fill" style="width:${pct}%;background:${chaveAtiva?corChave(chaveAtiva[0]):'var(--t3)'};"></div></div>
-      <div class="badge tiny" style="background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border);">${concluidas}/4 chaves</div>`;
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="badge tiny" style="background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border);">${concluidas}/4 chaves</div>
+        ${eq.investigacao_enviada?'<div class="badge tiny" style="background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.3);">✓ Enviou</div>':''}
+      </div>`;
     grid.appendChild(div);
   });
 }
@@ -982,9 +1558,16 @@ function renderAlertas(alertas){
 
 async function acaoSessao(){
   if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  // se status não está carregado, busca do servidor
+  if(!state.sessaoStatus){
+    try{
+      const d=await api('GET','/sessao/'+state.sessaoId);
+      state.sessaoStatus=d.status;
+    }catch(e){}
+  }
   const mapa={aguardando:'iniciar',ativa:'pausar',pausada:'retomar'};
   const acao=mapa[state.sessaoStatus];
-  if(!acao){toast('Ação não disponível neste estado','err');return;}
+  if(!acao){toast('Ação não disponível neste estado: '+state.sessaoStatus,'err');return;}
   await acaoSessaoEspecifica(acao);
 }
 
@@ -995,14 +1578,7 @@ async function acaoSessaoEspecifica(acao){
     state.sessaoStatus=data.status;
     atualizarStatusBadge(data.status);
     toast('Sessão: '+data.status,'ok');
-  }catch(e){
-    // modo demo — atualizar status localmente
-    const proxStatus={iniciar:'ativa',pausar:'pausada',retomar:'ativa',socializar:'socializando',encerrar:'encerrada'};
-    const novo=proxStatus[acao]||state.sessaoStatus;
-    state.sessaoStatus=novo;
-    atualizarStatusBadge(novo);
-    toast('⚡ Demo — sessão: '+novo,'gold');
-  }
+  }catch(e){toast(e.message,'err');}
 }
 
 async function verificarAlertas(){
@@ -1022,45 +1598,66 @@ function abrirModalCriarSessao(){abrirModal('modal-sessao');}
 
 async function criarSessao(){
   const titulo=document.getElementById('s-titulo').value.trim();
+  const contexto=document.getElementById('s-contexto').value;
+  const cenario=document.getElementById('s-cenario').value.trim()||null;
   if(!titulo){toast('Digite um título para a sessão','err');return;}
-  if(!state.token){toast('Faça login antes de criar uma sessão','err');return;}
+  if(contexto==='personalizado'&&!cenario){
+    toast('Descreva o contexto de investigação','err');
+    document.getElementById('s-cenario').focus();
+    return;
+  }
+  const btnCriar=document.querySelector('#modal-sessao .btn-primary');
+  if(btnCriar){btnCriar.disabled=true;btnCriar.textContent='⏳ Criando…';}
   try{
     const data=await api('POST','/sessao',{
       titulo,
-      contexto:document.getElementById('s-contexto').value,
-      cenario:document.getElementById('s-cenario').value||null,
+      contexto,
+      cenario,
       num_equipes:parseInt(document.getElementById('s-equipes').value),
+      integrantes_por_equipe:parseInt(document.getElementById('s-integrantes').value),
     });
-    fecharModal('modal-sessao');
     toast('Sessão criada! Código: '+data.codigo_acesso,'ok');
-    await carregarPainelEducador();
+    // adiciona à lista imediatamente sem esperar reload completo
+    const lista=document.getElementById('lista-sessoes');
+    const empty=lista.querySelector('.muted');
+    if(empty) empty.remove();
+    const d=document.createElement('div');
+    d.id='sessao-item-'+data.id;
+    d.className='eq-item on';
+    d.style.position='relative';
+    d.innerHTML=`<div class="eq-av" style="background:#2E80F0;font-size:9px;">S1</div>
+      <div style="flex:1;min-width:0;"><div class="eq-nm">${titulo}</div><div class="eq-st">aguardando · ${data.codigo_acesso}</div></div>
+      <button onclick="event.stopPropagation();excluirSessao('${data.id}','${titulo.replace(/'/g,"\\'")}',this)" title="Excluir sessão"
+        style="background:none;border:none;cursor:pointer;color:rgba(255,80,80,.5);font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0;"
+        onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='rgba(255,80,80,.5)'">✕</button>`;
+    document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
+    lista.prepend(d);
+    d.onclick=()=>selecionarSessao(data.id);
+    fecharModal('modal-sessao');
+    // seleciona a sessão automaticamente (mostra painel sem precisar clicar)
     await selecionarSessao(data.id);
   }catch(e){
-    // back-end offline ou token expirado — modo demo
+    if(btnCriar){btnCriar.disabled=false;btnCriar.textContent='Criar sessão →';}
     fecharModal('modal-sessao');
     const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
-    const sessaoDemo={
-      id:'demo-'+Date.now(), titulo,
-      contexto:document.getElementById('s-contexto').value,
-      codigo_acesso:codigo, status:'aguardando',
-      criada_em:new Date().toISOString(), alertas:[],
-      equipes:[
-        {id:'eq1',nome:'Equipe 1',numero:1,chaves_concluidas:0,chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
-        {id:'eq2',nome:'Equipe 2',numero:2,chaves_concluidas:0,chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
-        {id:'eq3',nome:'Equipe 3',numero:3,chaves_concluidas:0,chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
-      ],
-    };
-    state.sessaoAtual=sessaoDemo;
-    state.sessaoId=sessaoDemo.id;
-    state.sessaoStatus='aguardando';
+    const integrantes=parseInt(document.getElementById('s-integrantes').value)||4;
+    const nEq=parseInt(document.getElementById('s-equipes').value)||3;
+    const equipes=Array.from({length:nEq},(_,i)=>({
+      id:'eq'+(i+1),nome:'Equipe '+(i+1),numero:i+1,
+      integrantes,chaves_concluidas:0,
+      chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},
+              parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}},
+    }));
+    const sessaoDemo={id:'demo-'+Date.now(),titulo,contexto,cenario,
+      codigo_acesso:codigo,status:'aguardando',
+      criada_em:new Date().toISOString(),alertas:[],equipes};
+    state.sessaoAtual=sessaoDemo; state.sessaoId=sessaoDemo.id; state.sessaoStatus='aguardando';
     mostrarBannerDemo();
     toast('⚡ Sessão demo criada — código: '+codigo,'gold');
     document.getElementById('tb-sessao-titulo').textContent=titulo+' · '+codigo;
     document.getElementById('m-codigo').textContent=codigo;
     atualizarStatusBadge('aguardando');
-    renderEquipasGrid(sessaoDemo.equipes);
-    atualizarMetricas(sessaoDemo.equipes);
-    atualizarBarrasChaves(sessaoDemo.equipes);
+    renderEquipasGrid(equipes); atualizarMetricas(equipes); atualizarBarrasChaves(equipes);
   }
 }
 
@@ -1084,26 +1681,18 @@ function abrirModalNovasSessoes(){abrirModal('modal-novas');}
 
 async function irParaSocializacao(){
   if(!state.sessaoId){toast('Selecione uma sessão','err');return;}
+  // Se já está na tela de socialização, apenas atualiza os dados
+  const btnSoc=document.getElementById('btn-socializar');
+  if(btnSoc){btnSoc.disabled=true;btnSoc.textContent='⏳ Carregando…';}
   try{
     const data=await api('GET','/pitch/'+state.sessaoId);
     document.getElementById('soc-titulo').textContent=data.titulo;
     renderPitch(data);
     irPara('socializacao');
   }catch(e){
-    // modo demo — montar pitch com dados locais
-    const s=state.sessaoAtual||{titulo:'Sessão Demo',contexto:'escolar',equipes:[]};
-    document.getElementById('soc-titulo').textContent=s.titulo;
-    renderPitch({
-      titulo:s.titulo, contexto:s.contexto||'escolar',
-      equipes:(s.equipes||[]).map((eq,i)=>({
-        equipe_id:eq.id, equipe_nome:eq.nome,
-        chaves_concluidas:eq.chaves_concluidas||0,
-        chaves:Object.fromEntries(Object.entries(eq.chaves||{}).map(([k,v])=>[k,v.status||'nao_iniciada'])),
-        proposta:i===0?'Horta vertical com garrafas PET — custo zero, sem ocupar espaço':'Em construção...',
-      })),
-    });
-    irPara('socializacao');
-    toast('⚡ Modo demo — visualização do pitch','gold');
+    toast('Erro ao carregar socialização. Tente novamente.','err');
+  }finally{
+    if(btnSoc){btnSoc.disabled=false;btnSoc.textContent='↗ Socializar';}
   }
 }
 
@@ -1170,12 +1759,19 @@ async function carregarPainelJogadores(){
 
 async function carregarChaves(){
   try{
+    const grid=document.getElementById('jog-chaves-grid');
+    if(grid&&!state.chaves) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--t3);font-size:12px;">⏳ Conectando ao servidor…</div>';
     const data=await api('GET','/chaves/'+state.equipeId);
     state.chaves=data;
     renderChaves(data);
     atualizarChaveAtivaBadge(data);
     carregarSussurroChips();
-  }catch(e){toast(e.message,'err');}
+  }catch(e){
+    // modo demo: inicializa chaves disponíveis sem backend
+    if(!state.chavesDemo) state.chavesDemo={};
+    renderChavesDemo();
+    atualizarChaveAtivaBadge({});
+  }
 }
 
 function atualizarChaveAtivaBadge(chaves){
@@ -1219,10 +1815,12 @@ function renderChaves(chaves){
     else{badgeTxt='○ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     let fasesHtml='';
     dados.fases.forEach(f=>{
-      const fd=f.status==='concluida'; const fa=f.status==='ativa'||f.status==='disponivel'; const fl=f.status==='bloqueada';
-      fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa&&!fl?' active':''}${fl?' locked':''}" 
-        style="${fa&&!fl?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
-        onclick="${fl?'':('abrirFase("'+c+'",'+f.numero+',"'+f.nome+'")')}">
+      const fd=f.status==='concluida';
+      const fl=f.status==='bloqueada';
+      const fa=!fd&&!fl;
+      fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa?' active':''}${fl?' locked':''}"
+        style="${fa?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
+        onclick="abrirFase('${c}',${f.numero},'${f.nome}')">
         <div class="cc-fnum" style="${fd?'background:'+cor+';color:#fff;':fa?'background:'+bg+';color:'+cor+';':'background:rgba(255,255,255,.08);color:var(--t3);'}">${fd?'✓':f.numero}</div>
         <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${f.nome}</div>
         <div class="cc-ftxt">${fd?'✓':(fa?'clique':'🔒')}</div>
@@ -1231,29 +1829,104 @@ function renderChaves(chaves){
     card.innerHTML+=`
       <div class="cc-head">
         <div class="cc-icon" style="background:${bg};">${iconChave(c)}</div>
-        <div class="cc-name" style="color:${concluida||ativa||disponivel?cor:'rgba(255,255,255,.4)'};">${nomeChave(c)}</div>
-        <div class="cc-badge" style="${badgeStyle};">${badgeTxt}</div>
+        <div class="cc-name" style="color:${concluida||ativa||disponivel?cor:'rgba(255,255,255,.4)'};">${nomeChaveLocale(c)}</div>
+        ${helpChaveHtml(c)}
+        <div class="cc-badge" style="${badgeStyle};margin-left:4px;">${badgeTxt}</div>
       </div>
       <div class="cc-fases">${fasesHtml}</div>
       <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:${pct}%;background:${cor};${ativa?'box-shadow:0 0 6px '+cor:''}"></div></div>`;
-    if(!concluida&&(disponivel||naoIniciada)){
+    const problemaConcluida=chaves['problema']?.status==='concluida';
+    const chavesDependentes=['solucao','parcerias','oportunidades'];
+    const bloqueadaPorProblema=chavesDependentes.includes(c)&&!problemaConcluida;
+    // mostra botão para qualquer status que não seja ativa/concluida (inclui bloqueada, nao_iniciada, disponivel, etc)
+    if(!concluida&&!ativa&&!bloqueadaPorProblema){
       const btnAtivar=document.createElement('button');
       btnAtivar.className='btn btn-primary w100 btn-sm';
       btnAtivar.style.marginTop='8px';
-      btnAtivar.textContent='Iniciar '+nomeChave(c);
+      btnAtivar.textContent='Iniciar '+nomeChaveLocale(c);
       btnAtivar.onclick=()=>ativarChave(c);
       card.appendChild(btnAtivar);
+    } else if(!concluida&&!ativa&&bloqueadaPorProblema){
+      const lblBloq=document.createElement('div');
+      lblBloq.style.cssText='margin-top:8px;font-size:10px;color:var(--t3);text-align:center;padding:6px;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed rgba(255,255,255,.08);';
+      lblBloq.textContent='🔒 Complete Problema primeiro';
+      card.appendChild(lblBloq);
     }
     grid.appendChild(card);
   });
+  // mostrar botão "Ver resumo" se todas as 4 chaves concluídas
+  const todasConcluidas=Object.values(chaves).length===4&&Object.values(chaves).every(v=>v.status==='concluida');
+  const btnResumo=document.getElementById('btn-ver-resumo');
+  if(btnResumo) btnResumo.classList.toggle('hidden',!todasConcluidas);
 }
 
 async function ativarChave(chave){
+  // modo demo: equipeId null → ativa localmente sem API
+  if(!state.equipeId){
+    if(!state.chavesDemo) state.chavesDemo={};
+    const chavesDep=['solucao','parcerias','oportunidades'];
+    if(chavesDep.includes(chave)&&state.chavesDemo['problema']?.status!=='concluida'){
+      toast('🔒 Conclua Problema antes de ativar '+nomeChave(chave),'err');
+      return;
+    }
+    Object.keys(state.chavesDemo).forEach(k=>{ if(state.chavesDemo[k].status==='ativa') state.chavesDemo[k].status='disponivel'; });
+    state.chavesDemo[chave]={status:'ativa',fases:{1:{status:'disponivel'},2:{status:'bloqueada'},3:{status:'bloqueada'}}};
+    toast('⚡ '+nomeChave(chave)+' ativada (modo demo)','gold');
+    renderChavesDemo();
+    return;
+  }
   try{
     await api('POST','/chaves/'+state.equipeId+'/ativar',{chave});
     toast(nomeChave(chave)+' ativada!','ok');
     await carregarChaves();
-  }catch(e){toast(e.message,'err');}
+  }catch(e){
+    toast('Erro ao ativar: '+e.message,'err');
+  }
+}
+
+function renderChavesDemo(){
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const chavesData=state.chavesDemo||{};
+  const grid=document.getElementById('jog-chaves-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+  chaves.forEach(c=>{
+    const cd=chavesData[c]||{status:'disponivel',fases:{}};
+    const cor=corChave(c); const nm=nomeChaveLocale(c);
+    const icn={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'}[c];
+    const ativa=cd.status==='ativa';
+    const div=document.createElement('div');
+    div.className='chave-card';
+    div.style=`background:${ativa?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.07)`:'rgba(255,255,255,.02)'};border:${ativa?'2px':'1px dashed'} ${ativa?`var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bd)`:'rgba(255,255,255,.12)'};`;
+    const faseNomes={problema:['Contexto','Características','Motivação'],solucao:['Características','Custos','Riscos'],parcerias:['Recursos','Características','Tempo'],oportunidades:['Características','Diferenciação','Aplicabilidade']};
+    const fasesHtml=faseNomes[c].map((fn,i)=>{
+      const fst=(cd.fases&&cd.fases[i+1])||{status:ativa&&i===0?'disponivel':'bloqueada'};
+      const bloq=fst.status==='bloqueada'||!ativa;
+      return `<div class="cc-fase${bloq?' locked':''}" style="${!bloq?`border-color:var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bd);`:''}">
+        <div class="cc-fnum" style="background:${!bloq?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.15)`:'rgba(255,255,255,.06)'};color:${!bloq?cor:'var(--t3)'};">${i+1}</div>
+        <div class="cc-fnm" style="${!bloq?'color:var(--t1);':''}">${fn}</div>
+        <div class="cc-ftxt">${bloq?'🔒':'clique'}</div>
+      </div>`;
+    }).join('');
+    div.innerHTML=`
+      ${ativa?`<div style="position:absolute;top:0;left:0;right:0;height:2px;background:${cor};box-shadow:0 0 8px ${cor};border-radius:2px 2px 0 0;"></div>`:''}
+      <div class="cc-head">
+        <div class="cc-icon" style="background:var(--${c==='problema'?'prob':c==='solucao'?'sol':c==='parcerias'?'parc':'opor'}-bg);">${icn}</div>
+        <div class="cc-name" style="color:${ativa?cor:'rgba(255,255,255,.4)'};">${nm}</div>
+        ${helpChaveHtml(c)}
+        ${ativa?`<div class="cc-badge" style="background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd);margin-left:auto;">⏱ Ativa</div>`:''}
+      </div>
+      <div class="cc-fases">${fasesHtml}</div>
+      <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:0%;background:${cor};"></div></div>
+      ${!ativa?(()=>{
+        const problemaConcluida=chavesData['problema']?.status==='concluida';
+        const dep=['solucao','parcerias','oportunidades'].includes(c);
+        if(dep&&!problemaConcluida) return `<div style="margin-top:8px;font-size:10px;color:var(--t3);text-align:center;padding:6px;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed rgba(255,255,255,.08);">🔒 Complete Problema primeiro</div>`;
+        return `<button class="btn btn-primary w100 btn-sm" style="margin-top:8px;" onclick="ativarChave('${c}')">Iniciar ${nm}</button>`;
+      })():''}
+    `;
+    grid.appendChild(div);
+  });
 }
 
 // Estado para modal de fase
@@ -1262,14 +1935,59 @@ let _fasePendente={chave:null,numero:null,nome:null};
 function abrirFase(chave,numero,nome){
   _fasePendente={chave,numero,nome};
   document.getElementById('mf-titulo').textContent='Fase '+numero+' — '+nome;
-  document.getElementById('mf-desc').textContent='Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
-  document.getElementById('mf-conteudo').value='';
+  // mostra a pergunta-guia da fase no campo de descrição
+  const info=CHAVES_INFO[chave];
+  const faseInfo=info&&info.fases[numero-1];
+  const descFase=faseInfo?faseInfo.desc:'Registre as descobertas da equipe sobre esta fase de '+nomeChave(chave);
+  document.getElementById('mf-desc').textContent=descFase;
+  // carrega conteúdo já salvo (se fase foi concluída)
+  const ta=document.getElementById('mf-conteudo');
+  const conteudoSalvo=state.chaves?.[chave]?.fases?.find(f=>f.numero===numero)?.conteudo||'';
+  if(ta){
+    ta.value=conteudoSalvo;
+    ta.placeholder=faseInfo?'Responda: '+faseInfo.desc:'Descreva o que a equipe descobriu…';
+    ta.readOnly=!!conteudoSalvo; // somente leitura se já preenchida
+    ta.style.opacity=conteudoSalvo?'0.8':'1';
+  }
+  // botões: concluir oculto se já preenchida; editar visível se já preenchida
+  const btnConcluir=document.getElementById('btn-concluir-fase');
+  const btnEditar=document.getElementById('btn-editar-fase');
+  if(btnConcluir) btnConcluir.style.display=conteudoSalvo?'none':'';
+  if(btnEditar) btnEditar.style.display=conteudoSalvo?'':'none';
   abrirModal('modal-fase');
+}
+
+function habilitarEdicaoFase(){
+  const ta=document.getElementById('mf-conteudo');
+  if(ta){ta.readOnly=false;ta.style.opacity='1';ta.focus();}
+  const btnEditar=document.getElementById('btn-editar-fase');
+  const btnConcluir=document.getElementById('btn-concluir-fase');
+  if(btnEditar) btnEditar.style.display='none';
+  if(btnConcluir){btnConcluir.style.display='';btnConcluir.textContent='✓ Salvar edição';}
 }
 
 async function concluirFaseConfirmar(){
   const conteudo=document.getElementById('mf-conteudo').value.trim();
   if(!conteudo){toast('Descreva o que a equipe descobriu','err');return;}
+  // modo demo: equipeId null → conclui localmente sem API
+  if(!state.equipeId){
+    if(!state.chavesDemo) state.chavesDemo={};
+    const ch=_fasePendente.chave;
+    if(!state.chavesDemo[ch]) state.chavesDemo[ch]={status:'ativa',fases:{}};
+    state.chavesDemo[ch].fases[_fasePendente.numero]={status:'concluida',conteudo};
+    const totalFases=FASES_POR_CHAVE_NOMES?.[ch]?.length||3;
+    const proxNum=_fasePendente.numero+1;
+    if(proxNum<=totalFases){
+      state.chavesDemo[ch].fases[proxNum]={status:'disponivel'};
+    } else {
+      state.chavesDemo[ch].status='concluida';
+    }
+    fecharModal('modal-fase');
+    toast('Fase '+_fasePendente.numero+' de '+nomeChave(ch)+' concluída! (demo)','ok');
+    renderChavesDemo();
+    mostrarFeedbackConclusao(ch, _fasePendente.numero, _fasePendente.nome);
+    return;
+  }
   try{
     await api('POST','/chaves/'+state.equipeId+'/concluir-fase',{
       chave:_fasePendente.chave,
@@ -1280,7 +1998,10 @@ async function concluirFaseConfirmar(){
     toast('Fase '+_fasePendente.numero+' de '+nomeChave(_fasePendente.chave)+' concluída!','ok');
     await carregarChaves();
     adicionarEventoRegistro('sistema','Sistema','✓ Fase '+_fasePendente.nome+' de '+nomeChave(_fasePendente.chave)+' concluída');
-  }catch(e){toast(e.message,'err');}
+    mostrarFeedbackConclusao(_fasePendente.chave, _fasePendente.numero, _fasePendente.nome);
+  }catch(e){
+    toast(e.message,'err');
+  }
 }
 
 /* ── MEMBROS SIMULADOS (visual) ── */
@@ -1424,19 +2145,906 @@ setInterval(async()=>{
   if(state.perfil==='jogador'&&state.equipeId){
     try{await carregarBaloes();}catch(e){}
   }
+  // polling lúdico (timer + carta-desafio via localStorage)
+  pollingLudicoJogador();
 },10000);
 
+/* ── SISTEMA DE IDIOMAS ── */
+const I18N={
+  pt:{
+    sair:'Sair', iniciarSessao:'▶ Iniciar sessão', pausarSessao:'⏸ Pausar', retomarSessao:'↺ Retomar',
+    iniciar:'▶ Iniciar', pausar:'⏸ Pausar', retomar:'↺ Retomar',
+    socializar:'↗ Socializar',
+    lblConceitos:'Conceitos das Chaves', expandir:'▼ expandir', recolher:'▲ recolher',
+    chaveAtivaBadge:'— sem chave ativa —',
+    login:{
+      heroHl:'Sua ideia', heroJogo:'em JOGO',
+      heroTag:'Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.',
+      chips:['🔍 Problema','✓ Solução','🤝 Parcerias','💡 Oportunidades'],
+      tabLogin:'Entrar', tabCadastro:'Criar conta', tabCodigo:'Código',
+      loginTitle:'Bem-vindo de volta', loginSub:'Acesse sua conta de educador',
+      lblEmail:'E-mail', lblSenha:'Senha', btnEntrar:'Entrar →',
+      cadTitle:'Criar conta', cadSub:'Preencha para começar',
+      lblNome:'Nome', lblSobrenome:'Sobrenome', lblConf:'Confirmar',
+      btnCriar:'Criar conta →',
+      codTitle:'Entrar com código', codSub:'Para jogadores — sem cadastro',
+      lblNomeJog:'Seu nome', lblCodigo:'Código da sessão', lblEquipe:'Número da equipe',
+      btnEntrarJog:'Entrar no jogo →',
+      codeHint1:'Código fornecido pelo educador', codeHint2:'Peça o código de 6 letras para começar',
+      equipes:['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5'],
+      conhecaChaves:'Conheça as chaves',
+    },
+    chaves:{
+      problema:{
+        nome:'Problema',
+        conceito:`A chave Problema representa o início da dinâmica: ao compartilhar experiências, a equipe reflete sobre o contexto investigado, delimitando-o e caracterizando-o a partir de vivências com o meio. A motivação para solucionar o problema torna-se um aspecto compartilhado.
+O problema pode ser compreendido como: ocorrência negativa, avaliação de uma intervenção, utilização de recursos sem planejamento ou situações de incerteza (Landry, 1995). Bianchi e Verganti (2021) destacam que a identificação de problemas envolve componentes não apenas analíticos, mas também construções interpretativas decorrentes de transformações sociais, culturais e tecnológicas.`,
+        fases:[
+          {nm:'Contexto',desc:'Onde o problema acontece?'},
+          {nm:'Características',desc:'Como o problema afeta o contexto?'},
+          {nm:'Motivação',desc:'Por que vale a pena investigar esse problema?'},
+        ]
+      },
+      solucao:{
+        nome:'Solução',
+        conceito:`A chave Solução corresponde à trilha de investigação em que a equipe constrói uma solução aplicável ao contexto, estabelecendo respostas ou alternativas para o problema identificado. Nessa etapa, os participantes exercitam a criatividade e a tomada de decisão diante de proposições viáveis e geradoras de valor (Kujala et al., 2010; Vogel et al., 2025).
+O comportamento dos jogadores influencia nas possibilidades de criação de novos negócios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).`,
+        fases:[
+          {nm:'Características',desc:'Como será a solução?'},
+          {nm:'Custos',desc:'Quais são as despesas envolvidas para implementar a solução?'},
+          {nm:'Riscos',desc:'Quais barreiras que podem dificultar ou inviabilizar a implementação da solução?'},
+        ]
+      },
+      parcerias:{
+        nome:'Parcerias',
+        conceito:`A chave Parcerias estimula os participantes a analisar o contexto e definir alianças estratégicas para a implementação da proposta empreendedora. A combinação de conhecimentos de diferentes atores, organizados em torno de um objetivo comum (Crowley; Karim, 1995; Zahoor et al., 2021), contribui para o desenvolvimento de projetos com definição de prazos, responsabilidades (Reed; Reed, 2009), recursos e condições de atuação (Seo, 2020).`,
+        fases:[
+          {nm:'Recursos',desc:'Quem pode oferecer os serviços ou os produtos na localidade?'},
+          {nm:'Características',desc:'Qual será a responsabilidade de cada parceiro?'},
+          {nm:'Tempo',desc:'Quanto tempo entre a formalização e a execução?'},
+        ]
+      },
+      oportunidades:{
+        nome:'Oportunidades',
+        conceito:`A chave Oportunidades representa uma possibilidade identificada pelos participantes por meio da contextualização do problema e das soluções construídas durante a investigação. A oportunidade torna-se um processo de criação de valor (George et al., 2016), tanto pelo comportamento empreendedor quanto pelas transformações no contexto investigado.
+Os autores apresentam a oportunidade como um guarda-chuva que permite compreender a criação de novos negócios (Wood; McKinley, 2020) a partir da descoberta, avaliação e exploração (Shane; Venkataraman, 2000).`,
+        fases:[
+          {nm:'Características',desc:'O que é e como a oportunidade foi identificada?'},
+          {nm:'Diferenciação',desc:'Como a ideia é inovadora em relação às atividades existentes?'},
+          {nm:'Aplicabilidade',desc:'Como essa oportunidade pode ser desenvolvida no contexto investigado?'},
+        ]
+      },
+    }
+  },
+  en:{
+    sair:'Log out', iniciarSessao:'▶ Start session', pausarSessao:'⏸ Pause', retomarSessao:'↺ Resume',
+    iniciar:'▶ Start', pausar:'⏸ Pause', retomar:'↺ Resume',
+    socializar:'↗ Showcase',
+    lblConceitos:'Key Concepts', expandir:'▼ expand', recolher:'▲ collapse',
+    chaveAtivaBadge:'— no active key —',
+    login:{
+      heroHl:'Your idea', heroJogo:'in PLAY',
+      heroTag:'An active methodology that transforms real problems into impactful proposals — investigating, building solutions, forming partnerships and revealing opportunities.',
+      chips:['🔍 Problem','✓ Solution','🤝 Partnerships','💡 Opportunities'],
+      tabLogin:'Sign in', tabCadastro:'Create account', tabCodigo:'Code',
+      loginTitle:'Welcome back', loginSub:'Sign in to your educator account',
+      lblEmail:'Email', lblSenha:'Password', btnEntrar:'Sign in →',
+      cadTitle:'Create account', cadSub:'Fill in to get started',
+      lblNome:'First name', lblSobrenome:'Last name', lblConf:'Confirm',
+      btnCriar:'Create account →',
+      codTitle:'Enter with code', codSub:'For players — no registration needed',
+      lblNomeJog:'Your name', lblCodigo:'Session code', lblEquipe:'Team number',
+      btnEntrarJog:'Join the game →',
+      codeHint1:'Code provided by the educator', codeHint2:'Ask for the 6-letter code to begin',
+      equipes:['Team 1','Team 2','Team 3','Team 4','Team 5'],
+      conhecaChaves:'About the keys',
+    },
+    chaves:{
+      problema:{
+        nome:'Problem',
+        conceito:`The Problem key marks the start of the game dynamic. By sharing experiences, the team reflects on the investigated context, characterizing it based on lived interactions with the environment. The motivation to solve the problem becomes a shared aspect within the team.
+The problem can be understood as: a negative occurrence, evaluation of an intervention, unplanned use of resources, or situations of uncertainty (Landry, 1995). Bianchi and Verganti (2021) highlight that problem identification involves not only analytical components but also interpretive constructions arising from social, cultural, and technological transformations.`,
+        fases:[
+          {nm:'Context',desc:'Where does the problem occur?'},
+          {nm:'Characteristics',desc:'How does the problem affect the context?'},
+          {nm:'Motivation',desc:'Why is it worth investigating this problem?'},
+        ]
+      },
+      solucao:{
+        nome:'Solution',
+        conceito:`The Solution key is the investigation trail in which participants build a solution applicable to the context, establishing responses or alternatives for the identified problem. At this stage, participants exercise creativity and decision-making in the face of viable, value-generating propositions (Kujala et al., 2010; Vogel et al., 2025).
+Players' behavior influences the possibilities for creating new businesses (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).`,
+        fases:[
+          {nm:'Characteristics',desc:'What will the solution look like?'},
+          {nm:'Costs',desc:'What expenses are involved in implementing the solution?'},
+          {nm:'Risks',desc:'What barriers could hinder or prevent implementation of the solution?'},
+        ]
+      },
+      parcerias:{
+        nome:'Partnerships',
+        conceito:`The Partnerships key encourages participants to analyze the context and define strategic alliances for implementing the entrepreneurial proposal. The combination of knowledge from different actors organized around a common goal (Crowley; Karim, 1995; Zahoor et al., 2021) contributes to project development with defined timelines, responsibilities (Reed; Reed, 2009), resources, and operating conditions (Seo, 2020).`,
+        fases:[
+          {nm:'Resources',desc:'Who can provide services or products locally?'},
+          {nm:'Characteristics',desc:'What will be each partner\'s responsibility?'},
+          {nm:'Timeline',desc:'How long between formalization and execution?'},
+        ]
+      },
+      oportunidades:{
+        nome:'Opportunities',
+        conceito:`The Opportunities key represents a possibility identified by participants through contextualizing the problem and solutions built during the investigation. Opportunity becomes a value-creation process (George et al., 2016), both through entrepreneurial behavior and through possible transformations in the investigated context.
+The authors present opportunity as an umbrella concept encompassing the creation of new businesses (Wood; McKinley, 2020) through discovery, evaluation, and exploration (Shane; Venkataraman, 2000).`,
+        fases:[
+          {nm:'Characteristics',desc:'What is it and how was the opportunity identified?'},
+          {nm:'Differentiation',desc:'How is the idea innovative compared to existing activities?'},
+          {nm:'Applicability',desc:'How can this opportunity be developed in the investigated context?'},
+        ]
+      },
+    }
+  },
+  es:{
+    sair:'Salir', iniciarSessao:'▶ Iniciar sesión', pausarSessao:'⏸ Pausar', retomarSessao:'↺ Reanudar',
+    iniciar:'▶ Iniciar', pausar:'⏸ Pausar', retomar:'↺ Reanudar',
+    socializar:'↗ Socializar',
+    lblConceitos:'Conceptos de las Claves', expandir:'▼ expandir', recolher:'▲ colapsar',
+    chaveAtivaBadge:'— sin clave activa —',
+    login:{
+      heroHl:'Tu idea', heroJogo:'en JUEGO',
+      heroTag:'Una metodología activa que transforma problemas reales en propuestas de impacto — investigando, construyendo soluciones, formando alianzas y revelando oportunidades.',
+      chips:['🔍 Problema','✓ Solución','🤝 Alianzas','💡 Oportunidades'],
+      tabLogin:'Entrar', tabCadastro:'Crear cuenta', tabCodigo:'Código',
+      loginTitle:'Bienvenido de vuelta', loginSub:'Accede a tu cuenta de educador',
+      lblEmail:'Correo electrónico', lblSenha:'Contraseña', btnEntrar:'Entrar →',
+      cadTitle:'Crear cuenta', cadSub:'Completa para comenzar',
+      lblNome:'Nombre', lblSobrenome:'Apellido', lblConf:'Confirmar',
+      btnCriar:'Crear cuenta →',
+      codTitle:'Entrar con código', codSub:'Para jugadores — sin registro',
+      lblNomeJog:'Tu nombre', lblCodigo:'Código de sesión', lblEquipe:'Número de equipo',
+      btnEntrarJog:'Unirse al juego →',
+      codeHint1:'Código proporcionado por el educador', codeHint2:'Pide el código de 6 letras para comenzar',
+      equipes:['Equipo 1','Equipo 2','Equipo 3','Equipo 4','Equipo 5'],
+      conhecaChaves:'Conoce las claves',
+    },
+    chaves:{
+      problema:{
+        nome:'Problema',
+        conceito:`La clave Problema representa el inicio de la dinámica: al compartir experiencias, el equipo reflexiona sobre el contexto investigado, delimitándolo y caracterizándolo a partir de vivencias con el entorno. La motivación para resolver el problema se convierte en un aspecto compartido.
+El problema puede comprenderse como: ocurrencia negativa, evaluación de una intervención, uso no planificado de recursos o situaciones de incertidumbre (Landry, 1995). Bianchi y Verganti (2021) destacan que la identificación de problemas implica no solo componentes analíticos, sino también construcciones interpretativas derivadas de transformaciones sociales, culturales y tecnológicas.`,
+        fases:[
+          {nm:'Contexto',desc:'¿Dónde ocurre el problema?'},
+          {nm:'Características',desc:'¿Cómo afecta el problema al contexto?'},
+          {nm:'Motivación',desc:'¿Por qué vale la pena investigar este problema?'},
+        ]
+      },
+      solucao:{
+        nome:'Solución',
+        conceito:`La clave Solución corresponde a la ruta de investigación en la que los participantes construyen una solución aplicable al contexto, estableciendo respuestas o alternativas al problema identificado. En esta etapa, los participantes ejercitan la creatividad y la toma de decisiones ante propuestas viables y generadoras de valor (Kujala et al., 2010; Vogel et al., 2025).
+El comportamiento de los jugadores influye en las posibilidades de crear nuevos negocios (Leiblein; Macher, 2009; Zimmer; Salonen; Wangenheim, 2020).`,
+        fases:[
+          {nm:'Características',desc:'¿Cómo será la solución?'},
+          {nm:'Costos',desc:'¿Cuáles son los gastos involucrados en implementar la solución?'},
+          {nm:'Riesgos',desc:'¿Qué barreras podrían dificultar o inviabilizar la implementación de la solución?'},
+        ]
+      },
+      parcerias:{
+        nome:'Alianzas',
+        conceito:`La clave Alianzas estimula a los participantes a analizar el contexto y definir alianzas estratégicas para la implementación de la propuesta emprendedora. La combinación de conocimientos de distintos actores organizados en torno a un objetivo común (Crowley; Karim, 1995; Zahoor et al., 2021) contribuye al desarrollo de proyectos con plazos, responsabilidades (Reed; Reed, 2009), recursos y condiciones de actuación (Seo, 2020).`,
+        fases:[
+          {nm:'Recursos',desc:'¿Quién puede ofrecer servicios o productos en la localidad?'},
+          {nm:'Características',desc:'¿Cuál será la responsabilidad de cada aliado?'},
+          {nm:'Tiempo',desc:'¿Cuánto tiempo entre la formalización y la ejecución?'},
+        ]
+      },
+      oportunidades:{
+        nome:'Oportunidades',
+        conceito:`La clave Oportunidades representa una posibilidad identificada por los participantes a través de la contextualización del problema y las soluciones construidas durante la investigación. La oportunidad se convierte en un proceso de creación de valor (George et al., 2016), tanto por el comportamiento emprendedor como por las posibles transformaciones en el contexto investigado.
+Los autores presentan la oportunidad como un paraguas que permite comprender la creación de nuevos negocios (Wood; McKinley, 2020) a partir del descubrimiento, evaluación y exploración (Shane; Venkataraman, 2000).`,
+        fases:[
+          {nm:'Características',desc:'¿Qué es y cómo fue identificada la oportunidad?'},
+          {nm:'Diferenciación',desc:'¿Cómo la idea es innovadora respecto a las actividades existentes?'},
+          {nm:'Aplicabilidad',desc:'¿Cómo puede desarrollarse esta oportunidad en el contexto investigado?'},
+        ]
+      },
+    }
+  }
+};
+
+let _idiomaAtual='pt';
+
+function setIdioma(lang){
+  _idiomaAtual=lang;
+  // Atualizar botões de idioma
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    const isOn=b.getAttribute('onclick').includes("'"+lang+"'");
+    b.classList.toggle('on',isOn);
+  });
+  // Atualizar textos da interface
+  const t=I18N[lang];
+  // ── Tela de login ──
+  if(t.login){
+    const L=t.login;
+    const set=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
+    const setph=(id,txt)=>{const el=document.getElementById(id);if(el)el.placeholder=txt;};
+    set('login-hero-hl',L.heroHl);
+    set('login-hero-jogo',L.heroJogo);
+    set('login-hero-tag',L.heroTag);
+    const chips=['chip-prob','chip-sol','chip-parc','chip-opor'];
+    chips.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=L.chips[i];});
+    set('tab-login',L.tabLogin);
+    set('tab-cadastro',L.tabCadastro);
+    set('tab-codigo',L.tabCodigo);
+    set('login-title-edu',L.loginTitle);
+    set('login-sub-edu',L.loginSub);
+    set('lbl-email-edu',L.lblEmail);
+    set('lbl-senha-edu',L.lblSenha);
+    set('btn-entrar-edu',L.btnEntrar);
+    set('login-title-cad',L.cadTitle);
+    set('login-sub-cad',L.cadSub);
+    set('lbl-nome-cad',L.lblNome);
+    set('lbl-sob-cad',L.lblSobrenome);
+    set('lbl-email-cad',L.lblEmail);
+    set('lbl-senha-cad',L.lblSenha);
+    set('lbl-conf-cad',L.lblConf);
+    set('btn-criar-conta',L.btnCriar);
+    set('login-title-cod',L.codTitle);
+    set('login-sub-cod',L.codSub);
+    set('lbl-nome-jog',L.lblNomeJog);
+    set('lbl-codigo-jog',L.lblCodigo);
+    set('lbl-equipe-jog',L.lblEquipe);
+    set('btn-entrar-jog',L.btnEntrarJog);
+    set('code-hint1',L.codeHint1);
+    set('code-hint2',L.codeHint2);
+    // Equipes no select
+    L.equipes.forEach((nm,i)=>{const el=document.getElementById('opt-eq'+(i+1));if(el)el.textContent=nm;});
+    // Seção "Conheça as chaves" no hero
+    const conheca=document.querySelector('.hero-conceitos>div:first-child');
+    if(conheca) conheca.textContent=L.conhecaChaves;
+    // Atualiza nomes das chaves nos cards do hero
+    const chaveKeys=['problema','solucao','parcerias','oportunidades'];
+    document.querySelectorAll('.hc-nm').forEach((el,i)=>{
+      if(t.chaves[chaveKeys[i]]) el.textContent=t.chaves[chaveKeys[i]].nome;
+    });
+    // Atualiza conceitos expandíveis do hero
+    const corpos=document.querySelectorAll('.hc-body');
+    corpos.forEach((el,i)=>{
+      if(t.chaves[chaveKeys[i]]) el.innerHTML=t.chaves[chaveKeys[i]].conceito.replace(/\n/g,'<br><br>');
+    });
+  }
+  // ── Tabuleiro Educador ──
+  const btnAcao=document.getElementById('btn-acao-sessao');
+  if(btnAcao){
+    const mapa={aguardando:t.iniciarSessao,ativa:t.pausarSessao,pausada:t.retomarSessao};
+    btnAcao.textContent=mapa[state.sessaoStatus||'aguardando']||t.iniciarSessao;
+  }
+  const btnSocial=document.getElementById('btn-socializar');
+  if(btnSocial) btnSocial.textContent=t.socializar;
+  const btnEduSair=document.getElementById('btn-edu-sair');
+  if(btnEduSair) btnEduSair.textContent=t.sair;
+  const ctrlIniciar=document.getElementById('ctrl-iniciar');
+  if(ctrlIniciar){
+    const mapaCtrl={aguardando:t.iniciar||'▶',ativa:t.pausar||'⏸',pausada:t.retomar||'↺'};
+    ctrlIniciar.textContent=(mapaCtrl[state.sessaoStatus||'aguardando']);
+  }
+  // ── Tabuleiro Jogador ──
+  document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
+  const jogSair=document.getElementById('jog-btn-sair');
+  if(jogSair) jogSair.textContent=t.sair;
+  const jogAtivaBadge=document.getElementById('jog-chave-ativa');
+  // Só atualiza o badge se ainda estiver vazio/padrão
+  if(jogAtivaBadge&&jogAtivaBadge.textContent.includes('sem chave')||jogAtivaBadge&&jogAtivaBadge.textContent.includes('no active')||jogAtivaBadge&&jogAtivaBadge.textContent.includes('sin clave')){
+    jogAtivaBadge.textContent=t.chaveAtivaBadge;
+  }
+  const lblC=document.getElementById('lbl-conceitos');
+  if(lblC) lblC.textContent=t.lblConceitos;
+  // Rerender conceitos
+  renderConceitos();
+  // Atualizar o CHAVES_INFO com o idioma atual (para tooltips)
+  atualizarChavesInfo(lang);
+  // Atualizar nome das chaves visíveis nos cards já renderizados
+  if(state.chaves) renderChaves(state.chaves);
+  // Salvar preferência
+  try{localStorage.setItem('tdoe_lang',lang);}catch(e){}
+}
+
+function atualizarChavesInfo(lang){
+  const t=I18N[lang];
+  ['problema','solucao','parcerias','oportunidades'].forEach(c=>{
+    if(t.chaves[c]){
+      CHAVES_INFO[c].fases=t.chaves[c].fases;
+      CHAVES_INFO[c].nomeLocale=t.chaves[c].nome;
+    }
+  });
+}
+
+function nomeChaveLocale(c){
+  const t=I18N[_idiomaAtual];
+  return t?.chaves?.[c]?.nome||nomeChave(c);
+}
+
+/* CONCEITOS */
+function toggleConceitos(){
+  const lista=document.getElementById('conceitos-lista');
+  const btn=document.getElementById('btn-toggle-conceitos');
+  const t=I18N[_idiomaAtual];
+  const isOpen=lista.style.display!=='none';
+  lista.style.display=isOpen?'none':'flex';
+  btn.textContent=isOpen?t.expandir:t.recolher;
+}
+
+function renderConceitos(){
+  const lista=document.getElementById('conceitos-lista');
+  if(!lista) return;
+  const t=I18N[_idiomaAtual];
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+  const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+  const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+  // Manter estado aberto/fechado de cada card
+  const estadoAberto={};
+  lista.querySelectorAll('.conceito-card').forEach(el=>{
+    estadoAberto[el.dataset.chave]=el.classList.contains('open');
+  });
+  lista.innerHTML='';
+  chaves.forEach(c=>{
+    const info=t.chaves[c];
+    const cor=corMap[c]; const bg=bgMap[c]; const bd=bdMap[c];
+    const wasOpen=estadoAberto[c];
+    const fasesHtml=info.fases.map(f=>`
+      <div style="margin-bottom:8px;">
+        <span style="font-weight:700;color:${cor};font-size:10px;">↳ ${f.nm}:</span>
+        <span style="color:var(--t3);font-size:10px;"> ${f.desc}</span>
+      </div>`).join('');
+    const div=document.createElement('div');
+    div.className='conceito-card'+(wasOpen?' open':'');
+    div.dataset.chave=c;
+    div.style.cssText=`background:${bg};border-color:${bd};`;
+    div.innerHTML=`
+      <div class="conceito-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="conceito-icn" style="background:${cor}22;">${icnMap[c]}</div>
+        <div class="conceito-nm" style="color:${cor};">${info.nome}</div>
+        <span class="conceito-chev">›</span>
+      </div>
+      <div class="conceito-body">
+        <p style="margin-bottom:10px;">${info.conceito.replace(/\n/g,'<br><br>')}</p>
+        <div style="border-top:1px solid ${bd};padding-top:8px;margin-top:4px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${cor};margin-bottom:6px;">Fases / Phases</div>
+          ${fasesHtml}
+        </div>
+      </div>`;
+    lista.appendChild(div);
+  });
+}
+
+/* ── RELATÓRIO DE INTERAÇÃO ── */
+function gerarRelatorio(){
+  const sessao=state.sessaoAtual;
+  if(!sessao){toast('Nenhuma sessão selecionada','err');return;}
+  const equipes=sessao.equipes||[];
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const totalChaves=equipes.reduce((a,e)=>a+(Object.values(e.chaves||{}).filter(v=>v.status==='concluida').length),0);
+  const maxChave=equipes.length?equipes.reduce((best,e)=>{const n=Object.values(e.chaves||{}).filter(v=>v.status==='concluida').length;return n>best.n?{nm:e.nome,n}:best},{nm:'—',n:0}):{nm:'—',n:0};
+  const dataAtual=new Date().toLocaleString('pt-BR');
+  const corMap={problema:'#22C97A',solucao:'#0FD4B0',parcerias:'#2E80F0',oportunidades:'#A040E0'};
+  const nmMap={problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'};
+  const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+
+  const equipesRows=equipes.map((eq,i)=>{
+    const chavesConcluidas=chaves.filter(c=>eq.chaves?.[c]?.status==='concluida');
+    const chaveAtiva=chaves.find(c=>eq.chaves?.[c]?.status==='ativa');
+    const pct=Math.round((chavesConcluidas.length/4)*100);
+    const dots=chaves.map(c=>{
+      const st=eq.chaves?.[c]?.status||'nao_iniciada';
+      const cor=corMap[c];
+      const op=st==='concluida'?'1':st==='ativa'?'0.5':'0.15';
+      return `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${cor};opacity:${op};margin:0 2px;"></span>`;
+    }).join('');
+    return `<tr>
+      <td style="padding:10px 12px;font-weight:600;">${eq.nome||'Equipe '+(i+1)}</td>
+      <td style="padding:10px 12px;text-align:center;">${dots}</td>
+      <td style="padding:10px 12px;text-align:center;">${chavesConcluidas.length}/4</td>
+      <td style="padding:10px 12px;text-align:center;">
+        <div style="background:#eee;border-radius:4px;height:8px;width:80px;margin:0 auto;">
+          <div style="background:#2E80F0;height:8px;border-radius:4px;width:${pct}%;"></div>
+        </div>
+        <span style="font-size:10px;color:#666;">${pct}%</span>
+      </td>
+      <td style="padding:10px 12px;text-align:center;">${chaveAtiva?`<span style="color:${corMap[chaveAtiva]};font-weight:600;">${icnMap[chaveAtiva]} ${nmMap[chaveAtiva]}</span>`:'<span style="color:#bbb;">—</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  const fasesSummary=chaves.map(c=>{
+    const concluidas=equipes.filter(e=>e.chaves?.[c]?.status==='concluida').length;
+    const ativas=equipes.filter(e=>e.chaves?.[c]?.status==='ativa').length;
+    const cor=corMap[c];
+    const pct=equipes.length?Math.round((concluidas/equipes.length)*100):0;
+    return `<div style="padding:12px;border-radius:10px;border:1.5px solid ${cor}30;background:${cor}08;">
+      <div style="font-weight:800;color:${cor};margin-bottom:6px;">${icnMap[c]} ${nmMap[c]}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:4px;">Concluídas: <b style="color:${cor};">${concluidas}</b> equipe(s)</div>
+      <div style="font-size:12px;color:#555;margin-bottom:8px;">Em progresso: <b>${ativas}</b> equipe(s)</div>
+      <div style="background:#eee;border-radius:4px;height:6px;">
+        <div style="background:${cor};height:6px;border-radius:4px;width:${pct}%;"></div>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:3px;">${pct}% das equipes concluíram</div>
+    </div>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Relatório de Interação — TdoE</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#222;background:#f5f5f5;padding:24px;}
+    .page{max-width:800px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.1);}
+    h1{font-size:22px;font-weight:800;margin-bottom:4px;}
+    .sub{font-size:13px;color:#666;margin-bottom:24px;}
+    h2{font-size:15px;font-weight:700;margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid #eee;}
+    table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+    th{background:#f0f0f0;padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:#555;}
+    tr:nth-child(even){background:#fafafa;}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+    .sum-card{background:#f8f8f8;border-radius:10px;padding:14px;text-align:center;}
+    .sum-val{font-size:26px;font-weight:900;color:#2E80F0;}
+    .sum-lbl{font-size:11px;color:#888;margin-top:3px;}
+    .chaves-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .footer{margin-top:28px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center;}
+    @media print{body{background:#fff;padding:0;}.page{box-shadow:none;border-radius:0;}}
+  </style></head><body>
+  <div class="page">
+    <h1>📋 Relatório de Interação — TdoE</h1>
+    <div class="sub">Sessão: <b>${sessao.titulo}</b> · Código: <b>${sessao.codigo_acesso}</b> · Gerado em: ${dataAtual}</div>
+    <div class="summary-grid">
+      <div class="sum-card"><div class="sum-val" style="color:#22C97A;">${equipes.length}</div><div class="sum-lbl">Equipes</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#2E80F0;">${equipes.reduce((a,e)=>a+(e.membros?.length||0),0)||equipes.length*4}</div><div class="sum-lbl">Participantes (est.)</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#0FD4B0;">${totalChaves}</div><div class="sum-lbl">Chaves concluídas</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#A040E0;">${maxChave.nm}</div><div class="sum-lbl">Equipe mais avançada</div></div>
+    </div>
+    <h2>Progresso por Equipe</h2>
+    <table>
+      <thead><tr>
+        <th>Equipe</th><th style="text-align:center;">Chaves</th><th style="text-align:center;">Concluídas</th>
+        <th style="text-align:center;">Progresso</th><th style="text-align:center;">Chave atual</th>
+      </tr></thead>
+      <tbody>${equipesRows}</tbody>
+    </table>
+    <h2>Síntese por Chave</h2>
+    <div class="chaves-grid">${fasesSummary}</div>
+    <div class="footer">TdoE – Tabuleiro do Empreendedor · UFLA · Daniela Meirelles Andrade</div>
+  </div>
+  <scr\x69pt>window.print();<\/scr\x69pt>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  toast('Relatório aberto para impressão','ok');
+}
+
+/* ── EXPORTAR PROPOSTAS (MODELO DE NEGÓCIO) ── */
+async function exportarPropostas(){
+  const sessao=state.sessaoAtual;
+  if(!sessao){toast('Nenhuma sessão selecionada','err');return;}
+  // Busca dados frescos da API para garantir conteúdo atualizado
+  let equipes=sessao.equipes||[];
+  try{
+    const fresh=await api('GET','/sessao/'+state.sessaoId);
+    if(fresh&&fresh.equipes) equipes=fresh.equipes;
+  }catch(e){}
+  if(!equipes.length){toast('Nenhuma equipe nesta sessão','err');return;}
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const corMap={problema:'#22C97A',solucao:'#0FD4B0',parcerias:'#2E80F0',oportunidades:'#A040E0'};
+  const nmMap={problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'};
+  const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+  const descMap={
+    problema:'O que foi investigado? Onde acontece e por que é relevante?',
+    solucao:'Como a equipe propõe resolver? Custos e riscos identificados?',
+    parcerias:'Quem pode apoiar? Recursos locais e parcerias mapeadas?',
+    oportunidades:'Qual oportunidade foi identificada? Como pode ser desenvolvida?',
+  };
+  const dataAtual=new Date().toLocaleString('pt-BR');
+
+  const pagesHtml=equipes.map((eq,i)=>{
+    const quadrantes=chaves.map(c=>{
+      const status=eq.chaves?.[c]?.status||'nao_iniciada';
+      const concluida=status==='concluida';
+      const cor=corMap[c];
+      const fasesInfo=CHAVES_INFO[c]?.fases||[];
+      const fasesText=fasesInfo.map(f=>{
+        const conteudo=eq.chaves?.[c]?.conteudo?.[f.id]||'';
+        return `<div style="margin-bottom:8px;"><span style="font-size:10px;font-weight:700;color:${cor};">${f.nm}</span><div style="font-size:11px;color:#444;margin-top:3px;line-height:1.5;white-space:pre-wrap;">${conteudo||'(não preenchido)'}</div></div>`;
+      }).join('');
+      return `<div style="border:2px solid ${cor}${concluida?'':'44'};border-radius:10px;padding:14px;background:${cor}${concluida?'0D':'05'};">
+        <div style="font-weight:800;font-size:13px;color:${cor};margin-bottom:8px;">${icnMap[c]} ${nmMap[c]}</div>
+        ${fasesText}
+        ${!concluida?`<div style="font-size:10px;color:#bbb;font-style:italic;margin-top:8px;">Chave não concluída</div>`:''}
+      </div>`;
+    });
+    const numConcluidas=chaves.filter(c=>eq.chaves?.[c]?.status==='concluida').length;
+    return `<div class="page-break" style="page-break-after:always;padding:24px;max-width:800px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #eee;">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#1A4E9E,#0F3370);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;">E${i+1}</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;">${eq.nome||'Equipe '+(i+1)}</div>
+          <div style="font-size:12px;color:#888;">Sessão: ${sessao.titulo} · ${numConcluidas}/4 chaves concluídas</div>
+        </div>
+        <div style="margin-left:auto;font-size:11px;color:#aaa;">${dataAtual}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        ${quadrantes.join('')}
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:#f5f5f5;border-radius:8px;font-size:10px;color:#888;text-align:center;">
+        TdoE – Tabuleiro do Empreendedor · Modelo de Negócio da Equipe
+      </div>
+    </div>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Propostas — TdoE — ${sessao.titulo}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#222;background:#fff;}
+    @media print{.page-break{page-break-after:always;}body{background:#fff;}}
+    @media screen{body{background:#eee;padding:20px;}.page-break{background:#fff;border-radius:12px;margin-bottom:24px;box-shadow:0 2px 16px rgba(0,0,0,.1);}}
+  </style></head><body>
+  ${pagesHtml}
+  <scr\x69pt>window.print();<\/scr\x69pt>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  toast('Propostas abertas para impressão','ok');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ELEMENTOS LÚDICOS — Pontuação, Relógio, Feedback, Carta-Desafio
+═══════════════════════════════════════════════════════════════ */
+
+/* ── PONTUAÇÃO ── */
+const PONTOS_POR_CHAVE = 60;
+const TOTAL_FASES = 3;
+function atualizarScoreJogador(pts){
+  state.pontuacao=pts;
+  const el=document.getElementById('jog-score-val');
+  if(el) el.textContent=pts;
+}
+
+/* ── FEEDBACK DE CONCLUSÃO ── */
+function mostrarFeedbackConclusao(chave,numeroFase,nomeFase){
+  const chaveConcluida = numeroFase >= TOTAL_FASES;
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const cor=corMap[chave]||'var(--gold)';
+  const tEl=document.getElementById('congrats-titulo');
+  const sEl=document.getElementById('congrats-sub');
+  const pEl=document.getElementById('congrats-pts');
+  const badge=document.querySelector('.congrats-pts-badge');
+  if(chaveConcluida){
+    // pontuação só na conclusão da chave inteira
+    const pontos=PONTOS_POR_CHAVE;
+    const total=state.pontuacao+pontos;
+    atualizarScoreJogador(total);
+    try{localStorage.setItem('tdoe_pontuacao_'+(state.equipeId||'demo'),total);}catch(e){}
+    if(tEl) tEl.textContent='Chave concluída! 🎉';
+    if(sEl) sEl.textContent=nomeChave(chave)+' · todas as fases completas';
+    if(pEl){
+      pEl.textContent='0';
+      let c=0;
+      const iv=setInterval(()=>{c=Math.min(c+12,pontos);pEl.textContent=c;if(c>=pontos)clearInterval(iv);},30);
+    }
+    if(badge) badge.style.display='';
+  } else {
+    // fases intermediárias: feedback sem pontos
+    if(tEl) tEl.textContent='Fase '+numeroFase+' concluída!';
+    if(sEl) sEl.textContent=(nomeFase||'Fase')+' · '+nomeChave(chave);
+    if(badge) badge.style.display='none';
+  }
+  if(badge) badge.style.color=cor;
+  const ov=document.getElementById('overlay-congrats');
+  if(ov) ov.classList.remove('hidden');
+  // verificar se TODAS as 4 chaves estão concluídas → abrir encerramento após fechar congrats
+  if(chaveConcluida){
+    // pequeno delay para garantir que state.chaves já foi atualizado pelo carregarChaves()
+    setTimeout(()=>{
+      const todasChaves=['problema','solucao','parcerias','oportunidades'];
+      const todasConcluidas=todasChaves.every(c=>state.chaves?.[c]?.status==='concluida');
+      if(todasConcluidas){
+        setTimeout(()=>{
+          fecharCongrats();
+          abrirEncerramento();
+        },2000);
+      }
+    },200);
+  }
+}
+function fecharCongrats(){
+  const ov=document.getElementById('overlay-congrats');
+  if(ov) ov.classList.add('hidden');
+}
+
+/* ── ENCERRAMENTO — tela de resumo final ── */
+function abrirEncerramento(){
+  const chaves=['problema','solucao','parcerias','oportunidades'];
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+  const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+  const resumo=document.getElementById('enc-resumo');
+  resumo.innerHTML='';
+  const dadosChaves=state.chaves||{};
+  chaves.forEach(c=>{
+    const dados=dadosChaves[c];
+    if(!dados) return;
+    const card=document.createElement('div');
+    card.className='enc-chave-card';
+    card.style.borderColor=bdMap[c];
+    let fasesHtml='';
+    (dados.fases||[]).forEach(f=>{
+      if(f.conteudo){
+        fasesHtml+=`<div class="enc-fase">
+          <div class="enc-fase-nome" style="color:${corMap[c]};">${f.nome}</div>
+          <div class="enc-fase-conteudo">${f.conteudo}</div>
+        </div>`;
+      }
+    });
+    card.innerHTML=`<div class="enc-chave-titulo" style="color:${corMap[c]};border-bottom:1px solid ${bdMap[c]};padding-bottom:8px;margin-bottom:10px;">${iconChave(c)} ${nomeChaveLocale(c)}</div>${fasesHtml||'<div style="font-size:11px;color:var(--t3);">Nenhuma fase registrada</div>'}`;
+    resumo.appendChild(card);
+  });
+  // pontuação total
+  const sub=document.getElementById('enc-sub');
+  if(sub) sub.textContent='Equipe: '+(state.equipeNome||'sua equipe')+' · '+state.pontuacao+' pts';
+  document.getElementById('overlay-encerramento').classList.remove('hidden');
+}
+function fecharEncerramento(){
+  document.getElementById('overlay-encerramento').classList.add('hidden');
+}
+async function enviarEncerramento(){
+  // marca equipe como investigação enviada no backend
+  if(state.equipeId){
+    try{
+      await api('PATCH','/equipe/'+state.equipeId+'/encerrar',{});
+    }catch(e){console.warn('encerrar:',e);}
+  }
+  toast('📤 Investigação enviada com sucesso! O educador já pode ver.','ok');
+  fecharEncerramento();
+  adicionarEventoRegistro('sistema','Sistema','✓ Investigação final enviada ao educador');
+}
+
+/* ── RELÓGIO — helpers ── */
+function fmt(seg){return String(Math.floor(seg/60)).padStart(2,'0')+':'+String(seg%60).padStart(2,'0');}
+function atualizarDisplayTimer(){
+  const r=state.timerRestante,t=state.timerTotal||1;
+  const pct=Math.round((r/t)*100);
+  const urg=r<=60&&r>0;
+  const eD=document.getElementById('edu-timer-display');
+  if(eD) eD.textContent=state.timerTotal>0?fmt(r):'—';
+  const jS=document.getElementById('jog-timer-strip');
+  const jD=document.getElementById('jog-timer-display');
+  const jP=document.getElementById('jog-timer-pct');
+  const jR=document.getElementById('jog-timer-ring');
+  if(state.timerTotal>0&&jS) jS.classList.remove('hidden');
+  else if(jS) jS.classList.add('hidden');
+  if(jD){jD.textContent=fmt(r);jD.classList.toggle('urgent',urg);}
+  if(jP) jP.textContent=pct+'%';
+  if(jR){
+    const circ=100.53;
+    jR.style.strokeDashoffset=circ-(pct/100)*circ;
+    jR.classList.toggle('urgent',urg);
+  }
+}
+function aplicarTimerDaAPI(t){
+  if(!t||!t.total) return;
+  const jaRodava=state.timerRodando;
+  // calcula restante atual se estiver rodando (compensa latência)
+  let restante=t.restante||0;
+  if(t.rodando&&t.ts){
+    const elapsed=Math.floor((Date.now()/1000)-t.ts);
+    restante=Math.max(0,restante-elapsed);
+  }
+  state.timerTotal=t.total;
+  state.timerRestante=restante;
+  state.timerRodando=t.rodando||false;
+  if(jaRodava&&!t.rodando&&restante===0) toast('⏱ Tempo esgotado!','info');
+  atualizarDisplayTimer();
+}
+
+/* ── RELÓGIO — controles do educador (via API) ── */
+function setTimerPreset(min){
+  document.querySelectorAll('.timer-preset-btn').forEach(b=>{b.classList.toggle('sel',b.textContent.trim()===min+' min');});
+  state.timerTotal=min*60;state.timerRestante=min*60;state.timerRodando=false;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  atualizarDisplayTimer();
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'definir',total:min*60}).catch(()=>{});
+}
+function setTimerCustom(){
+  const inp=document.getElementById('edu-timer-min');
+  const min=parseInt(inp&&inp.value);
+  if(isNaN(min)||min<1||min>120){toast('Informe entre 1 e 120 minutos','err');return;}
+  document.querySelectorAll('.timer-preset-btn').forEach(b=>b.classList.remove('sel'));
+  state.timerTotal=min*60;state.timerRestante=min*60;state.timerRodando=false;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  atualizarDisplayTimer();toast('Timer: '+min+' min','ok');
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'definir',total:min*60}).catch(()=>{});
+}
+async function iniciarTimerEdu(){
+  if(state.timerTotal===0){toast('Defina a duração antes','err');return;}
+  if(state.timerRodando){toast('Timer já rodando','info');return;}
+  state.timerRodando=true;toast('⏱ Timer iniciado','ok');
+  state.timerInterval=setInterval(()=>{
+    if(state.timerRestante<=0){pararTimerEdu(true);return;}
+    state.timerRestante--;atualizarDisplayTimer();
+  },1000);
+  atualizarDisplayTimer();
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'iniciar'}).catch(()=>{});
+}
+async function pararTimerEdu(natural=false){
+  state.timerRodando=false;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  if(natural){state.timerRestante=0;toast('⏱ Tempo esgotado!','info');}
+  else toast('⏱ Timer parado','info');
+  atualizarDisplayTimer();
+  if(state.sessaoId) api('PATCH','/sessao/'+state.sessaoId+'/timer',{acao:'parar'}).catch(()=>{});
+}
+
+/* ── RELÓGIO — polling jogador (via API) ── */
+async function atualizarTimerJogador(){
+  if(!state.sessaoId) return;
+  try{
+    const d=await api('GET','/sessao/'+state.sessaoId+'/timer');
+    if(d&&d.timer) aplicarTimerDaAPI(d.timer);
+  }catch(e){}
+}
+
+/* ── CARTA-DESAFIO — preview antes de enviar (educador) ── */
+let _cartaPendente=null;
+function abrirPreviewCarta(chave,icone,titulo,corpo){
+  _cartaPendente={chave,icone,titulo,corpo};
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'rgba(34,201,122,.15)',solucao:'rgba(15,212,176,.15)',parcerias:'rgba(46,128,240,.15)',oportunidades:'rgba(160,64,224,.15)'};
+  const cor=corMap[chave]||'var(--gold)';
+  const bg=bgMap[chave]||'rgba(255,215,0,.15)';
+  const iEl=document.getElementById('pvc-icone');
+  const tipoEl=document.getElementById('pvc-tipo');
+  const titEl=document.getElementById('pvc-titulo');
+  const taEl=document.getElementById('pvc-corpo');
+  const btnEl=document.getElementById('pvc-btn-enviar');
+  if(iEl){iEl.textContent=icone;iEl.style.background=bg;iEl.style.color=cor;}
+  if(tipoEl){tipoEl.textContent='Carta-Desafio · '+nomeChave(chave);tipoEl.style.color=cor;}
+  if(titEl) titEl.textContent=titulo;
+  if(taEl) taEl.value=corpo;
+  if(btnEl) btnEl.style.background=cor;
+  abrirModal('modal-preview-carta');
+}
+async function confirmarEnvioCarta(){
+  if(!_cartaPendente) return;
+  const corpo=document.getElementById('pvc-corpo').value.trim();
+  if(!corpo){toast('O conteúdo da carta não pode estar vazio','err');return;}
+  await lancarCartaDesafio(_cartaPendente.chave,_cartaPendente.icone,_cartaPendente.titulo,corpo);
+  fecharModal('modal-preview-carta');
+  _cartaPendente=null;
+}
+
+/* ── CARTA-DESAFIO — lançar (educador) ── */
+async function lancarCartaDesafio(chave,icone,titulo,corpo){
+  const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+  const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+  const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+  const carta={chave,icone,titulo,corpo,cor:corMap[chave]||'var(--gold)',bg:bgMap[chave]||'var(--gold-bg)',bd:bdMap[chave]||'var(--gold-bd)'};
+  // salva no backend para sincronizar entre dispositivos
+  if(state.sessaoId){
+    try{ await api('POST','/sessao/'+state.sessaoId+'/carta',{chave,icone,titulo,corpo}); }catch(e){}
+  }
+  toast('🃏 Carta enviada: '+titulo,'ok');
+}
+
+/* ── CARTA-DESAFIO — receber (jogador) ── */
+function receberCartaDesafio(carta){
+  state.cartaDesafioAtiva=carta;
+  const ni=document.getElementById('jog-carta-notif-inline');
+  if(ni){
+    ni.classList.remove('hidden');
+    ni.innerHTML=`<div class="carta-notif" style="background:${carta.bg};border-color:${carta.bd};color:${carta.cor};" onclick="abrirCartaJogador()">
+      <span style="font-size:18px;">${carta.icone}</span>
+      <div><div style="font-size:11px;font-weight:700;">${carta.titulo}</div><div style="font-size:9px;opacity:.75;">Carta-desafio — toque para abrir</div></div>
+      <span style="margin-left:auto;">→</span>
+    </div>`;
+  }
+}
+function abrirCartaJogador(){
+  const carta=state.cartaDesafioAtiva;if(!carta) return;
+  const box=document.getElementById('carta-box-inner');
+  const iEl=document.getElementById('carta-icone-el');
+  const tpEl=document.getElementById('carta-tipo-el');
+  const ttEl=document.getElementById('carta-titulo-el');
+  const cpEl=document.getElementById('carta-corpo-el');
+  const abEl=document.getElementById('carta-aceitar-btn');
+  if(iEl){iEl.textContent=carta.icone;iEl.style.background=carta.bg;}
+  if(tpEl){tpEl.textContent='Carta-Desafio · '+nomeChave(carta.chave);tpEl.style.color=carta.cor;}
+  if(ttEl) ttEl.textContent=carta.titulo;
+  if(cpEl) cpEl.textContent=carta.corpo;
+  if(box) box.style.borderColor=carta.bd;
+  if(abEl){abEl.style.background=carta.cor;abEl.style.color='#fff';}
+  const ov=document.getElementById('overlay-carta');
+  if(ov) ov.classList.remove('hidden');
+}
+function fecharCartaOverlay(){
+  const ov=document.getElementById('overlay-carta');if(ov) ov.classList.add('hidden');
+}
+function aceitarCarta(){
+  const carta=state.cartaDesafioAtiva;
+  fecharCartaOverlay();
+  toast('✓ Desafio aceito! Boa investigação 🚀','ok');
+  adicionarEventoRegistro('sistema','Sistema','🃏 Carta "'+carta?.titulo+'" aceita');
+  const ni=document.getElementById('jog-carta-notif-inline');
+  if(ni) ni.classList.add('hidden');
+  state.cartaDesafioAtiva=null;
+  try{localStorage.removeItem('tdoe_carta_desafio');}catch(e){}
+}
+
+/* ── POLLING LÚDICO — jogador verifica timer e carta a cada 10s ── */
+// Timer: sinc com API a cada 5s + tick local a cada 1s para display suave
+setInterval(()=>{
+  if(state.perfil==='jogador'&&state.sessaoId) atualizarTimerJogador();
+},5000);
+// Carta-desafio: verifica via API a cada 8s
+setInterval(()=>{
+  if(state.perfil==='jogador'&&state.sessaoId) pollingLudicoJogador();
+},8000);
+setInterval(()=>{
+  if(state.perfil==='jogador'&&state.timerRodando&&state.timerRestante>0){
+    state.timerRestante--;atualizarDisplayTimer();
+  }
+},1000);
+async function pollingLudicoJogador(){
+  if(state.perfil!=='jogador'||!state.sessaoId) return;
+  // timer já tem seu próprio interval acima
+  atualizarTimerJogador();
+  // carta via API
+  try{
+    const d=await api('GET','/sessao/'+state.sessaoId+'/carta');
+    if(d&&d.carta&&!state.cartaDesafioAtiva){
+      const c=d.carta;
+      const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+      const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+      const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+      receberCartaDesafio({...c,cor:corMap[c.chave]||'var(--gold)',bg:bgMap[c.chave]||'var(--gold-bg)',bd:bdMap[c.chave]||'var(--gold-bd)'});
+    } else if(d&&!d.carta){
+      // carta foi removida
+      state.cartaDesafioAtiva=null;
+      const ni=document.getElementById('jog-carta-notif-inline');
+      if(ni) ni.classList.add('hidden');
+    }
+  }catch(e){}
+  // pontuação salva
+  try{
+    const pts=parseInt(localStorage.getItem('tdoe_pontuacao_'+(state.equipeId||'demo'))||'0');
+    if(pts&&state.pontuacao===0) atualizarScoreJogador(pts);
+  }catch(e){}
+}
+
 /* ── INIT ── */
-// Recuperar sessão anterior se token ainda válido
 (function(){
   const t=localStorage.getItem('tdoe_edu_token');
   const n=localStorage.getItem('tdoe_edu_nome');
   if(t){
-    state.token=t;
-    state.perfil='educador';
-    state.usuario={nome:n||'Educador'};
+    // Valida JWT localmente antes de usar
+    try{
+      const parts=t.split('.');
+      if(parts.length===3){
+        const payload=JSON.parse(atob(parts[1]));
+        const agora=Math.floor(Date.now()/1000);
+        if(payload.exp&&payload.exp<agora){
+          // Token expirado — limpar
+          localStorage.removeItem('tdoe_edu_token');
+          localStorage.removeItem('tdoe_edu_nome');
+        }else{
+          state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};
+        }
+      }
+    }catch(e){
+      localStorage.removeItem('tdoe_edu_token');
+      localStorage.removeItem('tdoe_edu_nome');
+    }
   }
 })();
+// Restaurar idioma salvo
+(()=>{try{const l=localStorage.getItem('tdoe_lang');if(l&&I18N[l])setIdioma(l);}catch(e){}})();
 irPara('login');
 </script>
 </body>
