@@ -1818,6 +1818,27 @@ function renderChaves(chaves){
   const ORDEM=['problema','solucao','parcerias','oportunidades'];
   const chavesCompletas={};
   ORDEM.forEach(k=>{ chavesCompletas[k]=chaves[k]||{status:'nao_iniciada',fases:[]}; });
+  // nomes das fases no idioma atual
+  const _t18=I18N[_idiomaAtual]||I18N.pt;
+  const _lg=_idiomaAtual||'pt';
+  const _faseNomesLocale={
+    problema:(_t18.chaves?.problema?.fases||[]).map(f=>f.nm),
+    solucao:(_t18.chaves?.solucao?.fases||[]).map(f=>f.nm),
+    parcerias:(_t18.chaves?.parcerias?.fases||[]).map(f=>f.nm),
+    oportunidades:(_t18.chaves?.oportunidades?.fases||[]).map(f=>f.nm),
+  };
+  const _badgeTrad={concluida:{pt:'✓ Feita',en:'✓ Done',es:'✓ Hecha'},ativa:{pt:'⏱ Ativa',en:'⏱ Active',es:'⏱ Activa'},disponivel:{pt:'▶ Disponível',en:'▶ Available',es:'▶ Disponible'},padrao:{pt:'○ Disponível',en:'○ Available',es:'○ Disponible'}};
+  // nomes das fases no idioma atual
+  const _t18=I18N[_idiomaAtual]||I18N.pt;
+  const _lg=_idiomaAtual||'pt';
+  const _faseNomesLocale={
+    problema:(_t18.chaves?.problema?.fases||[]).map(f=>f.nm),
+    solucao:(_t18.chaves?.solucao?.fases||[]).map(f=>f.nm),
+    parcerias:(_t18.chaves?.parcerias?.fases||[]).map(f=>f.nm),
+    oportunidades:(_t18.chaves?.oportunidades?.fases||[]).map(f=>f.nm),
+  };
+  const _badgeTrad={concluida:{pt:'✓ Feita',en:'✓ Done',es:'✓ Hecha'},ativa:{pt:'⏱ Ativa',en:'⏱ Active',es:'⏱ Activa'},disponivel:{pt:'▶ Disponível',en:'▶ Available',es:'▶ Disponible'},padrao:{pt:'○ Disponível',en:'○ Available',es:'○ Disponible'}};
+  const _cliqueTrad={pt:'clique',en:'tap',es:'toca'};
   Object.entries(chavesCompletas).forEach(([c,dados])=>{
     const concluida=dados.status==='concluida';
     const ativa=dados.status==='ativa';
@@ -1839,15 +1860,17 @@ function renderChaves(chaves){
     else if(disponivel){badgeTxt='▶ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     else{badgeTxt='○ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     let fasesHtml='';
-    (dados.fases||[]).forEach(f=>{
+    const _fasesLocale=_faseNomesLocale[c]||[];
+    (dados.fases||[]).forEach((f,idx)=>{
+      const nomeExib=_fasesLocale[idx]||f.nome||('Fase '+(idx+1));
       const fd=f.status==='concluida';
       const fl=f.status==='bloqueada';
       const fa=!fd&&!fl;
       fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa?' active':''}${fl?' locked':''}"
         style="${fa?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
-        onclick="abrirFase('${c}',${f.numero},'${f.nome}')">
+        onclick="abrirFase('${c}',${f.numero},'${nomeExib}')">
         <div class="cc-fnum" style="${fd?'background:'+cor+';color:#fff;':fa?'background:'+bg+';color:'+cor+';':'background:rgba(255,255,255,.08);color:var(--t3);'}">${fd?'✓':f.numero}</div>
-        <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${f.nome}</div>
+        <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${nomeExib}</div>
         <div class="cc-ftxt">${fd?'✓':(fa?'clique':'🔒')}</div>
       </div>`;
     });
@@ -2524,6 +2547,9 @@ function setIdioma(lang){
     if(durLbl)durLbl.textContent=E.duracao;
     const defBtn=document.querySelector('.timer-custom-row .timer-preset-btn');
     if(defBtn)defBtn.textContent=E.definir;
+    const pcNames=document.querySelectorAll('#edu-prog-chaves .pc-name');
+    const chaveNmsEdu=['problema','solucao','parcerias','oportunidades'];
+    pcNames.forEach((el,i)=>{const nm=t.chaves?.[chaveNmsEdu[i]]?.nome;if(nm)el.textContent=nm;});
   }
   // ── Tabuleiro Jogador ──
   document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
@@ -3145,7 +3171,7 @@ async function pollingLudicoJogador(){
     }
     if(cartaObj){
       const c=cartaObj;
-      if(!state.cartaDesafioAtiva||state.cartaDesafioAtiva.id!==c.id){
+      if(!state.cartaDesafioAtiva||state.cartaDesafioAtiva.titulo!==c.titulo||state.cartaDesafioAtiva.chave!==c.chave){
         const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
         const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
         const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
