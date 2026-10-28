@@ -1805,7 +1805,11 @@ function atualizarChaveAtivaBadge(chaves){
 function renderChaves(chaves){
   const grid=document.getElementById('jog-chaves-grid');
   grid.innerHTML='';
-  Object.entries(chaves).forEach(([c,dados])=>{
+  // Garantir que todas as 4 chaves apareçam, mesmo que o backend retorne apenas as iniciadas
+  const ORDEM=['problema','solucao','parcerias','oportunidades'];
+  const chavesCompletas={};
+  ORDEM.forEach(k=>{ chavesCompletas[k]=chaves[k]||{status:'nao_iniciada',fases:[]}; });
+  Object.entries(chavesCompletas).forEach(([c,dados])=>{
     const concluida=dados.status==='concluida';
     const ativa=dados.status==='ativa';
     const disponivel=dados.status==='disponivel';
@@ -1847,7 +1851,7 @@ function renderChaves(chaves){
       </div>
       <div class="cc-fases">${fasesHtml}</div>
       <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:${pct}%;background:${cor};${ativa?'box-shadow:0 0 6px '+cor:''}"></div></div>`;
-    const problemaConcluida=chaves['problema']?.status==='concluida';
+    const problemaConcluida=chavesCompletas['problema']?.status==='concluida';
     const chavesDependentes=['solucao','parcerias','oportunidades'];
     const bloqueadaPorProblema=chavesDependentes.includes(c)&&!problemaConcluida;
     // mostra botão para qualquer status que não seja ativa/concluida (inclui bloqueada, nao_iniciada, disponivel, etc)
@@ -1867,7 +1871,7 @@ function renderChaves(chaves){
     grid.appendChild(card);
   });
   // mostrar botão "Ver resumo" se todas as 4 chaves concluídas
-  const todasConcluidas=Object.values(chaves).length===4&&Object.values(chaves).every(v=>v.status==='concluida');
+  const todasConcluidas=Object.values(chavesCompletas).length===4&&Object.values(chavesCompletas).every(v=>v.status==='concluida');
   const btnResumo=document.getElementById('btn-ver-resumo');
   if(btnResumo) btnResumo.classList.toggle('hidden',!todasConcluidas);
 }
@@ -3033,12 +3037,15 @@ async function pollingLudicoJogador(){
   // carta via API
   try{
     const d=await api('GET','/sessao/'+state.sessaoId+'/carta');
-    if(d&&d.carta&&!state.cartaDesafioAtiva){
+    if(d&&d.carta){
       const c=d.carta;
-      const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
-      const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
-      const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
-      receberCartaDesafio({...c,cor:corMap[c.chave]||'var(--gold)',bg:bgMap[c.chave]||'var(--gold-bg)',bd:bdMap[c.chave]||'var(--gold-bd)'});
+      // Só mostra a animação de "nova carta" se ainda não tinha carta ativa
+      if(!state.cartaDesafioAtiva||state.cartaDesafioAtiva.id!==c.id){
+        const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
+        const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
+        const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
+        receberCartaDesafio({...c,cor:corMap[c.chave]||'var(--gold)',bg:bgMap[c.chave]||'var(--gold-bg)',bd:bdMap[c.chave]||'var(--gold-bd)'});
+      }
     } else if(d&&!d.carta){
       // carta foi removida
       state.cartaDesafioAtiva=null;
@@ -3070,6 +3077,15 @@ async function pollingLudicoJogador(){
           localStorage.removeItem('tdoe_edu_nome');
         }else{
           state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};
+          // Auto-restaurar painel do educador após reload
+          (async()=>{
+            try{
+              await carregarPainelEducador();
+              irPara('educador');
+            }catch(e){
+              irPara('login');
+            }
+          })();
         }
       }
     }catch(e){
@@ -3080,7 +3096,8 @@ async function pollingLudicoJogador(){
 })();
 // Restaurar idioma salvo
 (()=>{try{const l=localStorage.getItem('tdoe_lang');if(l&&I18N[l])setIdioma(l);}catch(e){}})();
-irPara('login');
+// irPara('login') só se não houver token (o auto-login acima já chama irPara quando necessário)
+if(!localStorage.getItem('tdoe_edu_token')) irPara('login');
 </script>
 </body>
 </html>
