@@ -748,6 +748,12 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
           <div><div class="carta-launcher-nm">Oportunidades</div><div class="carta-launcher-sub">Descobrir novo caminho</div></div>
         </button>
       </div>
+      <!-- Carta ativa -->
+      <div id="edu-carta-ativa" class="hidden" style="margin-top:8px;padding:10px 12px;border-radius:9px;background:var(--gold-bg);border:1px solid var(--gold-bd);">
+        <div style="font-size:10px;font-weight:700;color:var(--gold);margin-bottom:4px;">🃏 Carta ativa</div>
+        <div id="edu-carta-ativa-txt" style="font-size:11px;color:var(--t2);"></div>
+        <button onclick="removerCartaAtiva()" style="margin-top:6px;font-size:10px;color:#ef4444;background:none;border:none;cursor:pointer;padding:0;">✕ Remover carta</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1462,6 +1468,13 @@ async function selecionarSessao(id){
     atualizarMetricas(s.equipes);
     atualizarBarrasChaves(s.equipes);
     if(s.alertas&&s.alertas.length>0) renderAlertas(s.alertas);
+    // Mostra carta ativa se existir
+    if(s.carta_desafio){
+      mostrarCartaAtivaEducador(s.carta_desafio);
+    } else {
+      const el=document.getElementById('edu-carta-ativa');
+      if(el) el.classList.add('hidden');
+    }
   }catch(e){toast(e.message,'err');}
 }
 
@@ -1798,7 +1811,7 @@ function renderChaves(chaves){
     const disponivel=dados.status==='disponivel';
     const naoIniciada=dados.status==='nao_iniciada';
     const cor=corChave(c); const bg=bgChave(c); const bd=bdChave(c);
-    const pct=Math.round((dados.fases.filter(f=>f.status==='concluida').length/3)*100);
+    const pct=Math.round(((dados.fases||[]).filter(f=>f.status==='concluida').length/3)*100);
     const bdStyle=concluida?`1.5px solid ${bd}`:(ativa?`2px solid ${bd}`:(disponivel?`1px dashed ${bd}`:'1px solid rgba(255,255,255,.06)'));
     const bgStyle=concluida?bg:(ativa?`rgba(${c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224'},.06)`:'rgba(255,255,255,.02)');
     const card=document.createElement('div');
@@ -1813,7 +1826,7 @@ function renderChaves(chaves){
     else if(disponivel){badgeTxt='▶ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     else{badgeTxt='○ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     let fasesHtml='';
-    dados.fases.forEach(f=>{
+    (dados.fases||[]).forEach(f=>{
       const fd=f.status==='concluida';
       const fl=f.status==='bloqueada';
       const fa=!fd&&!fl;
@@ -2646,8 +2659,11 @@ async function exportarPropostas(){
       const concluida=status==='concluida';
       const cor=corMap[c];
       const fasesInfo=CHAVES_INFO[c]?.fases||[];
-      const fasesText=fasesInfo.map(f=>{
-        const conteudo=eq.chaves?.[c]?.conteudo?.[f.id]||'';
+      // A API retorna eq.chaves[c].fases = [{numero, nome, status, conteudo}]
+      const fasesAPI=eq.chaves?.[c]?.fases||[];
+      const fasesText=fasesInfo.map((f,idx)=>{
+        const faseAPI=fasesAPI[idx]||{};
+        const conteudo=faseAPI.conteudo||'';
         return `<div style="margin-bottom:8px;"><span style="font-size:10px;font-weight:700;color:${cor};">${f.nm}</span><div style="font-size:11px;color:#444;margin-top:3px;line-height:1.5;white-space:pre-wrap;">${conteudo||'(não preenchido)'}</div></div>`;
       }).join('');
       return `<div style="border:2px solid ${cor}${concluida?'':'44'};border-radius:10px;padding:14px;background:${cor}${concluida?'0D':'05'};">
@@ -2930,6 +2946,26 @@ async function lancarCartaDesafio(chave,icone,titulo,corpo){
     try{ await api('POST','/sessao/'+state.sessaoId+'/carta',{chave,icone,titulo,corpo}); }catch(e){}
   }
   toast('🃏 Carta enviada: '+titulo,'ok');
+  mostrarCartaAtivaEducador({titulo,icone,chave});
+}
+
+function mostrarCartaAtivaEducador(carta){
+  const el=document.getElementById('edu-carta-ativa');
+  const txt=document.getElementById('edu-carta-ativa-txt');
+  if(el&&txt){
+    txt.textContent=(carta.icone||'🃏')+' '+carta.titulo+' ('+nomeChave(carta.chave)+')';
+    el.classList.remove('hidden');
+  }
+}
+
+async function removerCartaAtiva(){
+  if(!state.sessaoId) return;
+  try{
+    await api('DELETE','/sessao/'+state.sessaoId+'/carta');
+    const el=document.getElementById('edu-carta-ativa');
+    if(el) el.classList.add('hidden');
+    toast('Carta removida','ok');
+  }catch(e){ toast('Erro ao remover carta','err'); }
 }
 
 /* ── CARTA-DESAFIO — receber (jogador) ── */
