@@ -1162,7 +1162,7 @@ async function api(method, path, body=null){
   const timeout=isLong?35000:8000;
   const timer=setTimeout(()=>ctrl.abort(),timeout);
   // Não mostrar loader para polling (GET /carta, GET /sessao sem body, timer)
-  const isPolling=method==='GET'&&(path.includes('/carta')||path.includes('/timer'));
+  const isPolling=method==='GET'&&(path.includes('/carta')||path.includes('/timer')||path.includes('/balao')||path.includes('/comunicacao')||path.includes('/chaves/')||path==='/sessao'||/^\/sessao\/[^/]+$/.test(path));
   if(!isPolling) showLoader();
   try{
     // Garante que o token está sempre atualizado do localStorage
@@ -1808,6 +1808,8 @@ function irParaEducador(){irPara('educador');}
 async function carregarPainelJogadores(){
   document.getElementById('jog-topbar-nm').textContent=state.equipeNome;
   document.getElementById('jog-topbar-sessao').textContent='Sessão ativa';
+  // restaurar pontuacao do localStorage
+  try{const pts=parseInt(localStorage.getItem('tdoe_pontuacao_'+(state.equipeId||'demo'))||'0');if(pts>0){state.pontuacao=pts;const el=document.getElementById('jog-score-val');if(el)el.textContent=pts;}}catch(e){}
   document.getElementById('jog-cenario-titulo').textContent='Sessão de investigação — '+state.equipeNome;
   // Buscar cenário personalizado da sessão
   if(state.sessaoId){
@@ -1900,7 +1902,8 @@ function renderChaves(chaves){
     else if(disponivel){badgeTxt=_bdgTrad.disponivel[_lg];badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     else{badgeTxt=_bdgTrad.padrao[_lg];badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     const _fl=_faseNm[c]||[];
-    const _fasesBase=dados.fases&&dados.fases.length>0?dados.fases:(CHAVES_INFO[c]?.fases||[]).map((fi,i)=>({numero:i+1,nome:fi.nm,status:'bloqueada'}));
+    const _fasorig=CHAVES_INFO[c]?.fases||[];
+    const _fasesBase=dados.fases&&dados.fases.length>0?dados.fases:_fasorig.map((fi,i)=>({numero:i+1,nome:fi.nm||fi.nome||('Fase '+(i+1)),status:'bloqueada'}));
     let fasesHtml='';
     _fasesBase.forEach((f,idx)=>{
       const fd=f.status==='concluida';
