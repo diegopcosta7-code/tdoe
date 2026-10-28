@@ -409,6 +409,14 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .timer-stop{background:rgba(255,80,80,.1);color:#ff6b6b;border:1.5px solid rgba(255,80,80,.3);}
 .timer-custom-row{display:flex;gap:5px;align-items:center;}
 .timer-custom-input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--t1);font-family:inherit;text-align:center;}
+.timer-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:7px 10px;background:rgba(255,255,255,.04);border-radius:9px;border:1px solid var(--border);}
+.timer-toggle-lbl{font-size:10px;color:var(--t2);font-weight:600;}
+.toggle-sw{position:relative;width:32px;height:18px;cursor:pointer;}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{position:absolute;inset:0;border-radius:9px;background:rgba(255,255,255,.1);transition:background .2s;}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s;}
+.toggle-sw input:checked~.toggle-track{background:var(--sol);}
+.toggle-sw input:checked~.toggle-thumb{transform:translateX(14px);}
 
 /* ═══════════════════════════════════════
    FEEDBACK DE CONCLUSÃO DE FASE
@@ -746,6 +754,14 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
         <div class="timer-ctrl-row">
           <button class="timer-ctrl-btn timer-start" onclick="iniciarTimerEdu()">▶ Iniciar</button>
           <button class="timer-ctrl-btn timer-stop" onclick="pararTimerEdu()">⏹ Parar</button>
+        </div>
+        <div class="timer-toggle-row">
+          <span class="timer-toggle-lbl" id="lbl-timer-toggle">Mostrar timer para estudantes</span>
+          <label class="toggle-sw">
+            <input type="checkbox" id="chk-timer-estudante" onchange="toggleTimerEstudante(this.checked)"/>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -1410,6 +1426,7 @@ async function verificarVersaoBackend(){
 
 /* ── PAINEL EDUCADOR ── */
 async function carregarPainelEducador(selecionarId=null){
+  try{const chk=document.getElementById('chk-timer-estudante');if(chk)chk.checked=localStorage.getItem('tdoe_timer_estudante')!=='0';}catch(e){}
   let sessoes=[];
   let backendOnline=false;
   try{ sessoes=await api('GET','/sessao'); backendOnline=true; }catch(e){
@@ -2960,6 +2977,16 @@ async function enviarEncerramento(){
 }
 
 /* ── RELÓGIO — helpers ── */
+function toggleTimerEstudante(on){
+  try{ localStorage.setItem('tdoe_timer_estudante', on?'1':'0'); }catch(e){}
+  if(state.sessaoId){
+    api('PATCH','/sessao/'+state.sessaoId+'/timer',{mostrar_estudante:on}).catch(()=>{});
+  }
+  atualizarDisplayTimer();
+}
+function timerEstudanteVisivel(){
+  try{ return localStorage.getItem('tdoe_timer_estudante')!=='0'; }catch(e){ return true; }
+}
 function fmt(seg){return String(Math.floor(seg/60)).padStart(2,'0')+':'+String(seg%60).padStart(2,'0');}
 function atualizarDisplayTimer(){
   const r=state.timerRestante,t=state.timerTotal||1;
@@ -2971,7 +2998,7 @@ function atualizarDisplayTimer(){
   const jD=document.getElementById('jog-timer-display');
   const jP=document.getElementById('jog-timer-pct');
   const jR=document.getElementById('jog-timer-ring');
-  if(state.timerTotal>0&&jS) jS.classList.remove('hidden');
+  if(state.timerTotal>0&&jS&&timerEstudanteVisivel()) jS.classList.remove('hidden');
   else if(jS) jS.classList.add('hidden');
   if(jD){jD.textContent=fmt(r);jD.classList.toggle('urgent',urg);}
   if(jP) jP.textContent=pct+'%';
