@@ -53,6 +53,14 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .toast-ok{background:rgba(34,201,122,.15);border-color:rgba(34,201,122,.4);color:var(--prob);}
 .toast-err{background:rgba(255,80,80,.15);border-color:rgba(255,80,80,.4);color:#ff6b6b;}
 .toast-info{background:rgba(46,128,240,.15);border-color:rgba(46,128,240,.4);color:var(--parc);}
+/* ── Loader TdoE ── */
+#tdoe-loader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;background:rgba(14,16,22,.7);backdrop-filter:blur(4px);transition:opacity .3s;}
+#tdoe-loader.hidden{opacity:0;pointer-events:none;}
+.tdoe-spinner{position:relative;width:72px;height:72px;}
+.tdoe-spinner svg{animation:tdoe-spin 1.4s linear infinite;width:72px;height:72px;}
+@keyframes tdoe-spin{to{transform:rotate(360deg);}}
+.tdoe-spinner-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;letter-spacing:.5px;color:#fff;}
+.tdoe-loader-txt{margin-top:10px;font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.45);text-transform:lowercase;}
 
 /* LOADER */
 .loader{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--parc);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
@@ -481,6 +489,19 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
      TOAST
 ════════════════════════════════════ -->
 <div id="toast"></div>
+<!-- ── Loader TdoE ── -->
+<div id="tdoe-loader" class="hidden">
+  <div class="tdoe-spinner">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M36 4 A32 32 0 0 1 68 36" stroke="#22c97a" stroke-width="6" stroke-linecap="round"/>
+      <path d="M68 36 A32 32 0 0 1 36 68" stroke="#0fd4b0" stroke-width="6" stroke-linecap="round"/>
+      <path d="M36 68 A32 32 0 0 1 4 36" stroke="#2e80f0" stroke-width="6" stroke-linecap="round"/>
+      <path d="M4 36 A32 32 0 0 1 36 4" stroke="#a040e0" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+    <div class="tdoe-spinner-label">TdoE</div>
+  </div>
+  <div class="tdoe-loader-txt">trilhando...</div>
+</div>
 
 <!-- ════════════════════════════════════
      TELA 1 — LOGIN
@@ -1113,6 +1134,10 @@ function toast(msg, tipo='ok'){
   setTimeout(()=>t.remove(),3500);
 }
 
+let _loaderCount=0;
+function showLoader(){_loaderCount++;const el=document.getElementById('tdoe-loader');if(el)el.classList.remove('hidden');}
+function hideLoader(){_loaderCount=Math.max(0,_loaderCount-1);if(_loaderCount===0){const el=document.getElementById('tdoe-loader');if(el)el.classList.add('hidden');}}
+
 async function api(method, path, body=null){
   const ctrl=new AbortController();
   // DELETE e POST de ação demoram mais (Render pode estar dormindo)
@@ -1120,6 +1145,9 @@ async function api(method, path, body=null){
   const isLong=method==='DELETE'||longRoutes.some(r=>path.includes(r));
   const timeout=isLong?35000:8000;
   const timer=setTimeout(()=>ctrl.abort(),timeout);
+  // Não mostrar loader para polling (GET /carta, GET /sessao sem body, timer)
+  const isPolling=method==='GET'&&(path.includes('/carta')||path.includes('/timer'));
+  if(!isPolling) showLoader();
   try{
     // Garante que o token está sempre atualizado do localStorage
     if(!state.token){
@@ -1153,6 +1181,7 @@ async function api(method, path, body=null){
     }
     return data;
   }catch(e){clearTimeout(timer);throw e;}
+  finally{if(!isPolling) hideLoader();}
 }
 
 function mostrarBannerDemo(){
@@ -1818,6 +1847,21 @@ function renderChaves(chaves){
   const ORDEM=['problema','solucao','parcerias','oportunidades'];
   const chavesCompletas={};
   ORDEM.forEach(k=>{ chavesCompletas[k]=chaves[k]||{status:'nao_iniciada',fases:[]}; });
+  const _t18=I18N[_idiomaAtual]||I18N.pt;
+  const _lg=_idiomaAtual||'pt';
+  const _faseNm={
+    problema:(_t18.chaves?.problema?.fases||[]).map(f=>f.nm),
+    solucao:(_t18.chaves?.solucao?.fases||[]).map(f=>f.nm),
+    parcerias:(_t18.chaves?.parcerias?.fases||[]).map(f=>f.nm),
+    oportunidades:(_t18.chaves?.oportunidades?.fases||[]).map(f=>f.nm),
+  };
+  const _bdgTrad={
+    concluida:{pt:'✓ Feita',en:'✓ Done',es:'✓ Hecha'},
+    ativa:{pt:'⏱ Ativa',en:'⏱ Active',es:'⏱ Activa'},
+    disponivel:{pt:'▶ Disponível',en:'▶ Available',es:'▶ Disponible'},
+    padrao:{pt:'○ Disponível',en:'○ Available',es:'○ Disponible'},
+  };
+  const _clqTrad={pt:'clique',en:'tap',es:'toca'};
   Object.entries(chavesCompletas).forEach(([c,dados])=>{
     const concluida=dados.status==='concluida';
     const ativa=dados.status==='ativa';
@@ -1834,21 +1878,23 @@ function renderChaves(chaves){
     topBar.style.cssText=`position:absolute;top:0;left:0;right:0;height:2px;background:${concluida||ativa||disponivel?cor:'rgba(255,255,255,.1)'};${ativa?'box-shadow:0 0 8px '+cor:''};`;
     card.appendChild(topBar);
     let badgeTxt=''; let badgeStyle='';
-    if(concluida){badgeTxt='✓ Feita';badgeStyle=`background:${bg};color:${cor};border-color:${bd}`;}
-    else if(ativa){badgeTxt='⏱ Ativa';badgeStyle='background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd)';}
-    else if(disponivel){badgeTxt='▶ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
-    else{badgeTxt='○ Disponível';badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
+    if(concluida){badgeTxt=_bdgTrad.concluida[_lg];badgeStyle=`background:${bg};color:${cor};border-color:${bd}`;}
+    else if(ativa){badgeTxt=_bdgTrad.ativa[_lg];badgeStyle='background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd)';}
+    else if(disponivel){badgeTxt=_bdgTrad.disponivel[_lg];badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
+    else{badgeTxt=_bdgTrad.padrao[_lg];badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
+    const _fl=_faseNm[c]||[];
     let fasesHtml='';
-    (dados.fases||[]).forEach(f=>{
+    (dados.fases||[]).forEach((f,idx)=>{
       const fd=f.status==='concluida';
       const fl=f.status==='bloqueada';
       const fa=!fd&&!fl;
+      const nm=_fl[idx]||f.nome||('Fase '+(idx+1));
       fasesHtml+=`<div class="cc-fase${fd?' done':''}${fa?' active':''}${fl?' locked':''}"
         style="${fa?'border-color:'+bd+';background:rgba('+( c==='problema'?'34,201,122':c==='solucao'?'15,212,176':c==='parcerias'?'46,128,240':'160,64,224')+', .08);':''}"
-        onclick="abrirFase('${c}',${f.numero},'${f.nome}')">
+        onclick="abrirFase('${c}',${f.numero},'${nm}')">
         <div class="cc-fnum" style="${fd?'background:'+cor+';color:#fff;':fa?'background:'+bg+';color:'+cor+';':'background:rgba(255,255,255,.08);color:var(--t3);'}">${fd?'✓':f.numero}</div>
-        <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${f.nome}</div>
-        <div class="cc-ftxt">${fd?'✓':(fa?'clique':'🔒')}</div>
+        <div class="cc-fnm" style="${fd?'color:var(--t2)':fa?'color:var(--t1)':'color:var(--t3);'}">${nm}</div>
+        <div class="cc-ftxt">${fd?'✓':(fa?_clqTrad[_lg]:'🔒')}</div>
       </div>`;
     });
     card.innerHTML+=`
@@ -2524,6 +2570,8 @@ function setIdioma(lang){
     if(durLbl)durLbl.textContent=E.duracao;
     const defBtn=document.querySelector('.timer-custom-row .timer-preset-btn');
     if(defBtn)defBtn.textContent=E.definir;
+    const pcNms=document.querySelectorAll('#edu-prog-chaves .pc-name');
+    ['problema','solucao','parcerias','oportunidades'].forEach((k,i)=>{if(pcNms[i]&&t.chaves?.[k]?.nome)pcNms[i].textContent=t.chaves[k].nome;});
   }
   // ── Tabuleiro Jogador ──
   document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
@@ -3145,7 +3193,7 @@ async function pollingLudicoJogador(){
     }
     if(cartaObj){
       const c=cartaObj;
-      if(!state.cartaDesafioAtiva||state.cartaDesafioAtiva.id!==c.id){
+      if(!state.cartaDesafioAtiva||(state.cartaDesafioAtiva.titulo!==c.titulo||state.cartaDesafioAtiva.chave!==c.chave)){
         const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
         const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
         const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
@@ -3178,12 +3226,15 @@ async function pollingLudicoJogador(){
         }else{
           state.token=t;state.perfil='educador';state.usuario={nome:n||'Educador'};
           // Auto-restaurar painel do educador após reload
+          showLoader();
           (async()=>{
             try{
               await carregarPainelEducador();
               irPara('educador');
             }catch(e){
               irPara('login');
+            }finally{
+              hideLoader();
             }
           })();
         }
