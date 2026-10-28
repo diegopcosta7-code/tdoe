@@ -1763,6 +1763,15 @@ async function carregarPainelJogadores(){
   document.getElementById('jog-topbar-nm').textContent=state.equipeNome;
   document.getElementById('jog-topbar-sessao').textContent='Sessão ativa';
   document.getElementById('jog-cenario-titulo').textContent='Sessão de investigação — '+state.equipeNome;
+  // Buscar cenário personalizado da sessão
+  if(state.sessaoId){
+    try{
+      const s=await api('GET','/sessao/'+state.sessaoId);
+      if(s&&s.cenario){
+        document.getElementById('jog-cenario-sub').textContent=s.cenario;
+      }
+    }catch(e){}
+  }
   await carregarChaves();
   renderMembrosSimulados();
   carregarBaloes();
@@ -2173,6 +2182,14 @@ const I18N={
     socializar:'↗ Socializar',
     lblConceitos:'Conceitos das Chaves', expandir:'▼ expandir', recolher:'▲ recolher',
     chaveAtivaBadge:'— sem chave ativa —',
+    edu:{secSessoes:'Sessões',secAcoes:'Ações',secExportar:'Exportar',
+      novaSessao:'＋ Nova sessão',verificarAlertas:'🔔 Verificar alertas',socializar:'↗ Socializar',
+      relatorio:'📋 Relatório de interação',exportarPropostas:'📄 Exportar propostas',sair:'← Sair',
+      alertas:'Alertas de mediação',semAlertas:'Nenhum alerta ativo',controles:'Controles da sessão',
+      relogio:'⏱ Relógio da fase',duracao:'Duração',definir:'Definir',
+      cartaDesafio:'🃏 Carta-desafio',cartaAtiva:'🃏 Carta ativa',removerCarta:'✕ Remover carta',
+      mEquipes:'Equipes ativas',mParticipantes:'Participantes',mChaves:'Chaves concluídas',mCodigo:'Código de acesso',
+    },
     login:{
       heroHl:'Sua ideia', heroJogo:'em JOGO',
       heroTag:'Uma metodologia ativa que transforma problemas reais em propostas de impacto — investigando, construindo soluções, formando parcerias e revelando oportunidades.',
@@ -2238,6 +2255,14 @@ Os autores apresentam a oportunidade como um guarda-chuva que permite compreende
     socializar:'↗ Showcase',
     lblConceitos:'Key Concepts', expandir:'▼ expand', recolher:'▲ collapse',
     chaveAtivaBadge:'— no active key —',
+    edu:{secSessoes:'Sessions',secAcoes:'Actions',secExportar:'Export',
+      novaSessao:'＋ New session',verificarAlertas:'🔔 Check alerts',socializar:'↗ Showcase',
+      relatorio:'📋 Interaction report',exportarPropostas:'📄 Export proposals',sair:'← Log out',
+      alertas:'Mediation alerts',semAlertas:'No active alerts',controles:'Session controls',
+      relogio:'⏱ Phase timer',duracao:'Duration',definir:'Set',
+      cartaDesafio:'🃏 Challenge card',cartaAtiva:'🃏 Active card',removerCarta:'✕ Remove card',
+      mEquipes:'Active teams',mParticipantes:'Participants',mChaves:'Completed keys',mCodigo:'Access code',
+    },
     login:{
       heroHl:'Your idea', heroJogo:'in PLAY',
       heroTag:'An active methodology that transforms real problems into impactful proposals — investigating, building solutions, forming partnerships and revealing opportunities.',
@@ -2319,6 +2344,14 @@ The authors present opportunity as an umbrella concept encompassing the creation
       codeHint1:'Código proporcionado por el educador', codeHint2:'Pide el código de 6 letras para comenzar',
       equipes:['Equipo 1','Equipo 2','Equipo 3','Equipo 4','Equipo 5'],
       conhecaChaves:'Conoce las claves',
+    },
+    edu:{secSessoes:'Sesiones',secAcoes:'Acciones',secExportar:'Exportar',
+      novaSessao:'＋ Nueva sesión',verificarAlertas:'🔔 Verificar alertas',socializar:'↗ Socializar',
+      relatorio:'📋 Informe de interacción',exportarPropostas:'📄 Exportar propuestas',sair:'← Salir',
+      alertas:'Alertas de mediación',semAlertas:'Sin alertas activas',controles:'Controles de sesión',
+      relogio:'⏱ Reloj de fase',duracao:'Duración',definir:'Definir',
+      cartaDesafio:'🃏 Carta-desafío',cartaAtiva:'🃏 Carta activa',removerCarta:'✕ Quitar carta',
+      mEquipes:'Equipos activos',mParticipantes:'Participantes',mChaves:'Claves completadas',mCodigo:'Código de acceso',
     },
     chaves:{
       problema:{
@@ -2439,6 +2472,58 @@ function setIdioma(lang){
   if(ctrlIniciar){
     const mapaCtrl={aguardando:t.iniciar||'▶',ativa:t.pausar||'⏸',pausada:t.retomar||'↺'};
     ctrlIniciar.textContent=(mapaCtrl[state.sessaoStatus||'aguardando']);
+  }
+  // ── Labels sidebar/painel educador ──
+  if(t.edu){
+    const E=t.edu;
+    const setTxt=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
+    // sidebar seções
+    document.querySelectorAll('.sidebar-sec').forEach((el,i)=>{
+      if(i===0&&E.secSessoes)el.textContent=E.secSessoes;
+      else if(i===1&&E.secAcoes)el.textContent=E.secAcoes;
+      else if(i===2&&E.secExportar)el.textContent=E.secExportar;
+    });
+    // sidebar ações — busca por texto aproximado para não depender de ID
+    document.querySelectorAll('.sidebar-action').forEach(el=>{
+      const txt=el.textContent.trim();
+      if(txt.includes('Nova sess')||txt.includes('New sess')||txt.includes('Nueva ses'))el.textContent=E.novaSessao;
+      else if(txt.includes('Verificar')||txt.includes('Check')||txt.includes('alertas'))el.textContent=E.verificarAlertas;
+      else if(txt.includes('Socializar')||txt.includes('Showcase'))el.textContent=E.socializar;
+      else if(txt.includes('Relat')||txt.includes('report')||txt.includes('Informe'))el.textContent=E.relatorio;
+      else if(txt.includes('Exportar')||txt.includes('Export')||txt.includes('proposta'))el.textContent=E.exportarPropostas;
+      else if(txt.includes('Sair')||txt.includes('Log out')||txt.includes('Salir'))el.textContent=E.sair;
+    });
+    // painel direito
+    document.querySelectorAll('.panel-title').forEach(el=>{
+      const txt=el.textContent.trim();
+      if(txt.includes('Alerta')||txt.includes('alert'))el.textContent=E.alertas;
+      else if(txt.includes('Controle')||txt.includes('Control'))el.textContent=E.controles;
+      else if(txt.includes('Rel')||txt.includes('timer')||txt.includes('fase')||txt.includes('phase'))el.textContent=E.relogio;
+      else if(txt.includes('Carta')||txt.includes('card')||txt.includes('carta'))el.textContent=E.cartaDesafio;
+    });
+    // sem alertas
+    const eduAlertas=document.getElementById('edu-alertas');
+    if(eduAlertas&&eduAlertas.querySelector('div')&&eduAlertas.innerHTML.includes('Nenhum')||eduAlertas&&eduAlertas.innerHTML.includes('No active')||eduAlertas&&eduAlertas.innerHTML.includes('Sin alerta')){
+      eduAlertas.innerHTML=`<div style="font-size:11px;color:var(--t3);">${E.semAlertas}</div>`;
+    }
+    // métricas labels
+    document.querySelectorAll('.m-lbl').forEach(el=>{
+      const txt=el.textContent.trim();
+      if(txt.includes('Equipe')||txt.includes('team')||txt.includes('Equipo'))el.textContent=E.mEquipes;
+      else if(txt.includes('Participante')||txt.includes('Participant'))el.textContent=E.mParticipantes;
+      else if(txt.includes('Chave')||txt.includes('key')||txt.includes('Clave'))el.textContent=E.mChaves;
+      else if(txt.includes('digo')||txt.includes('code')||txt.includes('Access'))el.textContent=E.mCodigo;
+    });
+    // carta ativa
+    const cartaAtivaLbl=document.querySelector('#edu-carta-ativa div:first-child');
+    if(cartaAtivaLbl)cartaAtivaLbl.textContent=E.cartaAtiva;
+    const removerBtn=document.querySelector('#edu-carta-ativa button');
+    if(removerBtn)removerBtn.textContent=E.removerCarta;
+    // timer
+    const durLbl=document.querySelector('.timer-edu-block>div:first-child');
+    if(durLbl)durLbl.textContent=E.duracao;
+    const defBtn=document.querySelector('.timer-custom-row .timer-preset-btn');
+    if(defBtn)defBtn.textContent=E.definir;
   }
   // ── Tabuleiro Jogador ──
   document.querySelectorAll('.jog-btn-sair,[id=jog-btn-sair]').forEach(el=>el&&(el.textContent=t.sair));
@@ -3034,23 +3119,38 @@ async function pollingLudicoJogador(){
   if(state.perfil!=='jogador'||!state.sessaoId) return;
   // timer já tem seu próprio interval acima
   atualizarTimerJogador();
-  // carta via API
+  // carta via API — tenta rota dedicada, cai no GET /sessao como fallback
   try{
-    const d=await api('GET','/sessao/'+state.sessaoId+'/carta');
-    if(d&&d.carta){
-      const c=d.carta;
-      // Só mostra a animação de "nova carta" se ainda não tinha carta ativa
+    let cartaObj=null;
+    try{
+      const d=await api('GET','/sessao/'+state.sessaoId+'/carta');
+      if(d&&d.carta) cartaObj=d.carta;
+      else if(d&&d.carta===null){
+        // carta removida
+        state.cartaDesafioAtiva=null;
+        const ni=document.getElementById('jog-carta-notif-inline');
+        if(ni) ni.classList.add('hidden');
+      }
+    }catch(e2){
+      // fallback: busca dados da sessão que incluem carta_desafio
+      try{
+        const s=await api('GET','/sessao/'+state.sessaoId);
+        if(s&&s.carta_desafio) cartaObj=s.carta_desafio;
+        else if(s&&!s.carta_desafio){
+          state.cartaDesafioAtiva=null;
+          const ni=document.getElementById('jog-carta-notif-inline');
+          if(ni) ni.classList.add('hidden');
+        }
+      }catch(e3){}
+    }
+    if(cartaObj){
+      const c=cartaObj;
       if(!state.cartaDesafioAtiva||state.cartaDesafioAtiva.id!==c.id){
         const corMap={problema:'var(--prob)',solucao:'var(--sol)',parcerias:'var(--parc)',oportunidades:'var(--opor)'};
         const bgMap={problema:'var(--prob-bg)',solucao:'var(--sol-bg)',parcerias:'var(--parc-bg)',oportunidades:'var(--opor-bg)'};
         const bdMap={problema:'var(--prob-bd)',solucao:'var(--sol-bd)',parcerias:'var(--parc-bd)',oportunidades:'var(--opor-bd)'};
         receberCartaDesafio({...c,cor:corMap[c.chave]||'var(--gold)',bg:bgMap[c.chave]||'var(--gold-bg)',bd:bdMap[c.chave]||'var(--gold-bd)'});
       }
-    } else if(d&&!d.carta){
-      // carta foi removida
-      state.cartaDesafioAtiva=null;
-      const ni=document.getElementById('jog-carta-notif-inline');
-      if(ni) ni.classList.add('hidden');
     }
   }catch(e){}
   // pontuação salva
