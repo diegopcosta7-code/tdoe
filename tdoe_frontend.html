@@ -1883,8 +1883,9 @@ function renderChaves(chaves){
     else if(disponivel){badgeTxt=_bdgTrad.disponivel[_lg];badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     else{badgeTxt=_bdgTrad.padrao[_lg];badgeStyle='background:rgba(255,255,255,.05);color:var(--t3);border-color:var(--border)';}
     const _fl=_faseNm[c]||[];
+    const _fasesBase=dados.fases&&dados.fases.length>0?dados.fases:(CHAVES_INFO[c]?.fases||[]).map((fi,i)=>({numero:i+1,nome:fi.nm,status:'bloqueada'}));
     let fasesHtml='';
-    (dados.fases||[]).forEach((f,idx)=>{
+    _fasesBase.forEach((f,idx)=>{
       const fd=f.status==='concluida';
       const fl=f.status==='bloqueada';
       const fa=!fd&&!fl;
