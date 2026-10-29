@@ -1436,16 +1436,12 @@ async function carregarPainelEducador(selecionarId=null){
     if(e.name!=='TypeError' && e.name!=='AbortError') backendOnline=true;
     sessoes=[];
   }
-  // só injeta sessão demo se o backend estiver offline (erro de rede/timeout)
-  if(!backendOnline && !sessoes.length){
-    sessoes=[{id:'demo-1',titulo:'Sessão Demo',
-      contexto:'escolar',codigo_acesso:'DEMO01',status:'ativa',
-      criada_em:new Date().toISOString(),alertas:[],
-      equipes:[
-        {id:'eq1',nome:'Equipe 1',numero:1,chaves_concluidas:1,chaves:{problema:{status:'concluida'},solucao:{status:'ativa'},parcerias:{status:'disponivel'},oportunidades:{status:'disponivel'}}},
-        {id:'eq2',nome:'Equipe 2',numero:2,chaves_concluidas:0,chaves:{problema:{status:'ativa'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
-        {id:'eq3',nome:'Equipe 3',numero:3,chaves_concluidas:0,chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}}},
-      ]}];
+  // se backend offline: mostra aviso e tenta de novo em 15s (sem modo demo)
+  if(!backendOnline){
+    const lista2=document.getElementById('lista-sessoes');
+    if(lista2) lista2.innerHTML='<div class="sidebar-action muted small" style="color:#f0a500;">⏳ Servidor iniciando… aguarde</div>';
+    setTimeout(()=>carregarPainelEducador(selecionarId),15000);
+    return;
   }
   const lista=document.getElementById('lista-sessoes');
   lista.innerHTML='';
