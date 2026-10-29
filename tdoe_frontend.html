@@ -1404,6 +1404,7 @@ function logout(){
     chaves:{},sessaoAtual:null,sussurroDestinatario:null};
   localStorage.removeItem('tdoe_edu_token');
   localStorage.removeItem('tdoe_edu_nome');
+  localStorage.removeItem('tdoe_sessao_id');
   const b=document.getElementById('banner-demo');
   if(b){b.remove();document.body.style.paddingTop='';}
   irPara('login');
@@ -1500,6 +1501,7 @@ async function excluirSessao(id, titulo, btn){
 
 async function selecionarSessao(id){
   state.sessaoId=id;
+  try{localStorage.setItem('tdoe_sessao_id',id);}catch(e){}
   document.querySelectorAll('#lista-sessoes .eq-item').forEach(el=>el.classList.remove('on'));
   const item=document.getElementById('sessao-item-'+id);
   if(item) item.classList.add('on');
@@ -2755,8 +2757,11 @@ function gerarRelatorio(){
     .sum-lbl{font-size:11px;color:#888;margin-top:3px;}
     .chaves-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .footer{margin-top:28px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center;}
-    @media print{body{background:#fff;padding:0;}.page{box-shadow:none;border-radius:0;}}
+    .watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);pointer-events:none;z-index:0;opacity:.04;width:320px;height:320px;border-radius:50%;border:18px solid #1A4E9E;display:flex;align-items:center;justify-content:center;font-size:64px;font-weight:900;color:#1A4E9E;}
+    .page{position:relative;z-index:1;}
+    @media print{body{background:#fff;padding:0;}.page{box-shadow:none;border-radius:0;}.watermark{position:fixed;}}
   </style></head><body>
+  <div class="watermark">TdoE</div>
   <div class="page">
     <h1>📋 Relatório de Interação — TdoE</h1>
     <div class="sub">Sessão: <b>${sessao.titulo}</b> · Código: <b>${sessao.codigo_acesso}</b> · Gerado em: ${dataAtual}</div>
@@ -2776,7 +2781,7 @@ function gerarRelatorio(){
     </table>
     <h2>Síntese por Chave</h2>
     <div class="chaves-grid">${fasesSummary}</div>
-    <div class="footer">TdoE – Tabuleiro do Empreendedor · UFLA · Daniela Meirelles Andrade</div>
+    <div class="footer">TdoE – Tabuleiro do Empreendedor</div>
   </div>
   <scr\x69pt>window.print();<\/scr\x69pt>
   </body></html>`;
@@ -2819,9 +2824,10 @@ async function exportarPropostas(){
       // A API retorna eq.chaves[c].fases = [{numero, nome, status, conteudo}]
       const fasesAPI=eq.chaves?.[c]?.fases||[];
       const fasesText=fasesInfo.map((f,idx)=>{
-        const faseAPI=fasesAPI[idx]||{};
+        const faseAPI=fasesAPI.find(fa=>fa.numero===(idx+1))||fasesAPI[idx]||{};
         const conteudo=faseAPI.conteudo||'';
-        return `<div style="margin-bottom:8px;"><span style="font-size:10px;font-weight:700;color:${cor};">${f.nm}</span><div style="font-size:11px;color:#444;margin-top:3px;line-height:1.5;white-space:pre-wrap;">${conteudo||'(não preenchido)'}</div></div>`;
+        const nmFase=f.nm||f.nome||('Fase '+(idx+1));
+        return `<div style="margin-bottom:8px;"><span style="font-size:10px;font-weight:700;color:${cor};">${nmFase}</span><div style="font-size:11px;color:#444;margin-top:3px;line-height:1.5;white-space:pre-wrap;">${conteudo||'(não preenchido)'}</div></div>`;
       }).join('');
       return `<div style="border:2px solid ${cor}${concluida?'':'44'};border-radius:10px;padding:14px;background:${cor}${concluida?'0D':'05'};">
         <div style="font-weight:800;font-size:13px;color:${cor};margin-bottom:8px;">${icnMap[c]} ${nmMap[c]}</div>
@@ -3000,7 +3006,9 @@ function atualizarDisplayTimer(){
   const jD=document.getElementById('jog-timer-display');
   const jP=document.getElementById('jog-timer-pct');
   const jR=document.getElementById('jog-timer-ring');
-  if(state.timerTotal>0&&jS&&timerEstudanteVisivel()) jS.classList.remove('hidden');
+  const jogador=state.perfil==='jogador';
+  const mostrarJog=state.timerTotal>0&&(!jogador||state.timerMostrarEstudante!==false);
+  if(mostrarJog&&jS) jS.classList.remove('hidden');
   else if(jS) jS.classList.add('hidden');
   if(jD){jD.textContent=fmt(r);jD.classList.toggle('urgent',urg);}
   if(jP) jP.textContent=pct+'%';
@@ -3022,6 +3030,7 @@ function aplicarTimerDaAPI(t){
   state.timerTotal=t.total;
   state.timerRestante=restante;
   state.timerRodando=t.rodando||false;
+  if(typeof t.mostrar_estudante!=='undefined') state.timerMostrarEstudante=t.mostrar_estudante;
   if(jaRodava&&!t.rodando&&restante===0) toast('⏱ Tempo esgotado!','info');
   atualizarDisplayTimer();
 }
@@ -3261,6 +3270,7 @@ async function pollingLudicoJogador(){
             try{
               await carregarPainelEducador();
               irPara('educador');
+              try{const sid=localStorage.getItem('tdoe_sessao_id');if(sid){const item=document.getElementById('sessao-item-'+sid);if(item) item.click();}}catch(e2){}
             }catch(e){
               irPara('login');
             }finally{
