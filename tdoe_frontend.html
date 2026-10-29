@@ -2038,14 +2038,13 @@ function abrirFase(chave,numero,nome){
   if(ta){
     ta.value=conteudoSalvo;
     ta.placeholder=faseInfo?'Responda: '+faseInfo.desc:'Descreva o que a equipe descobriu…';
-    ta.readOnly=!!conteudoSalvo; // somente leitura se já preenchida
-    ta.style.opacity=conteudoSalvo?'0.8':'1';
+    ta.readOnly=false;
+    ta.style.opacity='1';
   }
-  // botões: concluir oculto se já preenchida; editar visível se já preenchida
   const btnConcluir=document.getElementById('btn-concluir-fase');
   const btnEditar=document.getElementById('btn-editar-fase');
-  if(btnConcluir) btnConcluir.style.display=conteudoSalvo?'none':'';
-  if(btnEditar) btnEditar.style.display=conteudoSalvo?'':'none';
+  if(btnConcluir){btnConcluir.style.display='';btnConcluir.textContent=conteudoSalvo?'✓ Salvar edição':'✓ Concluir fase';}
+  if(btnEditar) btnEditar.style.display='none';
   abrirModal('modal-fase');
 }
 
