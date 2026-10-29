@@ -1326,12 +1326,12 @@ async function fazerLogin(){
     await carregarPainelEducador();
     irPara('educador');
   }catch(e){
-    state.perfil='educador';
-    state.usuario={nome:email.split('@')[0]||'Educador',email};
-    mostrarBannerDemo();
-    toast('⚡ Modo demo — back-end offline','info');
-    await carregarPainelEducador();
-    irPara('educador');
+    // erro de rede/timeout = backend dormindo; erro HTTP = credencial errada
+    if(e.name==='TypeError'||e.name==='AbortError'){
+      toast('⏳ Servidor iniciando… aguarde e tente novamente em 30s','info');
+    } else {
+      toast(e.message||'E-mail ou senha inválidos','err');
+    }
   }
 }
 
@@ -1358,12 +1358,11 @@ async function fazerCadastro(){
     await carregarPainelEducador();
     irPara('educador');
   }catch(e){
-    state.perfil='educador';
-    state.usuario={nome,email:document.getElementById('cad-email').value};
-    mostrarBannerDemo();
-    toast('⚡ Modo demo — conta criada localmente','info');
-    await carregarPainelEducador();
-    irPara('educador');
+    if(e.name==='TypeError'||e.name==='AbortError'){
+      toast('⏳ Servidor iniciando… aguarde e tente novamente em 30s','info');
+    } else {
+      toast(e.message||'Erro ao criar conta','err');
+    }
   }
 }
 
@@ -1388,13 +1387,11 @@ async function entrarComCodigo(){
     irPara('jogadores');
     setTimeout(pollingLudicoJogador,2000); // verifica carta logo ao entrar
   }catch(e){
-    state.perfil='jogador';
-    state.participanteNome=nome;
-    state.equipeNome='Equipe '+equipe;
-    mostrarBannerDemo();
-    toast('⚡ Modo demo — entrando como jogador','info');
-    await carregarPainelJogadores();
-    irPara('jogadores');
+    if(e.name==='TypeError'||e.name==='AbortError'){
+      toast('⏳ Servidor iniciando… aguarde e tente novamente em 30s','info');
+    } else {
+      toast(e.message||'Código inválido ou sessão não encontrada','err');
+    }
   }
 }
 
@@ -1696,25 +1693,11 @@ async function criarSessao(){
   }catch(e){
     if(btnCriar){btnCriar.disabled=false;btnCriar.textContent='Criar sessão →';}
     fecharModal('modal-sessao');
-    const codigo=Math.random().toString(36).substring(2,8).toUpperCase();
-    const integrantes=parseInt(document.getElementById('s-integrantes').value)||4;
-    const nEq=parseInt(document.getElementById('s-equipes').value)||3;
-    const equipes=Array.from({length:nEq},(_,i)=>({
-      id:'eq'+(i+1),nome:'Equipe '+(i+1),numero:i+1,
-      integrantes,chaves_concluidas:0,
-      chaves:{problema:{status:'disponivel'},solucao:{status:'nao_iniciada'},
-              parcerias:{status:'nao_iniciada'},oportunidades:{status:'disponivel'}},
-    }));
-    const sessaoDemo={id:'demo-'+Date.now(),titulo,contexto,cenario,
-      codigo_acesso:codigo,status:'aguardando',
-      criada_em:new Date().toISOString(),alertas:[],equipes};
-    state.sessaoAtual=sessaoDemo; state.sessaoId=sessaoDemo.id; state.sessaoStatus='aguardando';
-    mostrarBannerDemo();
-    toast('⚡ Sessão demo criada — código: '+codigo,'gold');
-    document.getElementById('tb-sessao-titulo').textContent=titulo+' · '+codigo;
-    document.getElementById('m-codigo').textContent=codigo;
-    atualizarStatusBadge('aguardando');
-    renderEquipasGrid(equipes); atualizarMetricas(equipes); atualizarBarrasChaves(equipes);
+    if(e.name==='TypeError'||e.name==='AbortError'){
+      toast('⏳ Servidor iniciando… aguarde e tente criar a sessão novamente','info');
+    } else {
+      toast(e.message||'Erro ao criar sessão','err');
+    }
   }
 }
 
