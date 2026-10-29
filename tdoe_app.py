@@ -265,8 +265,8 @@ class PapelRPGEntrada(BaseModel):
 # ─────────────────────────────────────────────────────────
 app = FastAPI(
     title="TdoE — Tabuleiro do Empreendedor",
-    description="API pedagógica · UFLA · v1.3.0",
-    version="1.3.0",
+    description="API pedagógica · UFLA · v1.4.0",
+    version="1.4.0",
 )
 app.add_middleware(
     CORSMiddleware,
@@ -274,6 +274,84 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ─────────────────────────────────────────────────────────
+# ESTADO EM MEMÓRIA (timer + carta-desafio por sessão)
+# ─────────────────────────────────────────────────────────
+# Estrutura: _timer_estado[sessao_id] = {total, restante, rodando, iniciado_em, mostrar_estudante}
+# Estrutura: _carta_estado[sessao_id] = {chave, icone, titulo, corpo} | None
+from datetime import timezone
+import time as _time
+
+_timer_estado: dict = {}
+_carta_estado: dict = {}
+
+
+def _timer_get(sessao_id: str) -> dict:
+    t = _timer_estado.get(sessao_id, {})
+    if not t:
+        return {"total": 0, "restante": 0, "rodando": False, "mostrar_estudante": True}
+    restante = t.get("restante", 0)
+    if t.get("rodando") and t.get("iniciado_em"):
+        elapsed = _time.time() - t["iniciado_em"]
+        restante = max(0, t.get("restante_ao_iniciar", t["total"]) - elapsed)
+        if restante == 0:
+            t["rodando"] = False
+            t["restante"] = 0
+        else:
+            t["restante_calculado"] = restante
+    return {
+        "total": t.get("total", 0),
+        "restante": int(restante),
+        "rodando": t.get("rodando", False),
+        "mostrar_estudante": t.get("mostrar_estudante", True),
+    }
+
+
+def _timer_set(sessao_id: str, update: dict):
+    t = _timer_estado.setdefault(sessao_id, {
+        "total": 0, "restante": 0, "rodando": False,
+        "mostrar_estudante": True, "iniciado_em": None,
+    })
+    if "total" in update:
+        t["total"] = update["total"]
+        t["restante"] = update["total"]
+        t["rodando"] = False
+        t["iniciado_em"] = None
+    if "mostrar_estudante" in update:
+        t["mostrar_estudante"] = update["mostrar_estudante"]
+    acao = update.get("acao")
+    if acao == "definir" and "total_seg" in update:
+        t["total"] = update["total_seg"]
+        t["restante"] = update["total_seg"]
+        t["rodando"] = False
+        t["iniciado_em"] = None
+    elif acao == "iniciar":
+        if not t.get("rodando") and t.get("total", 0) > 0:
+            restante_atual = t.get("restante", t["total"])
+            t["restante_ao_iniciar"] = restante_atual
+            t["iniciado_em"] = _time.time()
+            t["rodando"] = True
+    elif acao == "parar":
+        if t.get("rodando"):
+            elapsed = _time.time() - (t.get("iniciado_em") or _time.time())
+            t["restante"] = max(0, t.get("restante_ao_iniciar", t["total"]) - elapsed)
+            t["rodando"] = False
+            t["iniciado_em"] = None
+
+
+class TimerAcao(BaseModel):
+    acao: Optional[str] = None
+    total: Optional[int] = None
+    mostrar_estudante: Optional[bool] = None
+
+
+class CartaDesafio(BaseModel):
+    chave: str
+    icone: str
+    titulo: str
+    corpo: str
+
 
 
 # ─────────────────────────────────────────────────────────
@@ -352,10 +430,24 @@ def listar_sessoes(edu=Depends(get_educador)):
 
 
 @app.get("/sessao/{sessao_id}", tags=["Sessão"])
-def detalhar_sessao(sessao_id: str, edu=Depends(get_educador)):
+def detalhar_sessao(sessao_id: str, payload=Depends(get_usuario_atual)):
     sessao = db_get("sessoes", sessao_id)
     if not sessao:
         raise HTTPException(404, "Sessão não encontrada.")
+    perfil = payload.get("perfil")
+    # Jogadores só vêem dados básicos da sua própria sessão
+    if perfil not in ("educador", "instituicao"):
+        tok_sessao = payload.get("sessao_id")
+        if tok_sessao != sessao_id:
+            raise HTTPException(403, "Acesso não autorizado para esta sessão.")
+        return {
+            "id": sessao["id"],
+            "titulo": sessao["titulo"],
+            "status": sessao["status"],
+            "contexto": sessao["contexto"],
+            "codigo_acesso": sessao["codigo_acesso"],
+        }
+    # Educadores vêem tudo
     equipes = sorted(
         db_list("equipes", {"sessao_id": sessao_id}),
         key=lambda e: e["numero"],
@@ -368,6 +460,62 @@ def detalhar_sessao(sessao_id: str, edu=Depends(get_educador)):
     alertas_res = supabase.table("alertas").select("*").eq("sessao_id", sessao_id).eq("resolvido", False).execute()
     alertas = alertas_res.data or []
     return {**sessao, "equipes": resultado, "alertas": alertas}
+
+
+
+# ─────────────────────────────────────────────────────────
+# ROTAS — TIMER
+# ─────────────────────────────────────────────────────────
+@app.get("/sessao/{sessao_id}/timer", tags=["Timer"])
+def ver_timer(sessao_id: str, payload=Depends(get_usuario_atual)):
+    if not db_get("sessoes", sessao_id):
+        raise HTTPException(404, "Sessão não encontrada.")
+    return {"timer": _timer_get(sessao_id)}
+
+
+@app.patch("/sessao/{sessao_id}/timer", tags=["Timer"])
+def atualizar_timer(sessao_id: str, dados: TimerAcao, payload=Depends(get_usuario_atual)):
+    if not db_get("sessoes", sessao_id):
+        raise HTTPException(404, "Sessão não encontrada.")
+    update: dict = {}
+    if dados.acao:
+        update["acao"] = dados.acao
+    if dados.total is not None:
+        update["total"] = dados.total
+    if dados.mostrar_estudante is not None:
+        update["mostrar_estudante"] = dados.mostrar_estudante
+    _timer_set(sessao_id, update)
+    return {"timer": _timer_get(sessao_id)}
+
+
+# ─────────────────────────────────────────────────────────
+# ROTAS — CARTA-DESAFIO
+# ─────────────────────────────────────────────────────────
+@app.get("/sessao/{sessao_id}/carta", tags=["Carta"])
+def ver_carta(sessao_id: str, payload=Depends(get_usuario_atual)):
+    if not db_get("sessoes", sessao_id):
+        raise HTTPException(404, "Sessão não encontrada.")
+    carta = _carta_estado.get(sessao_id)
+    return {"carta": carta}
+
+
+@app.post("/sessao/{sessao_id}/carta", tags=["Carta"])
+def lancar_carta(sessao_id: str, dados: CartaDesafio, payload=Depends(get_usuario_atual)):
+    if not db_get("sessoes", sessao_id):
+        raise HTTPException(404, "Sessão não encontrada.")
+    _carta_estado[sessao_id] = {
+        "chave": dados.chave,
+        "icone": dados.icone,
+        "titulo": dados.titulo,
+        "corpo": dados.corpo,
+    }
+    return {"ok": True, "carta": _carta_estado[sessao_id]}
+
+
+@app.delete("/sessao/{sessao_id}/carta", tags=["Carta"])
+def remover_carta(sessao_id: str, payload=Depends(get_usuario_atual)):
+    _carta_estado.pop(sessao_id, None)
+    return {"ok": True}
 
 
 @app.delete("/sessao/{sessao_id}", tags=["Sessão"])
