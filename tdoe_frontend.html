@@ -2076,24 +2076,58 @@ async function concluirFaseConfirmar(){
   }
 }
 
-/* ── MEMBROS SIMULADOS (visual) ── */
+/* ── MEMBROS DA EQUIPE (reais via API) ── */
+async function carregarMembrosReais(){
+  const grid=document.getElementById('jog-membros-grid');
+  if(!grid) return;
+  if(!state.equipeId){ renderMembrosSimulados(); return; }
+  try{
+    const data=await api('GET','/rpg/equipe/'+state.equipeId);
+    const membros=data.membros||[];
+    if(!membros.length){ renderMembrosSimulados(); return; }
+    grid.innerHTML='';
+    membros.forEach((m,i)=>{
+      const eu=m.participante_id===state.participanteId;
+      const d=document.createElement('div');
+      d.className='membro-card ativo';
+      d.innerHTML=`
+        <div class="membro-av" style="background:${avatarCor(i)};">${(m.nome||'?').substring(0,2).toUpperCase()}</div>
+        <div class="membro-nm">${m.nome||'Membro '+(i+1)}</div>
+        <div class="membro-st" style="${eu?'color:var(--parc)':''}">● ativo</div>
+        ${eu?'<div style="font-size:8px;color:var(--parc);margin-top:3px;font-weight:600;">você</div>':'<div class="cutucar-btn" title="Cutucar" onclick="enviarCutucarReal(''+m.participante_id+'',''+m.nome+'')">👆</div>'}`;
+      grid.appendChild(d);
+    });
+  }catch(e){
+    renderMembrosSimulados();
+  }
+}
+
 function renderMembrosSimulados(){
   const grid=document.getElementById('jog-membros-grid');
-  const membros=[
-    {nome:state.participanteNome||'Você',eu:true},
-    {nome:'Membro 2',eu:false},{nome:'Membro 3',eu:false},{nome:'Membro 4',eu:false}
-  ];
+  if(!grid) return;
+  const d=document.createElement('div');
+  d.className='membro-card ativo';
+  const nm=state.participanteNome||'Você';
+  d.innerHTML=`
+    <div class="membro-av" style="background:${avatarCor(0)};">${nm.substring(0,2).toUpperCase()}</div>
+    <div class="membro-nm">${nm}</div>
+    <div class="membro-st" style="color:var(--parc)">● ativo</div>
+    <div style="font-size:8px;color:var(--parc);margin-top:3px;font-weight:600;">você</div>`;
   grid.innerHTML='';
-  membros.forEach((m,i)=>{
-    const d=document.createElement('div');
-    d.className='membro-card ativo';
-    d.innerHTML=`
-      <div class="membro-av" style="background:${avatarCor(i)};">${m.nome.substring(0,2).toUpperCase()}</div>
-      <div class="membro-nm">${m.nome}</div>
-      <div class="membro-st" style="${m.eu?'color:var(--parc)':''}">● ativo</div>
-      ${m.eu?'<div style="font-size:8px;color:var(--parc);margin-top:3px;font-weight:600;">você</div>':'<div class="cutucar-btn" title="Cutucar" onclick="enviarCutucar(\''+m.nome+'\')">👆</div>'}`;
-    grid.appendChild(d);
-  });
+  grid.appendChild(d);
+}
+
+async function enviarCutucarReal(paraId, paraNome){
+  if(!state.participanteId||!state.equipeId){ toast('👆 Você cutucou '+paraNome,'info'); return; }
+  try{
+    await api('POST','/comunicacao/cutucar',{
+      equipe_id:state.equipeId,
+      de_participante_id:state.participanteId,
+      para_participante_id:paraId,
+    });
+    toast('👆 Você cutucou '+paraNome,'gold');
+    adicionarEventoRegistro('cutucar','Você','Você cutucou '+paraNome);
+  }catch(e){ toast('Erro ao cutucar','err'); }
 }
 
 function enviarCutucar(nome){
