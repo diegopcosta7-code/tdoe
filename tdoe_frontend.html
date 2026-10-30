@@ -2700,7 +2700,7 @@ function renderConceitos(){
 }
 
 /* ── RELATÓRIO DE INTERAÇÃO ── */
-function gerarRelatorio(){
+async function gerarRelatorio(){
   const sessao=state.sessaoAtual;
   if(!sessao){toast('Nenhuma sessão selecionada','err');return;}
   const equipes=sessao.equipes||[];
@@ -2711,6 +2711,33 @@ function gerarRelatorio(){
   const corMap={problema:'#22C97A',solucao:'#0FD4B0',parcerias:'#2E80F0',oportunidades:'#A040E0'};
   const nmMap={problema:'Problema',solucao:'Solução',parcerias:'Parcerias',oportunidades:'Oportunidades'};
   const icnMap={problema:'🔍',solucao:'✓',parcerias:'🤝',oportunidades:'💡'};
+
+  // Busca membros reais de cada equipe
+  const membrosMap={};
+  await Promise.all(equipes.map(async eq=>{
+    try{
+      const d=await api('GET','/rpg/equipe/'+eq.id);
+      membrosMap[eq.id]=d.membros||[];
+    }catch(e){ membrosMap[eq.id]=[]; }
+  }));
+
+  // Total de participantes reais
+  const totalPart=Object.values(membrosMap).reduce((a,m)=>a+m.length,0);
+
+  // Tabela de logins por equipe
+  const loginsRows=equipes.map((eq,i)=>{
+    const membros=membrosMap[eq.id]||[];
+    if(!membros.length) return `<tr><td colspan="4" style="padding:10px 12px;color:#aaa;font-style:italic;">Nenhum participante registrado</td></tr>`;
+    return membros.map((m,j)=>{
+      const dt=m.entrou_em?new Date(m.entrou_em).toLocaleString('pt-BR'):'—';
+      return `<tr>
+        <td style="padding:8px 12px;font-weight:600;">${j===0?eq.nome||'Equipe '+(i+1):''}</td>
+        <td style="padding:8px 12px;">${m.nome||'—'}</td>
+        <td style="padding:8px 12px;font-size:11px;color:#555;">${dt}</td>
+        <td style="padding:8px 12px;font-size:11px;color:#666;">${m.papel?.nome_rpg||'—'}</td>
+      </tr>`;
+    }).join('');
+  }).join('');
 
   const equipesRows=equipes.map((eq,i)=>{
     const chavesConcluidas=chaves.filter(c=>eq.chaves?.[c]?.status==='concluida');
@@ -2780,7 +2807,7 @@ function gerarRelatorio(){
     <div class="sub">Sessão: <b>${sessao.titulo}</b> · Código: <b>${sessao.codigo_acesso}</b> · Gerado em: ${dataAtual}</div>
     <div class="summary-grid">
       <div class="sum-card"><div class="sum-val" style="color:#22C97A;">${equipes.length}</div><div class="sum-lbl">Equipes</div></div>
-      <div class="sum-card"><div class="sum-val" style="color:#2E80F0;">${equipes.reduce((a,e)=>a+(e.membros?.length||0),0)||equipes.length*4}</div><div class="sum-lbl">Participantes (est.)</div></div>
+      <div class="sum-card"><div class="sum-val" style="color:#2E80F0;">${totalPart||equipes.length*4}</div><div class="sum-lbl">Participantes</div></div>
       <div class="sum-card"><div class="sum-val" style="color:#0FD4B0;">${totalChaves}</div><div class="sum-lbl">Chaves concluídas</div></div>
       <div class="sum-card"><div class="sum-val" style="color:#A040E0;">${maxChave.nm}</div><div class="sum-lbl">Equipe mais avançada</div></div>
     </div>
@@ -2794,6 +2821,13 @@ function gerarRelatorio(){
     </table>
     <h2>Síntese por Chave</h2>
     <div class="chaves-grid">${fasesSummary}</div>
+    <h2>Participantes por Equipe (Logins)</h2>
+    <table>
+      <thead><tr>
+        <th>Equipe</th><th>Participante</th><th>Entrou em</th><th>Papel RPG</th>
+      </tr></thead>
+      <tbody>${loginsRows}</tbody>
+    </table>
     <div class="footer">TdoE – Tabuleiro do Empreendedor</div>
   </div>
   <scr\x69pt>window.print();<\/scr\x69pt>

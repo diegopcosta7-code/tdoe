@@ -580,6 +580,10 @@ def entrar_com_codigo(dados: EntrarComCodigo):
     equipe = res2.data[0] if res2.data else None
     if not equipe:
         raise HTTPException(404, f"Equipe {dados.numero_equipe} não encontrada.")
+    # Verifica limite de participantes por equipe
+    ja_na_equipe = db_list("participantes", {"equipe_id": equipe["id"]})
+    if len(ja_na_equipe) >= 6:
+        raise HTTPException(400, f"A equipe {dados.numero_equipe} já está cheia (máx. 6 participantes). Escolha outra equipe.")
     pid = uid()
     db_insert("participantes", {
         "id": pid, "equipe_id": equipe["id"],
@@ -1025,7 +1029,9 @@ def papeis_da_equipe(equipe_id: str, payload=Depends(get_usuario_atual)):
         res = supabase.table("papeis_rpg").select("*").eq("participante_id", part["id"]).execute()
         papel = res.data[0] if res.data else None
         resultado.append({"participante_id": part["id"],
-                          "nome": part["nome"], "papel": papel})
+                          "nome": part["nome"],
+                          "entrou_em": part.get("entrou_em"),
+                          "papel": papel})
     return {"equipe_id": equipe_id, "membros": resultado}
 
 
