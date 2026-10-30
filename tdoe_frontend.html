@@ -2094,7 +2094,7 @@ async function carregarMembrosReais(){
         <div class="membro-av" style="background:${avatarCor(i)};">${(m.nome||'?').substring(0,2).toUpperCase()}</div>
         <div class="membro-nm">${m.nome||'Membro '+(i+1)}</div>
         <div class="membro-st" style="${eu?'color:var(--parc)':''}">● ativo</div>
-        ${eu?'<div style="font-size:8px;color:var(--parc);margin-top:3px;font-weight:600;">você</div>':'<div class="cutucar-btn" title="Cutucar" onclick="enviarCutucarReal(''+m.participante_id+'',''+m.nome+'')">👆</div>'}`;
+        ${eu?'<div style="font-size:8px;color:var(--parc);margin-top:3px;font-weight:600;">você</div>':`<div class="cutucar-btn" title="Cutucar" onclick="enviarCutucarReal('${m.participante_id}','${(m.nome||'').replace(/'/g,'')}')">👆</div>`}`;
       grid.appendChild(d);
     });
   }catch(e){
