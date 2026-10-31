@@ -2187,28 +2187,56 @@ async function enviarBalao(){
   }catch(e){toast(e.message,'err');}
 }
 
-function carregarSussurroChips(){
+async function carregarSussurroChips(){
   const chips=document.getElementById('sussurro-chips');
   if(!chips) return;
   chips.innerHTML='';
-  // membros simulados exceto o próprio
-  const membros=[{id:'m2',nome:'Membro 2',i:1},{id:'m3',nome:'Membro 3',i:2},{id:'m4',nome:'Membro 4',i:3}];
-  membros.forEach(m=>{
+  // Busca membros reais da equipe
+  let membros=[];
+  if(state.equipeId){
+    try{
+      const d=await api('GET','/rpg/equipe/'+state.equipeId);
+      membros=(d.membros||[]).filter(m=>m.participante_id!==state.participanteId);
+    }catch(e){}
+  }
+  if(!membros.length){
+    chips.innerHTML='<div style="font-size:11px;color:var(--t3);padding:4px 0;">Nenhum membro na equipe ainda</div>';
+    return;
+  }
+  membros.forEach((m,i)=>{
     const div=document.createElement('div');
-    div.className='mchip'+(state.sussurroDestinatario===m.id?' sel':'');
-    div.innerHTML=`<div class="mchip-av" style="background:${avatarCor(m.i)};">${m.nome.substring(0,2)}</div>${m.nome}`;
-    div.onclick=()=>{state.sussurroDestinatario=m.id; carregarSussurroChips();};
+    div.className='mchip'+(state.sussurroDestinatario===m.participante_id?' sel':'');
+    div.innerHTML=`<div class="mchip-av" style="background:${avatarCor(i+1)};">${(m.nome||'?').substring(0,2).toUpperCase()}</div>${m.nome||'Membro'}`;
+    div.onclick=()=>{
+      state.sussurroDestinatario=m.participante_id;
+      state.sussurroDestinatarioNome=m.nome;
+      carregarSussurroChips();
+    };
     chips.appendChild(div);
   });
 }
 
 async function enviarSussurro(){
-  const txt=document.getElementById('sussurro-txt').value.trim();
-  if(!txt){toast('Escreva a mensagem','err');return;}
+  const msg=document.getElementById('sussurro-txt').value.trim();
+  if(!msg){toast('Escreva a mensagem','err');return;}
   if(!state.sussurroDestinatario){toast('Selecione o destinatário','err');return;}
-  toast('💬 Sussurro enviado com sucesso','ok');
-  document.getElementById('sussurro-txt').value='';
-  adicionarEventoRegistro('sussurro','Você','Você → '+state.sussurroDestinatario+' (sussurro)');
+  if(!state.participanteId||!state.equipeId){
+    toast('💬 Sussurro enviado (demo)','ok');
+    adicionarEventoRegistro('sussurro','Você','Você → '+(state.sussurroDestinatarioNome||'membro')+' (sussurro)');
+    document.getElementById('sussurro-txt').value='';
+    return;
+  }
+  try{
+    await api('POST','/comunicacao/sussurro',{
+      equipe_id: state.equipeId,
+      de_participante_id: state.participanteId,
+      para_participante_id: state.sussurroDestinatario,
+      mensagem: msg,
+    });
+    toast('💬 Sussurro enviado!','ok');
+    document.getElementById('sussurro-txt').value='';
+    adicionarEventoRegistro('sussurro','Você','Você → '+(state.sussurroDestinatarioNome||'membro')+': '+msg.substring(0,30)+(msg.length>30?'…':''));
+  }catch(e){toast('Erro ao enviar sussurro: '+e.message,'err');}
 }
 
 function carregarRegistro(){
